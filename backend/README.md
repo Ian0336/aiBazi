@@ -5,7 +5,7 @@
 ## ✨ 功能特色
 
 - 🧮 **精確八字計算**：基於傳統干支曆法的準確計算
-- 🤖 **AI 智能分析**：整合 OpenAI GPT-4 進行深度命理解讀
+- 🤖 **AI 智能分析**：整合 Google Gemini API 進行深度命理解讀
 - 🚀 **高性能 API**：使用 Gin 框架構建的 RESTful API
 - 🔒 **安全可靠**：完整的輸入驗證和錯誤處理
 - 🌐 **跨域支持**：配置完善的 CORS 策略
@@ -33,7 +33,7 @@ bazi-backend/
 ### 前置需求
 
 - Go 1.21 或更高版本
-- OpenAI API Key（可選，用於 AI 分析功能）
+- Google Gemini API Key（可選，用於 AI 分析功能）
 
 ### 安裝步驟
 
@@ -51,10 +51,15 @@ bazi-backend/
 3. **配置環境變數**
    ```bash
    cp env.example .env
-   # 編輯 .env 文件，添加您的 OpenAI API Key
+   # 編輯 .env 文件，添加您的 Google Gemini API Key
    ```
 
-4. **運行服務**
+4. **獲取 Google Gemini API Key**
+   - 訪問 [Google AI Studio](https://makersuite.google.com/app/apikey)
+   - 創建新的 API Key
+   - 將 API Key 添加到環境變量中
+
+5. **運行服務**
    ```bash
    go run cmd/server/main.go
    ```
@@ -129,8 +134,23 @@ Content-Type: application/json
 |--------|------|--------|------|
 | `PORT` | 服務端口 | `8000` | ❌ |
 | `GIN_MODE` | Gin 運行模式 | `debug` | ❌ |
-| `OPENAI_API_KEY` | OpenAI API 密鑰 | - | ⚠️ 分析功能需要 |
+| `GEMINI_API_KEY` | Google Gemini API 密鑰 | - | ⚠️ 分析功能需要 |
+| `GEMINI_MODEL` | 使用的 Gemini 模型 | `gemini-1.5-flash` | ❌ |
 | `ALLOWED_ORIGINS` | 允許的跨域來源 | `http://localhost:3000` | ❌ |
+
+### 📋 Gemini 模型選擇
+
+- **`gemini-1.5-flash`** (預設): 經濟型，更高的免費配額，適合大多數用例
+- **`gemini-1.5-pro`**: 旗艦型，更強的分析能力，但配額較低
+
+### ⚡ 配額處理機制
+
+系統內建智能配額處理：
+
+1. **自動重試**: 遇到配額限制時自動重試 (指數退避)
+2. **模型降級**: 預設使用經濟型 `gemini-1.5-flash` 模型
+3. **優雅降級**: API 配額用盡時自動切換到模擬分析
+4. **錯誤提示**: 清楚的錯誤訊息和解決建議
 
 ## 🧮 八字計算原理
 
@@ -143,7 +163,7 @@ Content-Type: application/json
 
 ## 🤖 AI 分析功能
 
-AI 分析模組使用 OpenAI GPT-4 提供：
+AI 分析模組使用 Google Gemini API 提供：
 
 - 五行分析
 - 格局判斷  
@@ -155,7 +175,7 @@ AI 分析模組使用 OpenAI GPT-4 提供：
 
 ### 開發模式
 
-如果未設置 OpenAI API Key，系統將使用模擬數據進行演示。
+如果未設置 Google Gemini API Key，系統將使用模擬數據進行演示。
 
 ## 🔒 安全特性
 
@@ -203,7 +223,7 @@ curl -X POST http://localhost:8000/api/analyze \
 ## 🙏 致謝
 
 - 感謝傳統中國命理學的智慧傳承
-- 感謝 OpenAI 提供的強大 AI 技術
+- 感謝 Google 提供的強大 AI 技術
 - 感謝 Go 社區的優秀開源框架
 
 ## 📞 聯絡方式

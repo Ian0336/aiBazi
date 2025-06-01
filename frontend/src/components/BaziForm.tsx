@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { BaziInput, BaziChart } from '@/types/bazi';
 
 interface BaziFormProps {
-  onCalculate: (chart: BaziChart) => void;
+  onCalculate: (chart: BaziChart, input: BaziInput) => void;
   isLoading?: boolean;
 }
 
@@ -134,10 +134,11 @@ const BaziForm: React.FC<BaziFormProps> = ({ onCalculate, isLoading = false }) =
         },
         body: JSON.stringify(input),
       });
-
       if (response.ok) {
-        const chart: BaziChart = await response.json();
-        onCalculate(chart);
+        const chart = await response.json();
+        const baziData = JSON.parse(chart);
+        console.log("baziData", baziData);
+        onCalculate(baziData, input);
       } else {
         console.error('Failed to calculate Bazi');
       }

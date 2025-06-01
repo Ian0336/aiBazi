@@ -36,7 +36,7 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased font-inter">
-        {children}
+          {children}
       </body>
     </html>
   );

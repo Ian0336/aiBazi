@@ -5,11 +5,23 @@ export interface BaziInput {
   hour: number;
 }
 
+export interface BaziPillar {
+  cang_gan: string;
+  gan: string;
+  gan_wuxing: string;
+  ganzhi: string;
+  shi_shen: string;
+  zhi: string;
+  zhi_wuxing: string;
+}
+
 export interface BaziChart {
-  year_ganzhi: string;
-  month_ganzhi: string;
-  day_ganzhi: string;
-  hour_ganzhi: string;
+  year_pillar: BaziPillar;
+  month_pillar: BaziPillar;
+  day_pillar: BaziPillar;
+  hour_pillar: BaziPillar;
+  dayun: string;
+  lunar_date: string;
 }
 
 export interface AnalysisResponse {

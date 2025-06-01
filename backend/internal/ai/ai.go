@@ -5,67 +5,136 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
-	"github.com/sashabaranov/go-openai"
+	"google.golang.org/genai"
 )
 
 // Analyzer handles AI-powered bazi analysis
 type Analyzer struct {
-	client *openai.Client
+	client     *genai.Client
+	model      string
+	maxRetries int
 }
 
 // NewAnalyzer creates a new AI analyzer instance
 func NewAnalyzer() *Analyzer {
-	apiKey := os.Getenv("OPENAI_API_KEY")
+	apiKey := os.Getenv("GEMINI_API_KEY")
 	if apiKey == "" {
 		// For development/testing, return a mock analyzer
 		return &Analyzer{client: nil}
 	}
 
-	client := openai.NewClient(apiKey)
-	return &Analyzer{client: client}
+	// Get model configuration from environment
+	model := os.Getenv("GEMINI_MODEL")
+	if model == "" {
+		model = "gemini-1.5-flash" // Default to more economical model
+	}
+
+	ctx := context.Background()
+	client, err := genai.NewClient(ctx, &genai.ClientConfig{
+		APIKey:  apiKey,
+		Backend: genai.BackendGeminiAPI,
+	})
+	if err != nil {
+		// If client creation fails, return mock analyzer
+		return &Analyzer{client: nil}
+	}
+
+	return &Analyzer{
+		client:     client,
+		model:      model,
+		maxRetries: 2,
+	}
+}
+
+// isQuotaExceeded checks if the error is due to quota/rate limit exceeded
+func (a *Analyzer) isQuotaExceeded(err error) bool {
+	if err == nil {
+		return false
+	}
+	errStr := strings.ToLower(err.Error())
+	return strings.Contains(errStr, "quota") ||
+		strings.Contains(errStr, "rate limit") ||
+		strings.Contains(errStr, "resource_exhausted") ||
+		strings.Contains(errStr, "error 429")
+}
+
+// callWithRetry calls the Gemini API with retry logic for quota errors
+func (a *Analyzer) callWithRetry(ctx context.Context, model string, contents []*genai.Content, config *genai.GenerateContentConfig, maxRetries int) (string, error) {
+	var lastErr error
+
+	for attempt := 0; attempt <= maxRetries; attempt++ {
+		if attempt > 0 {
+			// Wait before retry (exponential backoff)
+			waitTime := time.Duration(attempt*attempt) * time.Second
+			fmt.Printf("API quota exceeded, retrying in %v... (attempt %d/%d)\n", waitTime, attempt, maxRetries)
+			time.Sleep(waitTime)
+		}
+
+		resp, err := a.client.Models.GenerateContent(ctx, model, contents, config)
+		if err != nil {
+			lastErr = err
+			if a.isQuotaExceeded(err) && attempt < maxRetries {
+				continue // Retry for quota errors
+			}
+			return "", fmt.Errorf("Gemini API error: %w", err)
+		}
+
+		// Success
+		analysis := resp.Text()
+		return a.formatAnalysis(analysis), nil
+	}
+
+	// If we get here, all retries failed
+	return "", fmt.Errorf("Gemini API error after %d retries: %w", maxRetries, lastErr)
 }
 
 // AnalyzeBazi performs AI analysis of a bazi chart
 func (a *Analyzer) AnalyzeBazi(yearGanzhi, monthGanzhi, dayGanzhi, hourGanzhi string) (string, error) {
-	// If no OpenAI client (development mode), return mock analysis
+	// If no Gemini client (development mode), return mock analysis
 	if a.client == nil {
 		return a.generateMockAnalysis(yearGanzhi, monthGanzhi, dayGanzhi, hourGanzhi), nil
 	}
 
-	// Create the prompt for OpenAI
-	prompt := a.createBaziPrompt(yearGanzhi, monthGanzhi, dayGanzhi, hourGanzhi)
+	// Create the system instruction and user prompt
+	systemInstruction := a.getSystemPrompt()
+	userPrompt := a.createBaziPrompt(yearGanzhi, monthGanzhi, dayGanzhi, hourGanzhi)
 
-	// Call OpenAI API
-	resp, err := a.client.CreateChatCompletion(
-		context.Background(),
-		openai.ChatCompletionRequest{
-			Model: openai.GPT4,
-			Messages: []openai.ChatCompletionMessage{
-				{
-					Role:    openai.ChatMessageRoleSystem,
-					Content: a.getSystemPrompt(),
-				},
-				{
-					Role:    openai.ChatMessageRoleUser,
-					Content: prompt,
-				},
+	// Combine system instruction with user prompt
+	combinedPrompt := systemInstruction + "\n\n" + userPrompt
+
+	// Create content without system role
+	contents := []*genai.Content{
+		{
+			Parts: []*genai.Part{
+				{Text: combinedPrompt},
 			},
-			MaxTokens:   2000,
-			Temperature: 0.7,
+			Role: "user",
 		},
-	)
+	}
 
+	// Generate content config
+	temperature := float32(0.7)
+	config := &genai.GenerateContentConfig{
+		Temperature:     &temperature,
+		MaxOutputTokens: 2000,
+	}
+
+	ctx := context.Background()
+
+	// Call Gemini API with retry logic
+	analysis, err := a.callWithRetry(ctx, a.model, contents, config, a.maxRetries)
 	if err != nil {
-		return "", fmt.Errorf("OpenAI API error: %w", err)
+		// If API still fails, fall back to mock analysis with warning
+		if a.isQuotaExceeded(err) {
+			fmt.Println("⚠️  API quota exceeded, using mock analysis")
+			return a.generateMockAnalysis(yearGanzhi, monthGanzhi, dayGanzhi, hourGanzhi), nil
+		}
+		return "", err
 	}
 
-	if len(resp.Choices) == 0 {
-		return "", fmt.Errorf("no response from OpenAI")
-	}
-
-	analysis := resp.Choices[0].Message.Content
-	return a.formatAnalysis(analysis), nil
+	return analysis, nil
 }
 
 // getSystemPrompt returns the system prompt for the AI
@@ -187,34 +256,41 @@ func (a *Analyzer) AnalyzeCompatibility(chart1, chart2 map[string]string) (strin
 		chart1["year"], chart1["month"], chart1["day"], chart1["hour"],
 		chart2["year"], chart2["month"], chart2["day"], chart2["hour"])
 
-	resp, err := a.client.CreateChatCompletion(
-		context.Background(),
-		openai.ChatCompletionRequest{
-			Model: openai.GPT4,
-			Messages: []openai.ChatCompletionMessage{
-				{
-					Role:    openai.ChatMessageRoleSystem,
-					Content: "你是八字合婚專家，請進行專業的合婚分析。",
-				},
-				{
-					Role:    openai.ChatMessageRoleUser,
-					Content: prompt,
-				},
+	// Combine system instruction with user prompt
+	systemInstruction := "你是八字合婚專家，請進行專業的合婚分析。"
+	combinedPrompt := systemInstruction + "\n\n" + prompt
+
+	// Create content without system role
+	contents := []*genai.Content{
+		{
+			Parts: []*genai.Part{
+				{Text: combinedPrompt},
 			},
-			MaxTokens:   1500,
-			Temperature: 0.7,
+			Role: "user",
 		},
-	)
+	}
 
+	// Generate content config
+	temperature := float32(0.7)
+	config := &genai.GenerateContentConfig{
+		Temperature:     &temperature,
+		MaxOutputTokens: 1500,
+	}
+
+	ctx := context.Background()
+
+	// Call Gemini API with retry logic
+	analysis, err := a.callWithRetry(ctx, a.model, contents, config, a.maxRetries)
 	if err != nil {
-		return "", fmt.Errorf("OpenAI API error: %w", err)
+		// If API still fails, fall back to mock analysis with warning
+		if a.isQuotaExceeded(err) {
+			fmt.Println("⚠️  API quota exceeded, using mock compatibility analysis")
+			return a.generateMockCompatibility(chart1, chart2), nil
+		}
+		return "", err
 	}
 
-	if len(resp.Choices) == 0 {
-		return "", fmt.Errorf("no response from OpenAI")
-	}
-
-	return a.formatAnalysis(resp.Choices[0].Message.Content), nil
+	return analysis, nil
 }
 
 // generateMockCompatibility generates mock compatibility analysis

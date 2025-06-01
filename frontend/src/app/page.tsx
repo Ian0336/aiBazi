@@ -5,10 +5,12 @@ import { motion } from 'framer-motion';
 import BaziForm from '@/components/BaziForm';
 import BaziResult from '@/components/BaziResult';
 import AnalysisModal from '@/components/AnalysisModal';
-import { BaziChart } from '@/types/bazi';
+import ClientOnly from '@/components/ClientOnly';
+import { BaziChart, BaziInput } from '@/types/bazi';
 
 export default function HomePage() {
   const [chart, setChart] = useState<BaziChart | null>(null);
+  const [originalInput, setOriginalInput] = useState<BaziInput | null>(null);
   const [analysis, setAnalysis] = useState<string>('');
   const [isCalculating, setIsCalculating] = useState<boolean>(false);
   const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
@@ -17,20 +19,18 @@ export default function HomePage() {
 
   // Generate particles on client side only
   useEffect(() => {
-    const generateParticles = () => {
-      if (typeof window === 'undefined') return [];
-      
+    const generateParticles = () => {      
       return Array.from({ length: 20 }, (_, i) => (
         <motion.div
           key={i}
           className="absolute w-1 h-1 bg-cyan-400 rounded-full opacity-40"
           initial={{
-            x: Math.random() * window.innerWidth,
-            y: Math.random() * window.innerHeight,
+            x: Math.random() * 1200,
+            y: Math.random() * 800,
           }}
           animate={{
-            x: Math.random() * window.innerWidth,
-            y: Math.random() * window.innerHeight,
+            x: Math.random() * 1200,
+            y: Math.random() * 800,
           }}
           transition={{
             duration: Math.random() * 20 + 10,
@@ -49,8 +49,9 @@ export default function HomePage() {
     setParticles(generateParticles());
   }, []);
 
-  const handleCalculate = (newChart: BaziChart) => {
+  const handleCalculate = (newChart: BaziChart, input: BaziInput) => {
     setChart(newChart);
+    setOriginalInput(input);
     setAnalysis(''); // Clear previous analysis
   };
 
@@ -59,12 +60,18 @@ export default function HomePage() {
 
     setIsAnalyzing(true);
     try {
+      console.log("chart", chart);
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/analyze`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(chart),
+        body: JSON.stringify({
+          year_ganzhi: chart.year_pillar.ganzhi,
+          month_ganzhi: chart.month_pillar.ganzhi,
+          day_ganzhi: chart.day_pillar.ganzhi, 
+          hour_ganzhi: chart.hour_pillar.ganzhi
+        }),
       });
 
       if (response.ok) {
@@ -124,7 +131,9 @@ export default function HomePage() {
     <div className="relative min-h-screen overflow-hidden">
       {/* Animated background particles */}
       <div className="fixed inset-0 pointer-events-none z-0">
-        {particles}
+        <ClientOnly>
+          {particles}
+        </ClientOnly>
       </div>
 
       {/* Main content */}
@@ -250,7 +259,7 @@ export default function HomePage() {
             </motion.section>
 
             {/* Results Section */}
-            {chart && (
+            {chart && originalInput && (
               <motion.section
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -258,6 +267,7 @@ export default function HomePage() {
               >
                 <BaziResult 
                   chart={chart}
+                  originalInput={originalInput}
                   onAnalyze={handleAnalyze}
                   isAnalyzing={isAnalyzing}
                 />
@@ -323,33 +333,48 @@ export default function HomePage() {
 
       {/* Enhanced background decorative elements */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
-        {/* Large floating orbs */}
-        {[...Array(4)].map((_, i) => (
+        <ClientOnly>
+          {/* Large floating orbs */}
+          {[...Array(4)].map((_, i) => (
+            <motion.div
+              key={`orb-${i}`}
+              className="absolute rounded-full opacity-5"
+              style={{
+                width: `${200 + i * 50}px`,
+                height: `${200 + i * 50}px`,
+                background: `linear-gradient(135deg, ${
+                  ['#00f3ff', '#8b5cf6', '#f97316', '#00ff88'][i]
+                }, transparent)`,
+                left: `${20 + i * 20}%`,
+                top: `${10 + i * 15}%`,
+              }}
+              animate={{
+                scale: [1, 1.2, 1],
+                rotate: [0, 180, 360],
+                opacity: [0.03, 0.08, 0.03],
+              }}
+              transition={{
+                duration: 15 + i * 3,
+                repeat: Infinity,
+                delay: i * 2,
+                ease: "easeInOut"
+              }}
+            />
+          ))}
+
+          {/* Scanning line effect */}
           <motion.div
-            key={`orb-${i}`}
-            className="absolute rounded-full opacity-5"
-            style={{
-              width: `${200 + i * 50}px`,
-              height: `${200 + i * 50}px`,
-              background: `linear-gradient(135deg, ${
-                ['#00f3ff', '#8b5cf6', '#f97316', '#00ff88'][i]
-              }, transparent)`,
-              left: `${20 + i * 20}%`,
-              top: `${10 + i * 15}%`,
-            }}
+            className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-cyan-400 to-transparent opacity-30"
             animate={{
-              scale: [1, 1.2, 1],
-              rotate: [0, 180, 360],
-              opacity: [0.03, 0.08, 0.03],
+              y: [0, 800],
             }}
             transition={{
-              duration: 15 + i * 3,
+              duration: 8,
               repeat: Infinity,
-              delay: i * 2,
-              ease: "easeInOut"
+              ease: "linear",
             }}
           />
-        ))}
+        </ClientOnly>
 
         {/* Grid pattern overlay */}
         <div 
@@ -362,21 +387,6 @@ export default function HomePage() {
             backgroundSize: '50px 50px'
           }}
         />
-
-        {/* Scanning line effect */}
-        {typeof window !== 'undefined' && (
-          <motion.div
-            className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-cyan-400 to-transparent opacity-30"
-            animate={{
-              y: [0, window.innerHeight || 800],
-            }}
-            transition={{
-              duration: 8,
-              repeat: Infinity,
-              ease: "linear",
-            }}
-          />
-        )}
       </div>
     </div>
   );

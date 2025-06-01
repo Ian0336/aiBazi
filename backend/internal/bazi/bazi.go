@@ -1,6 +1,7 @@
 package bazi
 
 import (
+	"encoding/json"
 	"fmt"
 
 	bazigo "github.com/warrially/BaziGo"
@@ -14,28 +15,79 @@ type BaziChart struct {
 	HourGanzhi  string `json:"hour_ganzhi"`
 }
 
+// BaziResult represents the complete bazi calculation result
+type BaziResult struct {
+	YearPillar  map[string]string `json:"year_pillar"`
+	MonthPillar map[string]string `json:"month_pillar"`
+	DayPillar   map[string]string `json:"day_pillar"`
+	HourPillar  map[string]string `json:"hour_pillar"`
+	DaYun       string            `json:"dayun"`
+	LunarDate   string            `json:"lunar_date"`
+	BaziHTML    string            `json:"bazi_html"`
+}
+
 // Calculate calculates the bazi chart for given date and time using the external BaziGo library
-func Calculate(year, month, day, hour int) (*BaziChart, error) {
+func Calculate(year, month, day, hour int) (string, error) {
 	// Validate input
 	if err := validateInput(year, month, day, hour); err != nil {
-		return nil, err
+		return "", err
 	}
 
 	// Use the external BaziGo library to calculate the bazi
 	// Sex parameter: 1 for male, 0 for female (we'll default to male for calculation purposes)
 	// The minute and second parameters are set to 0 as we only receive hour precision
 	pBazi := bazigo.GetBazi(year, month, day, hour, 0, 0, 1)
-
-	// Extract the four pillars from the BaziGo result
 	siZhu := pBazi.SiZhu()
-	baziChart := &BaziChart{
-		YearGanzhi:  siZhu.YearZhu().GanZhi().String(),
-		MonthGanzhi: siZhu.MonthZhu().GanZhi().String(),
-		DayGanzhi:   siZhu.DayZhu().GanZhi().String(),
-		HourGanzhi:  siZhu.HourZhu().GanZhi().String(),
+
+	// Create the result structure
+	result := BaziResult{
+		YearPillar: map[string]string{
+			"ganzhi":     siZhu.YearZhu().GanZhi().String(),
+			"gan":        siZhu.YearZhu().Gan().String(),
+			"zhi":        siZhu.YearZhu().Zhi().String(),
+			"gan_wuxing": siZhu.YearZhu().Gan().ToWuXing().String(),
+			"zhi_wuxing": siZhu.YearZhu().Zhi().ToWuXing().String(),
+			"shi_shen":   siZhu.YearZhu().ShiShen().String(),
+			"cang_gan":   siZhu.YearZhu().CangGan().String(),
+		},
+		MonthPillar: map[string]string{
+			"ganzhi":     siZhu.MonthZhu().GanZhi().String(),
+			"gan":        siZhu.MonthZhu().Gan().String(),
+			"zhi":        siZhu.MonthZhu().Zhi().String(),
+			"gan_wuxing": siZhu.MonthZhu().Gan().ToWuXing().String(),
+			"zhi_wuxing": siZhu.MonthZhu().Zhi().ToWuXing().String(),
+			"shi_shen":   siZhu.MonthZhu().ShiShen().String(),
+			"cang_gan":   siZhu.MonthZhu().CangGan().String(),
+		},
+		DayPillar: map[string]string{
+			"ganzhi":     siZhu.DayZhu().GanZhi().String(),
+			"gan":        siZhu.DayZhu().Gan().String(),
+			"zhi":        siZhu.DayZhu().Zhi().String(),
+			"gan_wuxing": siZhu.DayZhu().Gan().ToWuXing().String(),
+			"zhi_wuxing": siZhu.DayZhu().Zhi().ToWuXing().String(),
+			"shi_shen":   siZhu.DayZhu().ShiShen().String(),
+			"cang_gan":   siZhu.DayZhu().CangGan().String(),
+		},
+		HourPillar: map[string]string{
+			"ganzhi":     siZhu.HourZhu().GanZhi().String(),
+			"gan":        siZhu.HourZhu().Gan().String(),
+			"zhi":        siZhu.HourZhu().Zhi().String(),
+			"gan_wuxing": siZhu.HourZhu().Gan().ToWuXing().String(),
+			"zhi_wuxing": siZhu.HourZhu().Zhi().ToWuXing().String(),
+			"shi_shen":   siZhu.HourZhu().ShiShen().String(),
+			"cang_gan":   siZhu.HourZhu().CangGan().String(),
+		},
+		DaYun:     pBazi.DaYun().String(),
+		LunarDate: pBazi.LunarDate().String(),
 	}
 
-	return baziChart, nil
+	// Convert to JSON string
+	jsonBytes, err := json.Marshal(result)
+	if err != nil {
+		return "", fmt.Errorf("failed to marshal bazi result to JSON: %w", err)
+	}
+
+	return string(jsonBytes), nil
 }
 
 // validateInput validates the input parameters
@@ -110,6 +162,14 @@ func GetDetailedBaziInfo(year, month, day, hour int) (map[string]interface{}, er
 	// Get detailed bazi calculation from the external library
 	pBazi := bazigo.GetBazi(year, month, day, hour, 0, 0, 1)
 	siZhu := pBazi.SiZhu()
+	// Print the bazi calculation result
+	fmt.Printf("Year Pillar: %s\n", siZhu.YearZhu().GanZhi().String())
+	fmt.Printf("Month Pillar: %s\n", siZhu.MonthZhu().GanZhi().String())
+	fmt.Printf("Day Pillar: %s\n", siZhu.DayZhu().GanZhi().String())
+	fmt.Printf("Hour Pillar: %s\n", siZhu.HourZhu().GanZhi().String())
+	fmt.Printf("Lunar Date: %s\n", pBazi.LunarDate().String())
+	fmt.Printf("DaYun: %s\n", pBazi.DaYun().String())
+	fmt.Printf("HTML Output: %s\n", pBazi.ToHTML())
 
 	// Build comprehensive result with available methods
 	result := map[string]interface{}{

@@ -167,16 +167,20 @@ func calculateBazi(c *gin.Context) {
 		return
 	}
 
-	// Return response
-	response := BaziResponse{
-		YearGanzhi:  baziResult.YearGanzhi,
-		MonthGanzhi: baziResult.MonthGanzhi,
-		DayGanzhi:   baziResult.DayGanzhi,
-		HourGanzhi:  baziResult.HourGanzhi,
-	}
+	// Create serializable struct with exported fields using SiZhu API
+	// response := BaziResponse{
+	// 	YearGanzhi:  baziResult.YearPillar["ganzhi"],
+	// 	MonthGanzhi: baziResult.MonthPillar["ganzhi"],
+	// 	DayGanzhi:   baziResult.DayPillar["ganzhi"],
+	// 	HourGanzhi:  baziResult.HourPillar["ganzhi"],
+	// }
 
-	log.Printf("Bazi calculated for %d-%d-%d %d:00 -> %+v", req.Year, req.Month, req.Day, req.Hour, response)
-	c.JSON(http.StatusOK, response)
+	// Log the result
+	// fmt.Printf("baziResult: %+v\n", response)
+	// log.Printf("Bazi calculated for %d-%d-%d %d:00", req.Year, req.Month, req.Day, req.Hour)
+
+	// Return the response as JSON
+	c.JSON(http.StatusOK, baziResult)
 }
 
 // analyzeBazi handles AI analysis requests
