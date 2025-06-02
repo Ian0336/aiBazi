@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
 
 interface AnalysisModalProps {
   isOpen: boolean;
@@ -80,25 +81,10 @@ const AnalysisModal: React.FC<AnalysisModalProps> = ({ isOpen, onClose, analysis
       opacity: 1,
       transition: {
         delay: 0.4,
-        duration: 0.6,
-        staggerChildren: 0.01
+        duration: 0.6
       }
     }
   };
-
-  const charVariants = {
-    hidden: { opacity: 0, y: 10 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.05
-      }
-    }
-  };
-
-  // Split analysis text into characters for typewriter effect
-  const analysisChars = analysis.split('');
 
   return (
     <AnimatePresence>
@@ -216,25 +202,101 @@ const AnalysisModal: React.FC<AnalysisModalProps> = ({ isOpen, onClose, analysis
                     scrollbarColor: '#8b5cf6 #1e293b'
                   }}
                 >
+                  <style jsx>{`
+                    .markdown-content h1,
+                    .markdown-content h2,
+                    .markdown-content h3,
+                    .markdown-content h4,
+                    .markdown-content h5,
+                    .markdown-content h6 {
+                      color: #e2e8f0;
+                      margin-top: 1.5rem;
+                      margin-bottom: 0.75rem;
+                    }
+                    
+                    .markdown-content p {
+                      color: #cbd5e1;
+                      line-height: 1.7;
+                      margin-bottom: 1rem;
+                    }
+                    
+                    .markdown-content strong {
+                      color: #67e8f9;
+                      font-weight: 600;
+                    }
+                    
+                    .markdown-content em {
+                      color: #c084fc;
+                      font-style: italic;
+                    }
+                    
+                    .markdown-content ul,
+                    .markdown-content ol {
+                      color: #cbd5e1;
+                      margin-bottom: 1rem;
+                      padding-left: 1.5rem;
+                    }
+                    
+                    .markdown-content li {
+                      margin-bottom: 0.5rem;
+                    }
+                    
+                    .markdown-content blockquote {
+                      border-left: 4px solid #22d3ee;
+                      padding-left: 1rem;
+                      margin: 1rem 0;
+                      background: rgba(51, 65, 85, 0.3);
+                      border-radius: 0 0.5rem 0.5rem 0;
+                      padding: 0.75rem 1rem;
+                    }
+                  `}</style>
+                  
                   <motion.div
                     variants={textVariants}
                     initial="hidden"
                     animate="visible"
                     className="space-y-6"
                   >
-                    {/* Analysis content with enhanced typography */}
-                    <div className="prose prose-invert max-w-none">
-                      <div className="text-slate-200 leading-relaxed text-base md:text-lg">
-                        {analysisChars.map((char, index) => (
-                          <motion.span
-                            key={index}
-                            variants={charVariants}
-                            className={char === '\n' ? 'block h-4' : ''}
-                          >
-                            {char === '\n' ? '' : char}
-                          </motion.span>
-                        ))}
-                      </div>
+                    {/* Analysis content with Markdown rendering */}
+                    <div className="markdown-content prose prose-invert max-w-none text-slate-200 leading-relaxed text-base md:text-lg">
+                      <ReactMarkdown 
+                        components={{
+                          h1: ({children}) => (
+                            <h1 className="text-3xl font-bold gradient-text glow-text mb-4">{children}</h1>
+                          ),
+                          h2: ({children}) => (
+                            <h2 className="text-2xl font-bold text-cyan-300 mb-3 mt-6">{children}</h2>
+                          ),
+                          h3: ({children}) => (
+                            <h3 className="text-xl font-bold text-purple-300 mb-2 mt-4">{children}</h3>
+                          ),
+                          p: ({children}) => (
+                            <p className="mb-4 text-slate-200 leading-relaxed">{children}</p>
+                          ),
+                          strong: ({children}) => (
+                            <strong className="text-cyan-300 font-bold">{children}</strong>
+                          ),
+                          em: ({children}) => (
+                            <em className="text-purple-300 italic">{children}</em>
+                          ),
+                          ul: ({children}) => (
+                            <ul className="list-disc list-inside mb-4 space-y-2 text-slate-200">{children}</ul>
+                          ),
+                          ol: ({children}) => (
+                            <ol className="list-decimal list-inside mb-4 space-y-2 text-slate-200">{children}</ol>
+                          ),
+                          li: ({children}) => (
+                            <li className="text-slate-200 leading-relaxed">{children}</li>
+                          ),
+                          blockquote: ({children}) => (
+                            <blockquote className="border-l-4 border-cyan-400 pl-4 py-2 bg-slate-800/30 rounded-r-lg mb-4 text-slate-300 italic">
+                              {children}
+                            </blockquote>
+                          )
+                        }}
+                      >
+                        {analysis}
+                      </ReactMarkdown>
                     </div>
 
                     {/* Enhanced decorative elements */}
@@ -242,7 +304,7 @@ const AnalysisModal: React.FC<AnalysisModalProps> = ({ isOpen, onClose, analysis
                       className="flex justify-center mt-10"
                       initial={{ opacity: 0, scale: 0 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: 2, duration: 0.5 }}
+                      transition={{ delay: 1, duration: 0.5 }}
                     >
                       <div className="flex space-x-3">
                         {[...Array(7)].map((_, i) => (
@@ -277,7 +339,7 @@ const AnalysisModal: React.FC<AnalysisModalProps> = ({ isOpen, onClose, analysis
                       className="mt-8 p-6 rounded-xl bg-slate-800/30 border border-slate-600/30"
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 2.5, duration: 0.5 }}
+                      transition={{ delay: 1.5, duration: 0.5 }}
                     >
                       <div className="text-center">
                         <motion.div 
