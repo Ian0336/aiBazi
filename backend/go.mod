@@ -9,6 +9,7 @@ require (
 	github.com/gin-gonic/gin v1.9.1
 	github.com/joho/godotenv v1.4.0
 	github.com/warrially/BaziGo v1.0.2
+	golang.org/x/time v0.8.0
 	google.golang.org/genai v1.8.0
 )
 

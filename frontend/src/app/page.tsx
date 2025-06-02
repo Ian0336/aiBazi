@@ -78,6 +78,9 @@ export default function HomePage() {
         const result = await response.json();
         setAnalysis(result.analysis || '分析結果暫時無法取得，請稍後再試。');
         setIsModalOpen(true);
+      } else if (response.status === 429) {
+        setAnalysis('您已達到每小時分析次數上限，請下個小時再來試試看。😊');
+        setIsModalOpen(true);
       } else {
         setAnalysis('AI 分析服務暫時無法使用，請稍後再試。');
         setIsModalOpen(true);

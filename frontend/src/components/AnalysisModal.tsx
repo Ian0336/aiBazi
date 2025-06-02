@@ -139,7 +139,7 @@ const AnalysisModal: React.FC<AnalysisModalProps> = ({ isOpen, onClose, analysis
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="relative w-full max-w-5xl max-h-[85vh] overflow-hidden z-10"
+            className="relative w-full max-w-5xl max-h-[95vh] overflow-y-auto z-10"
             style={{ perspective: 1000 }}
           >
             <div className="neon-border">

@@ -1,15 +1,20 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"strconv"
+	"sync"
+	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/yuyi/aiBazi-backend/internal/ai"
 	"github.com/yuyi/aiBazi-backend/internal/bazi"
+	"golang.org/x/time/rate"
 )
 
 // BaziRequest represents the input structure for bazi calculation
@@ -47,6 +52,117 @@ type ErrorResponse struct {
 	Message string `json:"message,omitempty"`
 }
 
+// RateLimiter manages rate limiting for clients
+type RateLimiter struct {
+	visitors map[string]*Visitor
+	mu       sync.RWMutex
+	rate     rate.Limit
+	burst    int
+}
+
+// Visitor represents a client with its rate limiter
+type Visitor struct {
+	limiter  *rate.Limiter
+	lastSeen time.Time
+}
+
+// NewRateLimiter creates a new rate limiter instance
+func NewRateLimiter(requestsPerHour int, burst int) *RateLimiter {
+	rl := &RateLimiter{
+		visitors: make(map[string]*Visitor),
+		rate:     rate.Limit(float64(requestsPerHour) / 3600.0), // Convert per hour to per second
+		burst:    burst,
+	}
+
+	// Clean up old visitors every 10 minutes
+	go rl.cleanupVisitors()
+
+	return rl
+}
+
+// getVisitor retrieves or creates a visitor for the given IP
+func (rl *RateLimiter) getVisitor(ip string) *rate.Limiter {
+	rl.mu.Lock()
+	defer rl.mu.Unlock()
+
+	visitor, exists := rl.visitors[ip]
+	if !exists {
+		limiter := rate.NewLimiter(rl.rate, rl.burst)
+		rl.visitors[ip] = &Visitor{
+			limiter:  limiter,
+			lastSeen: time.Now(),
+		}
+		return limiter
+	}
+
+	visitor.lastSeen = time.Now()
+	return visitor.limiter
+}
+
+// cleanupVisitors removes old visitors to prevent memory leaks
+func (rl *RateLimiter) cleanupVisitors() {
+	ticker := time.NewTicker(10 * time.Minute)
+	defer ticker.Stop()
+
+	for {
+		<-ticker.C
+		rl.mu.Lock()
+		for ip, visitor := range rl.visitors {
+			if time.Since(visitor.lastSeen) > 30*time.Minute {
+				delete(rl.visitors, ip)
+			}
+		}
+		rl.mu.Unlock()
+	}
+}
+
+// Middleware returns a Gin middleware for rate limiting
+func (rl *RateLimiter) Middleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Get client IP
+		clientIP := c.ClientIP()
+
+		// Get or create rate limiter for this IP
+		limiter := rl.getVisitor(clientIP)
+
+		// Check if request is allowed
+		if !limiter.Allow() {
+			// Rate limit exceeded
+			c.JSON(http.StatusTooManyRequests, ErrorResponse{
+				Error:   "Rate limit exceeded",
+				Message: "You have exceeded the hourly rate limit for AI analysis. Please try again next hour.",
+			})
+			c.Abort()
+			return
+		}
+
+		c.Next()
+	}
+}
+
+// parseRateLimit parses the rate limit from environment variable
+func parseRateLimit() (int, int) {
+	rateLimitStr := os.Getenv("RATE_LIMIT")
+	if rateLimitStr == "" {
+		rateLimitStr = "5" // Default: 5 requests per hour
+	}
+	fmt.Println("rateLimitStr", rateLimitStr)
+
+	rateLimit, err := strconv.Atoi(rateLimitStr)
+	if err != nil {
+		log.Printf("Warning: Invalid RATE_LIMIT value '%s', using default: 5", rateLimitStr)
+		rateLimit = 5
+	}
+
+	// Set burst to allow some burstiness, but keep it reasonable for hourly limits
+	burst := rateLimit
+	if burst < 3 {
+		burst = 3 // Minimum burst of 3
+	}
+
+	return rateLimit, burst
+}
+
 func main() {
 	// Load environment variables
 	if err := godotenv.Load(); err != nil {
@@ -57,6 +173,10 @@ func main() {
 	if os.Getenv("GIN_MODE") == "release" {
 		gin.SetMode(gin.ReleaseMode)
 	}
+
+	// Parse rate limit configuration
+	rateLimit, burst := parseRateLimit()
+	rateLimiter := NewRateLimiter(rateLimit, burst)
 
 	// Create Gin router
 	router := gin.Default()
@@ -86,11 +206,11 @@ func main() {
 	// API routes group
 	api := router.Group("/api")
 	{
-		// Bazi calculation endpoint
+		// Bazi calculation endpoint (no rate limiting)
 		api.POST("/bazi", calculateBazi)
 
-		// AI analysis endpoint
-		api.POST("/analyze", analyzeBazi)
+		// AI analysis endpoint (with rate limiting)
+		api.POST("/analyze", rateLimiter.Middleware(), analyzeBazi)
 	}
 
 	// Get port from environment variable or use default
@@ -101,6 +221,7 @@ func main() {
 
 	log.Printf("🚀 AI Bazi Backend starting on port %s", port)
 	log.Printf("🌐 CORS enabled for frontend origins")
+	log.Printf("⚡ Rate limiting enabled: %d requests/hour (burst: %d) for /api/analyze", rateLimit, burst)
 	log.Printf("🔗 Health check: http://localhost:%s/health", port)
 	log.Printf("📊 Bazi API: http://localhost:%s/api/bazi", port)
 	log.Printf("🤖 Analysis API: http://localhost:%s/api/analyze", port)
