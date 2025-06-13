@@ -9,24 +9,11 @@ interface TraditionalBaziChartProps {
 }
 
 const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart, originalInput }) => {
-  // Parse dayun (大運) data
-  const parseDayun = (dayunStr: string) => {
-    const dayunData = dayunStr.replace('大运:\n', '').trim().split(' ').filter(d => d);
-    return dayunData.slice(0, 10); // Take first 10 dayun periods
-  };
-
-  // Extract cang_gan (藏干) for each pillar
-  const extractCangGan = (cangGanStr: string) => {
-    // Extract characters before the brackets, e.g., "丙[杀]戊[卩]庚[比]" -> ["丙", "戊", "庚"]
-    const matches = cangGanStr.match(/([^[\]]+)(?=\[)/g);
-    return matches || [];
-  };
-
-  // Extract shi_shen (十神) from cang_gan string
-  const extractShiShen = (cangGanStr: string) => {
-    // Extract characters inside brackets, e.g., "丙[杀]戊[卩]庚[比]" -> ["杀", "卩", "比"]
-    const matches = cangGanStr.match(/\[([^\]]+)\]/g);
-    return matches ? matches.map(m => m.replace(/[\[\]]/g, '')) : [];
+  // Generate sample dayun data (大運) - in a real app, this would come from the backend
+  const generateDayun = () => {
+    // This is placeholder data - in reality this would be calculated properly
+    const dayunPillars = ['甲寅', '乙卯', '丙辰', '丁巳', '戊午', '己未', '庚申', '辛酉', '壬戌', '癸亥'];
+    return dayunPillars;
   };
 
   const pillars = [
@@ -36,7 +23,7 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart, orig
     { label: '時柱', pillar: chart.hour_pillar }
   ];
 
-  const dayunData = parseDayun(chart.dayun);
+  const dayunData = generateDayun();
 
   return (
     <motion.div 
@@ -78,12 +65,12 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart, orig
         <div className="text-sm bg-amber-200 p-1 border border-amber-400">農</div>
         <div className="text-sm bg-amber-200 p-1 border border-amber-400">曆</div>
         <div className="text-sm bg-amber-200 p-1 border border-amber-400 col-span-9">
-          {chart.lunar_date.replace('农历:', '')}
+          {chart.lunar_date}
         </div>
       </div>
 
       {/* Additional Info Section */}
-      <div className="grid grid-cols-7 gap-2 mb-4">
+      {/* <div className="grid grid-cols-7 gap-2 mb-4">
         <div className="text-center">
           <div className="text-xs bg-amber-100 p-1 border border-amber-300">星座</div>
           <div className="text-xs bg-white p-1 border border-amber-300">雙魚</div>
@@ -112,7 +99,7 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart, orig
           <div className="text-xs bg-amber-100 p-1 border border-amber-300">身宮</div>
           <div className="text-xs bg-white p-1 border border-amber-300">壬戌</div>
         </div>
-      </div>
+      </div> */}
 
       {/* Main Chart Section */}
       <div className="border-2 border-amber-400 rounded">
@@ -121,7 +108,7 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart, orig
           <div className="text-center bg-amber-200 p-2 border-r border-amber-300 font-bold">主星</div>
           {pillars.map((pillar, index) => (
             <div key={index} className="text-center bg-amber-100 p-2 border-r border-amber-300 last:border-r-0">
-              <span className="text-sm font-medium text-amber-800">{pillar.pillar.shi_shen}</span>
+              <span className="text-sm font-medium text-amber-800">{pillar.pillar.ten_deity}</span>
             </div>
           ))}
         </div>
@@ -140,13 +127,13 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart, orig
         <div className="grid grid-cols-5 border-b border-amber-300">
           <div className="text-center bg-amber-200 p-2 border-r border-amber-300 font-bold">藏</div>
           {pillars.map((pillar, index) => {
-            const cangGan = extractCangGan(pillar.pillar.cang_gan);
+            const hiddenStems = pillar.pillar.hidden_stems || [];
             return (
               <div key={index} className="text-center bg-amber-50 p-2 border-r border-amber-300 last:border-r-0">
                 <div className="grid grid-cols-3 gap-1">
                   {[0, 1, 2].map(i => (
                     <span key={i} className="text-xs">
-                      {cangGan[i] || '　'}
+                      {hiddenStems[i]?.gan || '　'}
                     </span>
                   ))}
                 </div>
@@ -159,13 +146,13 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart, orig
         <div className="grid grid-cols-5">
           <div className="text-center bg-amber-200 p-2 border-r border-amber-300 font-bold">副星</div>
           {pillars.map((pillar, index) => {
-            const shiShen = extractShiShen(pillar.pillar.cang_gan);
+            const hiddenStems = pillar.pillar.hidden_stems || [];
             return (
               <div key={index} className="text-center bg-amber-50 p-2 border-r border-amber-300 last:border-r-0">
                 <div className="grid grid-cols-3 gap-1">
                   {[0, 1, 2].map(i => (
                     <span key={i} className="text-xs">
-                      {shiShen[i] || '　'}
+                      {hiddenStems[i]?.ten_deity || '　'}
                     </span>
                   ))}
                 </div>

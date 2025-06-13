@@ -136,9 +136,10 @@ const BaziForm: React.FC<BaziFormProps> = ({ onCalculate, isLoading = false }) =
       });
       if (response.ok) {
         const chart = await response.json();
-        const baziData = JSON.parse(chart);
-        console.log("baziData", baziData);
-        onCalculate(baziData, input);
+        console.log("chart", chart);
+        // const baziData = JSON.parse(chart);
+        // console.log("baziData", baziData);
+        onCalculate(chart, input);
       } else {
         console.error('Failed to calculate Bazi');
       }
