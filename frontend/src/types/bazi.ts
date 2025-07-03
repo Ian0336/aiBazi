@@ -28,13 +28,40 @@ export interface EmptyPositions {
 }
 
 export interface Analysis {
-  day_master: string;
-  day_master_wuxing: string;
-  wuxing_count: Record<string, number>;
-  day_master_strength: number;
+  wuxing_analysis: {
+    wuxing_scores: Record<string, number>;
+    gan_scores: Record<string, number>;
+    strongest_element: string;
+    weakest_element: string;
+    total_score: number;
+  };
+  root_analysis: string;
+  day_master_strength: {
   is_strong: boolean;
+    description: string;
+  };
+  combinations: {
+    gong_combinations: any[];
+    repeated_gans: Record<string, number>;
+    repeated_zhis: Record<string, number>;
+  };
+  deity_distribution: {
+    gan_deities: string[];
+    zhi_deities: string[];
+    deity_counts: Record<string, number>;
+  };
+  day_master_nature: {
+    gan: string;
+    is_yang: boolean;
+    element: string;
+  };
+  special_stars: Record<string, any>;
   gender: string;
-  summary: string;
+  recommendations: {
+    lacking_element: string;
+    strong_element: string;
+    advice: string;
+  };
 }
 
 export interface BaziChart {

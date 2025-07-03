@@ -1,32 +1,105 @@
-/* styles/globals.css */
+/* Modern Chinese-Style Bazi Website - Global Styles */
 
-/* 1. 一行导入，包含 theme、preflight（base）、components、utilities */
-@import "tailwindcss"; /* 简化安装：单行引入 Tailwind v4  */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-/* Import Google Fonts for cyber aesthetic */
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+/* Import Chinese-inspired fonts */
+@import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@400;500;600;700&family=Merriweather:wght@400;700&family=Fira+Code:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Ma+Shan+Zheng&display=swap');
 
-/* 2. 自定义 Base 样式（会在 Preflight 之后注入） */
 @layer base {
-  /* 统一淡色边框变量，需要在 tailwind.config.js extend colors.border */
+  :root {
+    /* Chinese Traditional Color Palette */
+    --background: oklch(0.9885 0.0057 84.5659);
+    --foreground: oklch(0.3660 0.0251 49.6085);
+    --card: oklch(0.9686 0.0091 78.2818);
+    --card-foreground: oklch(0.3660 0.0251 49.6085);
+    --popover: oklch(0.9686 0.0091 78.2818);
+    --popover-foreground: oklch(0.3660 0.0251 49.6085);
+    --primary: oklch(0.5553 0.1455 48.9975);
+    --primary-foreground: oklch(1.0000 0 0);
+    --secondary: oklch(0.8276 0.0752 74.4400);
+    --secondary-foreground: oklch(0.4444 0.0096 73.6390);
+    --muted: oklch(0.9363 0.0218 83.2637);
+    --muted-foreground: oklch(0.5534 0.0116 58.0708);
+    --accent: oklch(0.9000 0.0500 74.9889);
+    --accent-foreground: oklch(0.4444 0.0096 73.6390);
+    --destructive: oklch(0.4437 0.1613 26.8994);
+    --destructive-foreground: oklch(1.0000 0 0);
+    --border: oklch(0.8866 0.0404 89.6994);
+    --input: oklch(0.8866 0.0404 89.6994);
+    --ring: oklch(0.5553 0.1455 48.9975);
+    --chart-1: oklch(0.5553 0.1455 48.9975);
+    --chart-2: oklch(0.5534 0.0116 58.0708);
+    --chart-3: oklch(0.5538 0.1207 66.4416);
+    --chart-4: oklch(0.5534 0.0116 58.0708);
+    --chart-5: oklch(0.6806 0.1423 75.8340);
+    --sidebar: oklch(0.9363 0.0218 83.2637);
+    --sidebar-foreground: oklch(0.3660 0.0251 49.6085);
+    --sidebar-primary: oklch(0.5553 0.1455 48.9975);
+    --sidebar-primary-foreground: oklch(1.0000 0 0);
+    --sidebar-accent: oklch(0.5538 0.1207 66.4416);
+    --sidebar-accent-foreground: oklch(1.0000 0 0);
+    --sidebar-border: oklch(0.8866 0.0404 89.6994);
+    --sidebar-ring: oklch(0.5553 0.1455 48.9975);
+    --font-sans: Oxanium, sans-serif;
+    --font-serif: Merriweather, serif;
+    --font-mono: Fira Code, monospace;
+    --radius: 0.3rem;
+    --shadow-2xs: 0px 2px 3px 0px hsl(28 18% 25% / 0.09);
+    --shadow-xs: 0px 2px 3px 0px hsl(28 18% 25% / 0.09);
+    --shadow-sm: 0px 2px 3px 0px hsl(28 18% 25% / 0.18), 0px 1px 2px -1px hsl(28 18% 25% / 0.18);
+    --shadow: 0px 2px 3px 0px hsl(28 18% 25% / 0.18), 0px 1px 2px -1px hsl(28 18% 25% / 0.18);
+    --shadow-md: 0px 2px 3px 0px hsl(28 18% 25% / 0.18), 0px 2px 4px -1px hsl(28 18% 25% / 0.18);
+    --shadow-lg: 0px 2px 3px 0px hsl(28 18% 25% / 0.18), 0px 4px 6px -1px hsl(28 18% 25% / 0.18);
+    --shadow-xl: 0px 2px 3px 0px hsl(28 18% 25% / 0.18), 0px 8px 10px -1px hsl(28 18% 25% / 0.18);
+    --shadow-2xl: 0px 2px 3px 0px hsl(28 18% 25% / 0.45);
+    --tracking-normal: 0em;
+    --spacing: 0.25rem;
+
+    /* Traditional Chinese Colors */
+    --chinese-red: #DC143C;
+    --chinese-gold: #FFD700;
+    --chinese-black: #2C2C2C;
+    --ink-wash: #4A4A4A;
+    --lotus-pink: #F8BBD9;
+    --bamboo-green: #8FBC8F;
+    --jade-green: #00A86B;
+    --imperial-yellow: #FFDF00;
+  }
+
+
+
   * {
-    @apply border-0;
+    border-color: var(--border);
   }
 
   body {
-    @apply bg-gray-900 text-white overflow-x-hidden;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
-                 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans',
-                 'Droid Sans', 'Helvetica Neue', sans-serif;
-    background: 
-      radial-gradient(ellipse at top, rgba(0, 243, 255, 0.1) 0%, transparent 70%),
-      radial-gradient(ellipse at bottom left, rgba(139, 92, 246, 0.1) 0%, transparent 70%),
-      radial-gradient(ellipse at bottom right, rgba(249, 115, 22, 0.1) 0%, transparent 70%),
-      linear-gradient(180deg, #0a0a0a 0%, #1a1a2e 100%);
-    min-height: 100vh;
+    background-color: var(--background);
+    color: var(--foreground);
     position: relative;
+    min-height: 100vh;
+    /* Beautiful Chinese background with overlay */
+    background-image: 
+      linear-gradient(
+        135deg, 
+        rgba(255, 248, 240, 0.85) 0%, 
+        rgba(255, 245, 230, 0.80) 25%,
+        rgba(254, 243, 235, 0.85) 50%,
+        rgba(255, 240, 225, 0.80) 75%,
+        rgba(255, 248, 240, 0.85) 100%
+      ),
+      url('/bg.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
   }
 
+
+
+  /* Additional background texture for better integration */
   body::before {
     content: '';
     position: fixed;
@@ -35,74 +108,171 @@
     width: 100%;
     height: 100%;
     background: 
-      radial-gradient(circle at 20% 80%, rgba(0, 243, 255, 0.03) 0%, transparent 50%),
-      radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.03) 0%, transparent 50%),
-      radial-gradient(circle at 40% 40%, rgba(249, 115, 22, 0.03) 0%, transparent 50%);
+      radial-gradient(circle at 20% 80%, rgba(255, 182, 193, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 40% 40%, rgba(143, 188, 143, 0.1) 0%, transparent 50%);
     pointer-events: none;
     z-index: -1;
   }
-
-  html {
-    scroll-behavior: smooth;
-  }
-
-  /* Custom selection */
-  ::selection {
-    background: rgba(0, 243, 255, 0.3);
-    color: white;
-  }
 }
 
-/* 3. 自定义 Components 样式（会在 Tailwind Components 之后注入） */
 @layer components {
-  /* 自定义滚动条 */
-  ::-webkit-scrollbar {
-    width: 8px;
-  }
-  ::-webkit-scrollbar-track {
-    @apply bg-gray-900;
-  }
-  ::-webkit-scrollbar-thumb {
-    background: linear-gradient(45deg, #00f3ff, #8b5cf6);
-    border-radius: 4px;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(45deg, #00d4e5, #7c3aed);
+  /* Chinese-style Typography */
+  .chinese-text {
+    font-family: 'Noto Serif SC', serif;
+    line-height: 1.6;
   }
 
-  /* Enhanced Cyber 输入框 */
-  .cyber-input {
-    @apply relative bg-slate-900/80 border border-slate-600/50 text-white placeholder-slate-400
-           rounded-lg backdrop-blur-sm transition-all duration-300 outline-none;
-    background: linear-gradient(145deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.8));
-    box-shadow: 
-      inset 0 1px 0 rgba(255, 255, 255, 0.1),
-      0 1px 3px rgba(0, 0, 0, 0.3);
+  .chinese-title {
+    font-family: 'Ma Shan Zheng', cursive;
+    background: linear-gradient(45deg, var(--chinese-red), var(--chinese-gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.1));
   }
 
-  .cyber-input:focus {
-    @apply border-cyan-400 ring-2 ring-cyan-400/30;
+  /* Chinese-style Cards */
+  .chinese-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(220, 20, 60, 0.2);
+    border-radius: 12px;
     box-shadow: 
-      0 0 0 1px rgb(34 211 238),
-      0 0 20px rgba(34, 211, 238, 0.3),
-      inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    transform: translateY(-1px);
-  }
-
-  /* Enhanced Cyber 按钮 */
-  .cyber-button {
-    @apply relative overflow-hidden font-semibold py-3 px-6 rounded-lg
-           transition-all duration-300 transform
-           focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed;
-    background: linear-gradient(145deg, #4f46e5, #7c3aed, #ec4899);
-    background-size: 200% 200%;
-    box-shadow: 
-      0 4px 15px rgba(79, 70, 229, 0.4),
+      0 8px 32px rgba(0, 0, 0, 0.1),
       inset 0 1px 0 rgba(255, 255, 255, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
   }
 
-  .cyber-button::before {
+  .chinese-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+      0 12px 40px rgba(0, 0, 0, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
+
+  /* Brush Border Effect */
+  .brush-border {
+    position: relative;
+    border: 2px solid transparent;
+    background: 
+      linear-gradient(white, white) padding-box,
+      linear-gradient(45deg, var(--chinese-red), var(--chinese-gold), var(--chinese-red)) border-box;
+  }
+
+  .brush-border::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    right: -4px;
+    bottom: -4px;
+    background: linear-gradient(45deg, var(--chinese-red), var(--chinese-gold), var(--chinese-red));
+    border-radius: inherit;
+    z-index: -1;
+    opacity: 0.3;
+    filter: blur(6px);
+  }
+
+  /* Lotus Pattern Background */
+  .lotus-pattern {
+    position: relative;
+  }
+
+  .lotus-pattern::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      radial-gradient(circle at 10% 20%, rgba(248, 187, 217, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 90% 80%, rgba(248, 187, 217, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+    border-radius: inherit;
+  }
+
+  .lotus-pattern > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Five Elements Styling */
+  .element-wood {
+    background: linear-gradient(135deg, #228B22, #32CD32);
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+  }
+
+  .element-fire {
+    background: linear-gradient(135deg, #DC143C, #FF6347);
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+  }
+
+  .element-earth {
+    background: linear-gradient(135deg, #DAA520, #FFD700);
+    color: #8B4513;
+    text-shadow: 1px 1px 2px rgba(255,255,255,0.3);
+  }
+
+  .element-metal {
+    background: linear-gradient(135deg, #C0C0C0, #D3D3D3);
+    color: #2F4F4F;
+    text-shadow: 1px 1px 2px rgba(255,255,255,0.3);
+  }
+
+  .element-water {
+    background: linear-gradient(135deg, #4169E1, #87CEEB);
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+  }
+
+  /* Bazi Pillar Cards */
+  .bazi-pillar {
+    background: rgba(255, 255, 255, 0.98);
+    border: 2px solid rgba(220, 20, 60, 0.2);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 
+      0 10px 30px rgba(0, 0, 0, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .bazi-pillar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--chinese-red), var(--chinese-gold), var(--chinese-red));
+  }
+
+  /* Chinese Button Styling */
+  .btn-chinese {
+    background: linear-gradient(135deg, var(--chinese-red), #B22222);
+    color: white;
+    border: 2px solid var(--chinese-gold);
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-family: 'Noto Serif SC', serif;
+    font-weight: 600;
+    box-shadow: 
+      0 4px 15px rgba(220, 20, 60, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-chinese::before {
     content: '';
     position: absolute;
     top: 0;
@@ -110,167 +280,68 @@
     width: 100%;
     height: 100%;
     background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transition: left 0.5s;
+    transition: left 0.5s ease;
   }
 
-  .cyber-button:hover {
-    @apply scale-105;
-    background-position: 100% 0;
-    box-shadow: 
-      0 6px 25px rgba(79, 70, 229, 0.6),
-      0 0 30px rgba(34, 211, 238, 0.3),
-      inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  }
-
-  .cyber-button:hover::before {
+  .btn-chinese:hover::before {
     left: 100%;
   }
 
-  .cyber-button:active {
-    @apply scale-95;
-  }
-
-  /* Enhanced 霓虹边框效果 */
-  .neon-border {
-    @apply relative rounded-lg;
-    background: linear-gradient(145deg, rgba(0, 243, 255, 0.1), rgba(139, 92, 246, 0.1));
-    padding: 2px;
-    border-radius: 12px;
-  }
-
-  .neon-border::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(45deg, #00f3ff, #8b5cf6, #f97316, #00ff88);
-    background-size: 300% 300%;
-    border-radius: 12px;
-    animation: gradient 8s ease infinite;
-    z-index: -1;
-  }
-
-  .neon-border-content {
-    @apply bg-gray-900/95 rounded-lg relative backdrop-blur-xl;
-    background: linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.8));
-    border: 1px solid rgba(255, 255, 255, 0.1);
+  .btn-chinese:hover {
+    transform: translateY(-2px);
     box-shadow: 
-      0 8px 32px rgba(0, 0, 0, 0.4),
-      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      0 6px 20px rgba(220, 20, 60, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
   }
 
-  /* Glowing text effect */
-  .glow-text {
-    text-shadow: 
-      0 0 10px rgba(0, 243, 255, 0.5),
-      0 0 20px rgba(0, 243, 255, 0.3),
-      0 0 40px rgba(0, 243, 255, 0.1);
-  }
-
-  /* Animated gradient text */
-  .gradient-text {
-    background: linear-gradient(45deg, #00f3ff, #8b5cf6, #f97316, #00ff88);
-    background-size: 300% 300%;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    animation: gradient 4s ease infinite;
-  }
-
-  /* Floating particles effect */
-  .particles {
-    position: fixed;
-    top: 0;
-    left: 0;
+  /* Chinese Input Styling */
+  .input-chinese {
+    background: rgba(255, 255, 255, 0.95);
+    border: 2px solid rgba(220, 20, 60, 0.3);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-family: 'Noto Serif SC', serif;
+    font-size: 16px;
     width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 1;
-  }
-
-  .particle {
-    position: absolute;
-    width: 2px;
-    height: 2px;
-    background: linear-gradient(45deg, #00f3ff, #8b5cf6);
-    border-radius: 50%;
-    animation: float 6s infinite ease-in-out;
-    opacity: 0.6;
-  }
-
-  /* Enhanced card styles */
-  .cyber-card {
-    @apply relative rounded-xl overflow-hidden;
-    background: linear-gradient(145deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.6));
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 
-      0 8px 32px rgba(0, 0, 0, 0.3),
-      inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(20px);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
   }
 
-  .cyber-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(0, 243, 255, 0.8), transparent);
-  }
-
-  .cyber-card:hover {
-    transform: translateY(-5px);
+  .input-chinese:focus {
+    outline: none;
+    border-color: var(--chinese-red);
     box-shadow: 
-      0 12px 40px rgba(0, 0, 0, 0.4),
-      0 0 30px rgba(0, 243, 255, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    border-color: rgba(0, 243, 255, 0.3);
+      inset 0 2px 4px rgba(0, 0, 0, 0.1),
+      0 0 0 3px rgba(220, 20, 60, 0.1);
   }
 
-  /* Loading animation */
-  .loading-dots {
-    display: inline-block;
+  /* Shimmer animation for progress bars */
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
   }
 
-  .loading-dots::after {
-    content: '';
-    animation: loading-dots 1.5s infinite;
+  .animate-shimmer {
+    animation: shimmer 2s infinite;
   }
 
-  @keyframes loading-dots {
-    0%, 20% { content: ''; }
-    40% { content: '.'; }
-    60% { content: '..'; }
-    80%, 100% { content: '...'; }
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 8px;
   }
 
-  /* Pulse ring effect */
-  .pulse-ring {
-    position: relative;
+  ::-webkit-scrollbar-track {
+    background: rgba(220, 20, 60, 0.1);
+    border-radius: 4px;
   }
 
-  .pulse-ring::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 100%;
-    height: 100%;
-    border: 2px solid rgba(0, 243, 255, 0.3);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    animation: pulse-ring 2s infinite;
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, var(--chinese-red), var(--chinese-gold));
+    border-radius: 4px;
   }
 
-  @keyframes pulse-ring {
-    0% {
-      transform: translate(-50%, -50%) scale(1);
-      opacity: 1;
-    }
-    100% {
-      transform: translate(-50%, -50%) scale(1.5);
-      opacity: 0;
-    }
+  ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #B22222, #FFD700);
   }
 }
+

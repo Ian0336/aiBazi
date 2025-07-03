@@ -1,98 +1,48 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import BaziForm from '@/components/BaziForm';
-import BaziResult from '@/components/BaziResult';
-import AnalysisModal from '@/components/AnalysisModal';
-import ClientOnly from '@/components/ClientOnly';
-import { BaziChart, BaziInput } from '@/types/bazi';
+import BaziChart from '@/components/BaziChart';
+import FiveElementsBalance from '@/components/FiveElementsBalance';
+import TraditionalBaziChart from '@/components/TraditionalBaziChart';
+import StickyHeader from '@/components/StickyHeader';
+import { BaziChart as BaziChartType, BaziInput } from '@/types/bazi';
 
 export default function HomePage() {
-  const [chart, setChart] = useState<BaziChart | null>(null);
+  const [chart, setChart] = useState<BaziChartType | null>(null);
   const [originalInput, setOriginalInput] = useState<BaziInput | null>(null);
-  const [analysis, setAnalysis] = useState<string>('');
   const [isCalculating, setIsCalculating] = useState<boolean>(false);
-  const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [particles, setParticles] = useState<React.ReactElement[]>([]);
+  const [showChart, setShowChart] = useState<boolean>(false);
+  const [sequenceState  , setSequenceState] = useState<'visible' | 'exit'>('visible');
 
-  // Generate particles on client side only
-  useEffect(() => {
-    const generateParticles = () => {      
-      return Array.from({ length: 20 }, (_, i) => (
-        <motion.div
-          key={i}
-          className="absolute w-1 h-1 bg-cyan-400 rounded-full opacity-40"
-          initial={{
-            x: Math.random() * 1200,
-            y: Math.random() * 800,
-          }}
-          animate={{
-            x: Math.random() * 1200,
-            y: Math.random() * 800,
-          }}
-          transition={{
-            duration: Math.random() * 20 + 10,
-            repeat: Infinity,
-            repeatType: "reverse",
-            ease: "linear"
-          }}
-          style={{
-            left: Math.random() * 100 + '%',
-            top: Math.random() * 100 + '%',
-          }}
-        />
-      ));
-    };
-
-    setParticles(generateParticles());
-  }, []);
-
-  const handleCalculate = (newChart: BaziChart, input: BaziInput) => {
+  const handleCalculate = (newChart: BaziChartType, input: BaziInput) => {
     setChart(newChart);
     setOriginalInput(input);
-    setAnalysis(''); // Clear previous analysis
+    setShowChart(true);
   };
 
-  const handleAnalyze = async () => {
-    if (!chart) return;
-
-    setIsAnalyzing(true);
-    try {
-      console.log("chart", chart);
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/analyze`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          year_ganzhi: chart.year_pillar.ganzhi,
-          month_ganzhi: chart.month_pillar.ganzhi,
-          day_ganzhi: chart.day_pillar.ganzhi, 
-          hour_ganzhi: chart.hour_pillar.ganzhi
-        }),
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        setAnalysis(result.analysis || '分析結果暫時無法取得，請稍後再試。');
-        setIsModalOpen(true);
-      } else if (response.status === 429) {
-        setAnalysis('您已達到每小時分析次數上限，請下個小時再來試試看。😊');
-        setIsModalOpen(true);
-      } else {
-        setAnalysis('AI 分析服務暫時無法使用，請稍後再試。');
-        setIsModalOpen(true);
-      }
-    } catch (error) {
-      console.error('Error analyzing Bazi:', error);
-      setAnalysis('連線錯誤，請檢查網路連線後再試。');
-      setIsModalOpen(true);
-    } finally {
-      setIsAnalyzing(false);
-    }
+  const handleEdit = () => {
+    setShowChart(false);
+    setChart(null);
+    setOriginalInput(null);
+    setSequenceState('exit');
   };
+
+
+  useEffect(() => {
+    const sequenceAnimation = () => {
+      setTimeout(() => {
+        setSequenceState('visible');
+        
+        setTimeout(() => {
+          setSequenceState('exit');
+        }, 2000); 
+      }, 1000); 
+    };
+
+    sequenceAnimation();
+  }, []);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -105,292 +55,316 @@ export default function HomePage() {
     }
   };
 
-  const titleVariants = {
-    hidden: { opacity: 0, y: -50, scale: 0.8 },
+  const itemVariants = {
+    hidden: { opacity: 0, y: 30, rotate: -1 },
     visible: {
       opacity: 1,
       y: 0,
-      scale: 1,
-      transition: {
-        duration: 0.8,
-        ease: "easeOut"
-      }
+      rotate: 0,
+      transition: { duration: 0.6, type: "spring", stiffness: 100 }
     }
   };
 
-  const subtitleVariants = {
+  const calligraphyVariants = {
+    hidden: { opacity: 0, scale: 0.8, filter: "blur(4px)" },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      filter: "blur(0px)",
+      transition: { duration: 1.2, ease: "easeOut" }
+    }
+  };
+
+  const chartSectionVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: {
-        duration: 0.6,
-        delay: 0.3
-      }
+      transition: { duration: 0.6, ease: "easeOut" }
+    }
+  };
+
+  const sequenceVariants = {
+    hidden: { 
+      opacity: 0, 
+      scale: 0.95,
+      transition: { duration: 1.5, ease: "easeInOut" }
+    },
+    visible: { 
+      opacity: 1, 
+      scale: 1,
+      transition: { duration: 1.5, ease: "easeInOut" }
+    },
+    exit: { 
+      opacity: 0,
+      scale: 0.95,
+      height: 0,
+      padding: 0,
+      margin: 0,
+      border: 0,
+      borderRadius: 0,
+      borderColor: 'transparent',
+      borderStyle: 'none',
+      borderWidth: 0,
+      transition: { duration: 1.5, ease: "easeInOut" }
     }
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden">
-      {/* Animated background particles */}
+    <div className="min-h-screen transition-colors duration-300 relative">
+      {/* Traditional Chinese Background Elements */}
       <div className="fixed inset-0 pointer-events-none z-0">
-        <ClientOnly>
-          {particles}
-        </ClientOnly>
+        {/* Ink wash effect corners */}
+        <div className="absolute top-0 left-0 w-64 h-64 opacity-10">
+          <div className="w-full h-full rounded-full bg-gradient-radial from-black/20 via-transparent to-transparent blur-xl"></div>
+        </div>
+        <div className="absolute bottom-0 right-0 w-80 h-80 opacity-8">
+          <div className="w-full h-full rounded-full bg-gradient-radial from-red-900/15 via-transparent to-transparent blur-2xl"></div>
+        </div>
+        
+        {/* Subtle mountain silhouettes */}
+        <div className="absolute bottom-0 left-0 right-0 h-32 opacity-5">
+          <svg viewBox="0 0 1200 200" className="w-full h-full">
+            <path d="M0,200 C300,50 600,120 900,40 C1000,20 1100,60 1200,30 L1200,200 Z" fill="currentColor"/>
+          </svg>
+        </div>
+      </div>
+      {/* Traditional Chinese Seal/Stamp in corner */}
+      <div className="fixed top-6 left-6 z-10 opacity-20">
+        <div className="w-16 h-16 bg-red-600 rounded-sm rotate-12 flex items-center justify-center chinese-text text-white text-xs font-bold">
+          <span>八字</span>
+        </div>
       </div>
 
-      {/* Main content */}
+      {/* Sticky Header - only show when chart is calculated */}
+      <AnimatePresence>
+        {showChart && originalInput && (
+          <StickyHeader input={originalInput} onEdit={handleEdit} />
+        )}
+      </AnimatePresence>
+
       <motion.main
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="relative z-10 min-h-screen py-8 px-4 sm:px-6 lg:px-8"
+        className="container mx-auto px-4 py-8 relative z-10"
       >
-        <div className="max-w-7xl mx-auto">
-          {/* Header with enhanced styling */}
-          <motion.header 
-            className="text-center mb-16"
-            variants={titleVariants}
-          >
-            {/* Glowing orb behind title */}
-            <div className="absolute top-20 left-1/2 transform -translate-x-1/2 w-96 h-96 bg-gradient-to-r from-cyan-400/20 to-purple-600/20 rounded-full blur-3xl -z-10"></div>
-            
-            <motion.h1 
-              className="text-6xl md:text-8xl font-bold mb-6 relative"
-              initial={{ scale: 0.5, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 1, ease: "easeOut" }}
+        {/* Header Section */}
+        <AnimatePresence mode="wait">
+          {!showChart && (
+            <motion.header 
+              key="header"
+              variants={sequenceVariants}
+              animate={sequenceState}
+              className="text-center mb-16 pt-20"
             >
-              <span className="gradient-text glow-text font-cyber">
-                AI 八字算命
-              </span>
-              
-              {/* Floating symbols around title */}
+              {/* Traditional Chinese Title */}
               <motion.div 
-                className="absolute -top-8 -left-8 text-3xl opacity-60"
-                animate={{ 
-                  rotate: 360,
-                  scale: [1, 1.2, 1]
-                }}
-                transition={{ 
-                  duration: 8,
-                  repeat: Infinity,
-                  ease: "linear"
-                }}
+                variants={calligraphyVariants}
+                className="relative mb-8"
               >
-                ✨
+                <h1 className="text-6xl md:text-8xl font-bold chinese-title mb-4">
+                  八字命盤
+                </h1>
+                {/* Decorative elements */}
+                <div className="flex justify-center items-center gap-4 mb-6">
+                  <div className="w-16 h-0.5 bg-gradient-to-r from-transparent via-red-600 to-transparent"></div>
+                  <span className="text-2xl">🪷</span>
+                  <div className="w-16 h-0.5 bg-gradient-to-r from-transparent via-yellow-600 to-transparent"></div>
+                </div>
               </motion.div>
-              <motion.div 
-                className="absolute -top-4 -right-12 text-2xl opacity-40"
-                animate={{ 
-                  rotate: -360,
-                  y: [-10, 10, -10]
-                }}
-                transition={{ 
-                  duration: 6,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
+
+              {/* Subtitle with traditional elements */}
+              <motion.div
+                variants={itemVariants}
+                className="max-w-3xl mx-auto"
               >
-                🔮
+                <p className="text-xl md:text-2xl chinese-text text-gray-700 leading-relaxed mb-4">
+                  千古智慧 · 現代演繹
+                </p>
+                <p className="text-base md:text-lg chinese-text text-gray-600 leading-relaxed">
+                  運用傳統八字命理學，結合現代科技分析
+                  <br />
+                  為您解讀生命密碼，指引人生方向
+                </p>
+                
+                {/* Five Elements Symbols */}
+                <div className="flex justify-center gap-6 mt-8 text-2xl">
+                  <span title="木" className="hover:scale-125 transition-transform cursor-help">🌳</span>
+                  <span title="火" className="hover:scale-125 transition-transform cursor-help">🔥</span>
+                  <span title="土" className="hover:scale-125 transition-transform cursor-help">🏔️</span>
+                  <span title="金" className="hover:scale-125 transition-transform cursor-help">⚡</span>
+                  <span title="水" className="hover:scale-125 transition-transform cursor-help">💧</span>
+                </div>
               </motion.div>
-              <motion.div 
-                className="absolute -bottom-6 left-4 text-xl opacity-50"
-                animate={{ 
-                  scale: [1, 1.5, 1],
-                  opacity: [0.5, 0.8, 0.5]
-                }}
-                transition={{ 
-                  duration: 4,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
-              >
-                🌟
-              </motion.div>
-            </motion.h1>
-            
+            </motion.header>
+          )}
+        </AnimatePresence>
+
+        {/* Form Section */}
+        <AnimatePresence mode="wait">
+          {!showChart && (
             <motion.div
-              variants={subtitleVariants}
-              className="space-y-6"
+              key="form"
+              variants={itemVariants}
+              initial="hidden"
+              animate="visible"
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="max-w-2xl mx-auto animate-ink-drop"
             >
-              <p className="text-2xl md:text-3xl text-slate-200 mb-8 font-light">
-                融合古老智慧與現代 <span className="text-cyan-400 font-semibold">AI 技術</span>的命理分析
-              </p>
-              
-              {/* Enhanced feature badges */}
-              <div className="flex flex-wrap justify-center gap-6 text-sm">
-                {[
-                  { icon: '🔮', text: '準確計算', color: 'from-cyan-400 to-blue-500' },
-                  { icon: '🤖', text: 'AI 分析', color: 'from-purple-400 to-pink-500' },
-                  { icon: '⚡', text: '即時結果', color: 'from-orange-400 to-red-500' },
-                ].map((feature, index) => (
-                  <motion.div
-                    key={feature.text}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5 + index * 0.1, duration: 0.5 }}
-                    className="relative group"
-                  >
-                    <div className={`bg-gradient-to-r ${feature.color} p-px rounded-full`}>
-                      <div className="bg-gray-900 rounded-full px-6 py-3 flex items-center space-x-2 hover:bg-gray-800 transition-colors">
-                        <span className="text-lg">{feature.icon}</span>
-                        <span className="text-white font-medium">{feature.text}</span>
-                      </div>
-                    </div>
-                    
-                    {/* Hover glow effect */}
-                    <div className={`absolute inset-0 bg-gradient-to-r ${feature.color} rounded-full opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-300`}></div>
-                  </motion.div>
-                ))}
+              {/* Traditional form wrapper */}
+              <div className="chinese-card p-8 brush-border">
+                <div className="text-center mb-6">
+                  <h3 className="text-2xl chinese-title mb-2">輸入生辰資訊</h3>
+                  <p className="chinese-text text-gray-600">請準確填寫您的出生時間</p>
+                </div>
+                
+                <BaziForm 
+                  onCalculate={handleCalculate}
+                  isLoading={isCalculating}
+                />
+                
+                {/* Decorative border */}
+                <div className="mt-6 flex justify-center">
+                  <div className="flex items-center gap-2 text-xs chinese-text text-gray-500">
+                    <span>✦</span>
+                    <span>準確的時間有助於精確分析</span>
+                    <span>✦</span>
+                  </div>
+                </div>
               </div>
             </motion.div>
-          </motion.header>
+          )}
+        </AnimatePresence>
 
-          {/* Main Content with enhanced spacing */}
-          <div className="space-y-12">
-            {/* Form Section */}
-            <motion.section
-              initial={{ opacity: 0, y: 30 }}
+        {/* Chart Section */}
+        <AnimatePresence>
+          {showChart && chart && (
+            <motion.div
+              key="chart"
+              initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4, duration: 0.6 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className="space-y-12"
             >
-              <BaziForm 
-                onCalculate={handleCalculate}
-                isLoading={isCalculating}
-              />
-            </motion.section>
-
-            {/* Results Section */}
-            {chart && originalInput && (
+              {/* Traditional Bazi Chart */}
               <motion.section
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
+                variants={chartSectionVariants}
+                initial="hidden"
+                animate="visible"
+                className="animate-fade-in-brush"
               >
-                <BaziResult 
-                  chart={chart}
-                  originalInput={originalInput}
-                  onAnalyze={handleAnalyze}
-                  isAnalyzing={isAnalyzing}
-                />
+                <TraditionalBaziChart chart={chart} />
               </motion.section>
-            )}
-          </div>
 
-          {/* Enhanced Footer */}
-          <motion.footer 
-            className="mt-24 text-center text-slate-400"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1, duration: 0.6 }}
-          >
-            <div className="relative">
-              {/* Decorative line */}
-              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-64 h-px bg-gradient-to-r from-transparent via-cyan-400 to-transparent opacity-50"></div>
-              
-              <div className="pt-12 pb-8">
-                <motion.p 
-                  className="text-lg mb-6"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 1.2, duration: 0.4 }}
-                >
-                  © 2024 AI 八字算命系統 | 結合傳統命理與人工智慧技術
-                </motion.p>
-                
-                <motion.div 
-                  className="flex flex-wrap justify-center gap-8 text-sm"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 1.4, duration: 0.4 }}
-                >
-                  {[
-                    { icon: '⚡', text: '極速計算' },
-                    { icon: '🎯', text: '精準分析' },
-                    { icon: '🔒', text: '隱私保護' },
-                    { icon: '🌐', text: '雲端服務' },
-                  ].map((item, index) => (
-                    <motion.span 
-                      key={item.text}
-                      className="flex items-center space-x-2 text-slate-300 hover:text-cyan-400 transition-colors cursor-default"
-                      whileHover={{ scale: 1.05 }}
-                    >
-                      <span>{item.icon}</span>
-                      <span>{item.text}</span>
-                    </motion.span>
-                  ))}
-                </motion.div>
-              </div>
-            </div>
-          </motion.footer>
-        </div>
+              {/* Five Elements Balance */}
+              <motion.section
+                variants={chartSectionVariants}
+                initial="hidden"
+                animate="visible"
+                className="animate-lotus-bloom"
+                style={{ animationDelay: '0.3s' }}
+              >
+                <FiveElementsBalance chart={chart} />
+              </motion.section>
 
-        {/* Analysis Modal */}
-        <AnalysisModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          analysis={analysis}
-        />
+              {/* Detailed Analysis Section */}
+              <motion.section
+                variants={chartSectionVariants}
+                initial="hidden"
+                animate="visible"
+                className="animate-ink-drop"
+                style={{ animationDelay: '0.6s' }}
+              >
+                <div className="chinese-card p-8 brush-border lotus-pattern">
+                  <div className="text-center mb-8">
+                    <h3 className="text-3xl chinese-title mb-4">命理詳析</h3>
+                    <div className="flex justify-center items-center gap-4">
+                      <div className="w-20 h-0.5 bg-gradient-to-r from-transparent via-red-600 to-transparent"></div>
+                      <span className="text-lg">🔮</span>
+                      <div className="w-20 h-0.5 bg-gradient-to-r from-transparent via-yellow-600 to-transparent"></div>
+                    </div>
+                  </div>
+                  
+                  <div className="grid md:grid-cols-2 gap-8">
+                    {/* Four Pillars Analysis */}
+                    <div className="space-y-6">
+                      <div className="chinese-card p-6">
+                        <h4 className="text-xl font-semibold chinese-text text-red-700 mb-3 flex items-center gap-2">
+                          <span>🏛️</span>年柱 · 根基
+                        </h4>
+                        <p className="chinese-text text-gray-700 leading-relaxed">
+                          年柱代表祖上根基與早年運勢，奠定一生的基本格局與先天稟賦，影響性格底蘊。
+                        </p>
+                      </div>
+                      
+                      <div className="chinese-card p-6">
+                        <h4 className="text-xl font-semibold chinese-text text-yellow-700 mb-3 flex items-center gap-2">
+                          <span>🌸</span>月柱 · 青春
+                        </h4>
+                        <p className="chinese-text text-gray-700 leading-relaxed">
+                          月柱主管青年時期，關係到事業發展、人際關係與求學運勢，是人生發展的關鍵期。
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-6">
+                      <div className="chinese-card p-6">
+                        <h4 className="text-xl font-semibold chinese-text text-blue-700 mb-3 flex items-center gap-2">
+                          <span>☀️</span>日柱 · 本命
+                        </h4>
+                        <p className="chinese-text text-gray-700 leading-relaxed">
+                          日柱為命主本身，代表個人性格、夫妻關係與中年運勢，是八字分析的核心。
+                        </p>
+                      </div>
+                      
+                      <div className="chinese-card p-6">
+                        <h4 className="text-xl font-semibold chinese-text text-green-700 mb-3 flex items-center gap-2">
+                          <span>🌙</span>時柱 · 晚景
+                        </h4>
+                        <p className="chinese-text text-gray-700 leading-relaxed">
+                          時柱主晚年運勢，也關係到子女緣分與後代發展，影響人生的收穫與歸宿。
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Traditional Chinese wisdom quote */}
+                  <div className="mt-8 text-center">
+                    <div className="chinese-card p-6 bg-gradient-to-r from-red-50 to-yellow-50">
+                      <p className="chinese-text text-lg text-gray-800 italic">
+                        "天行健，君子以自強不息；地勢坤，君子以厚德載物"
+                      </p>
+                      <p className="chinese-text text-sm text-gray-600 mt-2">
+                        ——《易經》
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </motion.section>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.main>
 
-      {/* Enhanced background decorative elements */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
-        <ClientOnly>
-          {/* Large floating orbs */}
-          {[...Array(4)].map((_, i) => (
-            <motion.div
-              key={`orb-${i}`}
-              className="absolute rounded-full opacity-5"
-              style={{
-                width: `${200 + i * 50}px`,
-                height: `${200 + i * 50}px`,
-                background: `linear-gradient(135deg, ${
-                  ['#00f3ff', '#8b5cf6', '#f97316', '#00ff88'][i]
-                }, transparent)`,
-                left: `${20 + i * 20}%`,
-                top: `${10 + i * 15}%`,
-              }}
-              animate={{
-                scale: [1, 1.2, 1],
-                rotate: [0, 180, 360],
-                opacity: [0.03, 0.08, 0.03],
-              }}
-              transition={{
-                duration: 15 + i * 3,
-                repeat: Infinity,
-                delay: i * 2,
-                ease: "easeInOut"
-              }}
-            />
-          ))}
-
-          {/* Scanning line effect */}
-          <motion.div
-            className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-cyan-400 to-transparent opacity-30"
-            animate={{
-              y: [0, 800],
-            }}
-            transition={{
-              duration: 8,
-              repeat: Infinity,
-              ease: "linear",
-            }}
-          />
-        </ClientOnly>
-
-        {/* Grid pattern overlay */}
-        <div 
-          className="absolute inset-0 opacity-5"
-          style={{
-            backgroundImage: `
-              linear-gradient(rgba(0, 243, 255, 0.1) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(0, 243, 255, 0.1) 1px, transparent 1px)
-            `,
-            backgroundSize: '50px 50px'
-          }}
-        />
-      </div>
+      {/* Traditional Chinese footer elements */}
+      {!showChart && (
+        <motion.footer 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1, duration: 0.8 }}
+          className="mt-20 pb-8 text-center chinese-text text-gray-500 text-sm"
+        >
+          <div className="flex justify-center items-center gap-4 mb-4">
+            <span>🪷</span>
+            <span>傳承千年智慧</span>
+            <span>·</span>
+            <span>現代科技演繹</span>
+            <span>🪷</span>
+          </div>
+          <p>願您前程似錦，命運亨通</p>
+        </motion.footer>
+      )}
     </div>
   );
 }

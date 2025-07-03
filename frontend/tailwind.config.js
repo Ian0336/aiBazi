@@ -1,100 +1,98 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  // 啟用 class-based dark mode
-  darkMode: 'class',
-
-  // 確保掃描到 app/, pages/, components/ 下所有 TSX/JSX/MDX
   content: [
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
   ],
-
   theme: {
     extend: {
       colors: {
-        // 你的自訂顏色
-        'cyber-blue':  '#00f3ff',
-        'cyber-purple':'#8b5cf6',
-        'cyber-pink':  '#f97316',
-        'neon-green':  '#00ff88',
-        'dark-bg':     '#0a0a0a',
-        'card-bg':     'rgba(15, 23, 42, 0.8)',
-
-        // 如果你有在 global.css 用到 `border-border`
-        border:       'rgba(255,255,255,0.1)',
-        
-        // Enhanced color palette
+        // Modern minimalist colors
         primary: {
-          50: '#eff6ff',
-          100: '#dbeafe',
-          200: '#bfdbfe',
-          300: '#93c5fd',
-          400: '#60a5fa',
-          500: '#3b82f6',
-          600: '#2563eb',
-          700: '#1d4ed8',
-          800: '#1e40af',
-          900: '#1e3a8a',
+          light: '#F7F8FA',
+          dark: '#1F2A37',
+        },
+        secondary: {
+          light: '#FFFFFF',
+          dark: '#374151',
         },
         accent: {
-          blue: '#00f3ff',
-          purple: '#8b5cf6',
-          pink: '#f97316',
-          green: '#00ff88',
-        }
+          gold: '#F5C518',
+          start: '#4CA1AF',
+          end: '#C4E0E5',
+        },
+        // Five elements colors
+        element: {
+          wood: '#10B981',
+          fire: '#EF4444',
+          earth: '#F59E0B',
+          metal: '#6B7280',
+          water: '#3B82F6',
+        },
       },
       backgroundImage: {
-        'gradient-radial':  'radial-gradient(var(--tw-gradient-stops))',
-        'neon-gradient':    'linear-gradient(135deg, #00f3ff 0%, #8b5cf6 50%, #f97316 100%)',
-        'cyber-gradient':   'linear-gradient(45deg, #6366f1, #8b5cf6, #d946ef)',
-        'dark-gradient':    'linear-gradient(135deg, #1e293b 0%, #334155 100%)',
-        'mesh-gradient':    'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        'aurora':           'linear-gradient(90deg, #00f3ff, #8b5cf6, #f97316, #00ff88)',
-      },
-      boxShadow: {
-        neon:           '0 0 20px rgba(0, 243, 255, 0.5)',
-        'neon-purple':  '0 0 20px rgba(139, 92, 246, 0.5)',
-        'neon-pink':    '0 0 20px rgba(249, 115, 22, 0.5)',
-        'neon-green':   '0 0 20px rgba(0, 255, 136, 0.5)',
-        cyber:          '0 4px 20px rgba(99, 102, 241, 0.3)',
-        'glow-sm':      '0 0 10px rgba(0, 243, 255, 0.3)',
-        'glow-md':      '0 0 20px rgba(0, 243, 255, 0.4)',
-        'glow-lg':      '0 0 30px rgba(0, 243, 255, 0.5)',
-        'glow-xl':      '0 0 40px rgba(0, 243, 255, 0.6)',
-      },
-      animation: {
-        'pulse-slow':   'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        glow:           'glow 2s ease-in-out infinite alternate',
-        float:          'float 6s ease-in-out infinite',
-        'gradient':     'gradient 8s linear infinite',
-        'bounce-slow':  'bounce 3s infinite',
-        'spin-slow':    'spin 3s linear infinite',
-        'ping-slow':    'ping 3s cubic-bezier(0, 0, 0.2, 1) infinite',
-      },
-      keyframes: {
-        glow: {
-          '0%':   { boxShadow: '0 0 5px rgba(0, 243, 255, 0.5)' },
-          '100%': { boxShadow: '0 0 25px rgba(0, 243, 255, 0.8)' },
-        },
-        float: {
-          '0%, 100%': { transform: 'translateY(0)' },
-          '50%':      { transform: 'translateY(-10px)' },
-        },
-        gradient: {
-          '0%, 100%': { backgroundPosition: '0% 50%' },
-          '50%': { backgroundPosition: '100% 50%' },
-        },
+        'gradient-primary': 'linear-gradient(135deg, #4CA1AF, #C4E0E5)',
+        'glass-light': 'rgba(255, 255, 255, 0.8)',
+        'glass-dark': 'rgba(31, 42, 55, 0.8)',
       },
       backdropBlur: {
         xs: '2px',
       },
       fontFamily: {
-        'cyber': ['Orbitron', 'monospace'],
+        'mono': ['JetBrains Mono', 'monospace'],
+      },
+      boxShadow: {
+        'soft': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+        'medium': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+        'large': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+        'soft-dark': '0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2)',
+        'medium-dark': '0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2)',
+        'large-dark': '0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2)',
+      },
+      animation: {
+        'fade-in-up': 'fadeInUp 0.6s ease-out',
+        'slide-in': 'slideIn 0.5s ease-out',
+        'slide-in-from-top': 'slideInFromTop 0.5s ease-out',
+        'shimmer': 'shimmer 2s infinite',
+      },
+      keyframes: {
+        fadeInUp: {
+          from: {
+            opacity: '0',
+            transform: 'translateY(20px)',
+          },
+          to: {
+            opacity: '1',
+            transform: 'translateY(0)',
+          },
+        },
+        slideIn: {
+          from: {
+            opacity: '0',
+            transform: 'translateX(-20px)',
+          },
+          to: {
+            opacity: '1',
+            transform: 'translateX(0)',
+          },
+        },
+        slideInFromTop: {
+          from: {
+            opacity: '0',
+            transform: 'translateY(-100%)',
+          },
+          to: {
+            opacity: '1',
+            transform: 'translateY(0)',
+          },
+        },
+        shimmer: {
+          '0%': { backgroundPosition: '-200% 0' },
+          '100%': { backgroundPosition: '200% 0' },
+        },
       },
     },
   },
-
-  // Remove the incorrect plugin syntax
   plugins: [],
 }
