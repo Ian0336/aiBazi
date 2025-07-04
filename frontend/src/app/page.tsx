@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import BaziForm from '@/components/BaziForm';
-import BaziChart from '@/components/BaziChart';
 import FiveElementsBalance from '@/components/FiveElementsBalance';
 import TraditionalBaziChart from '@/components/TraditionalBaziChart';
 import StickyHeader from '@/components/StickyHeader';
@@ -16,10 +15,18 @@ export default function HomePage() {
   const [showChart, setShowChart] = useState<boolean>(false);
   const [sequenceState  , setSequenceState] = useState<'visible' | 'exit'>('visible');
 
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
+
   const handleCalculate = (newChart: BaziChartType, input: BaziInput) => {
     setChart(newChart);
     setOriginalInput(input);
     setShowChart(true);
+    scrollToTop();
   };
 
   const handleEdit = () => {
@@ -27,7 +34,9 @@ export default function HomePage() {
     setChart(null);
     setOriginalInput(null);
     setSequenceState('exit');
+    scrollToTop();
   };
+
 
 
   useEffect(() => {
@@ -37,7 +46,7 @@ export default function HomePage() {
         
         setTimeout(() => {
           setSequenceState('exit');
-        }, 2000); 
+        }, 1000); 
       }, 1000); 
     };
 
@@ -106,7 +115,7 @@ export default function HomePage() {
       borderColor: 'transparent',
       borderStyle: 'none',
       borderWidth: 0,
-      transition: { duration: 1.5, ease: "easeInOut" }
+      transition: { duration: 3, ease: "easeInOut" }
     }
   };
 
@@ -147,7 +156,7 @@ export default function HomePage() {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="container mx-auto px-4 py-8 relative z-10"
+        className="container mx-auto px-1 md:px-4 py-8 relative z-10"
       >
         {/* Header Section */}
         <AnimatePresence mode="wait">

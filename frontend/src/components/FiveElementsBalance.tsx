@@ -47,8 +47,8 @@ const FiveElementsBalance: React.FC<FiveElementsBalanceProps> = ({ chart }) => {
   ];
 
   // Get element counts from analysis
-  const wuxingCount = chart.analysis?.wuxing_analysis?.wuxing_scores || {};
-  const totalCount = Object.values(wuxingCount).reduce((sum, count) => sum + count, 0);
+  const wuxingCount: Record<string, number> = chart.analysis?.wuxing_analysis?.wuxing_scores || {};
+  const totalCount = Object.values(wuxingCount).reduce((sum: number, count: number) => sum + count, 0);
 
   // Find strongest and weakest elements
   const strongestElement = chart.analysis?.wuxing_analysis?.strongest_element || '';
