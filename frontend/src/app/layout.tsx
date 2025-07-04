@@ -1,4 +1,6 @@
 import type { Metadata, Viewport } from "next";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -37,6 +39,19 @@ export default function RootLayout({
       </head>
       <body className="antialiased font-inter">
           {children}
+          <ToastContainer
+            position="top-right"
+            autoClose={2000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="light"
+            className="chinese-text"
+          />
       </body>
     </html>
   );

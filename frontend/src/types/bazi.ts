@@ -3,6 +3,9 @@ export interface BaziInput {
   month: number;
   day: number;
   hour: number;
+  gender: string;
+  is_lunar: boolean;
+  is_leap_month: boolean;
 }
 
 export interface HiddenStem {

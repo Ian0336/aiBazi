@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { toast } from 'react-toastify';
 import { BaziInput, BaziChart } from '@/types/bazi';
 
 interface BaziFormProps {
@@ -15,9 +16,19 @@ const BaziForm: React.FC<BaziFormProps> = ({ onCalculate, isLoading = false }) =
     month: new Date().getMonth() + 1,
     day: new Date().getDate(),
     hour: new Date().getHours(),
+    gender: 'male',
+    is_lunar: false,
+    is_leap_month: false,
   });
 
-  const [errors, setErrors] = useState<Partial<BaziInput>>({});
+  interface FormErrors {
+    year?: number;
+    month?: number;
+    day?: number;
+    hour?: number;
+  }
+
+  const [errors, setErrors] = useState<FormErrors>({});
   const [internalLoading, setInternalLoading] = useState(false);
 
   // Helper function to check if a year is a leap year
@@ -112,23 +123,32 @@ const BaziForm: React.FC<BaziFormProps> = ({ onCalculate, isLoading = false }) =
   }, [input.year, input.month]);
 
   const validateInput = (): boolean => {
-    const newErrors: Partial<BaziInput> = {};
+    const newErrors: FormErrors = {};
+    let hasErrors = false;
 
     if (input.year < 1900 || input.year > 2100) {
       newErrors.year = 1;
+      toast.error('出生年份必須在 1900 年至 2100 年之間');
+      hasErrors = true;
     }
     if (input.month < 1 || input.month > 12) {
       newErrors.month = 1;
+      toast.error('請選擇正確的月份');
+      hasErrors = true;
     }
     if (input.day < 1 || input.day > getDaysInMonth(input.year, input.month)) {
       newErrors.day = 1;
+      toast.error('請選擇正確的日期');
+      hasErrors = true;
     }
     if (input.hour < 0 || input.hour > 23) {
       newErrors.hour = 1;
+      toast.error('請選擇正確的時辰');
+      hasErrors = true;
     }
 
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return !hasErrors;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -139,23 +159,57 @@ const BaziForm: React.FC<BaziFormProps> = ({ onCalculate, isLoading = false }) =
     }
 
     setInternalLoading(true);
+    
+
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/bazi`, {
+      const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+      if (!apiUrl) {
+        throw new Error('API 配置錯誤，請聯繫管理員');
+      }
+
+      const response = await fetch(`${apiUrl}/bazi`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(input),
       });
-      if (response.ok) {
-        const chart = await response.json();
-        console.log("chart", chart);
-        onCalculate(chart, input);
-      } else {
-        console.error('Failed to calculate Bazi');
+
+      
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        
+        switch (response.status) {
+          case 400:
+            throw new Error(errorData.error || '輸入資料格式錯誤，請檢查填寫內容');
+          case 404:
+            throw new Error('服務暫時無法使用，請稍後再試');
+          case 500:
+            throw new Error('伺服器內部錯誤，請稍後再試');
+          default:
+            throw new Error(errorData.error || `請求失敗 (${response.status})`);
+        }
       }
+
+      const chart = await response.json();
+      
+      onCalculate(chart, input);
+      
     } catch (error) {
       console.error('Error calculating Bazi:', error);
+      
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        toast.error('網路連接失敗，請檢查網路連線後重試');
+      } else if (error instanceof Error) {
+        if (error.message.includes('Invalid')) {
+          toast.error('輸入資料錯誤，請檢查填寫內容');
+        } else {
+          toast.error(error.message);
+        }
+      } else {
+        toast.error('未知錯誤，請稍後再試');
+      }
     } finally {
       setInternalLoading(false);
     }
@@ -180,12 +234,84 @@ const BaziForm: React.FC<BaziFormProps> = ({ onCalculate, isLoading = false }) =
     >
       {/* Form Grid */}
       <div className="grid md:grid-cols-2 gap-6">
+        {/* Gender Selection */}
+        <motion.div variants={itemVariants} className="space-y-3">
+          <label className="block text-sm font-medium chinese-text text-gray-700 flex items-center gap-2">
+            <span className="text-lg">👤</span>
+            <span>性別</span>
+          </label>
+          <div className="flex gap-4">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                value="male"
+                checked={input.gender === 'male'}
+                onChange={(e) => setInput(prev => ({ ...prev, gender: e.target.value }))}
+                className="w-4 h-4 text-red-600 border-gray-300 focus:ring-red-500"
+                disabled={loading}
+              />
+              <span className="chinese-text text-gray-700">👨 男性</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                value="female"
+                checked={input.gender === 'female'}
+                onChange={(e) => setInput(prev => ({ ...prev, gender: e.target.value }))}
+                className="w-4 h-4 text-red-600 border-gray-300 focus:ring-red-500"
+                disabled={loading}
+              />
+              <span className="chinese-text text-gray-700">👩 女性</span>
+            </label>
+          </div>
+        </motion.div>
+
+        {/* Calendar Type Selection */}
+        <motion.div variants={itemVariants} className="space-y-3">
+          <label className="block text-sm font-medium chinese-text text-gray-700 flex items-center gap-2">
+            <span className="text-lg">📅</span>
+            <span>曆法選擇</span>
+          </label>
+          <div className="flex gap-4">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                value="false"
+                checked={!input.is_lunar}
+                onChange={(e) => setInput(prev => ({ 
+                  ...prev, 
+                  is_lunar: false,
+                  is_leap_month: false // Reset leap month when switching to solar
+                }))}
+                className="w-4 h-4 text-red-600 border-gray-300 focus:ring-red-500"
+                disabled={loading}
+              />
+              <span className="chinese-text text-gray-700">🗓️ 國曆</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                value="true"
+                checked={input.is_lunar}
+                onChange={(e) => setInput(prev => ({ 
+                  ...prev, 
+                  is_lunar: true,
+                  is_leap_month: false // Reset leap month when switching to lunar
+                }))}
+                className="w-4 h-4 text-red-600 border-gray-300 focus:ring-red-500"
+                disabled={loading}
+              />
+              <span className="chinese-text text-gray-700">🌙 農曆</span>
+            </label>
+          </div>
+        </motion.div>
+
         {/* Year Selection */}
         <motion.div variants={itemVariants} className="space-y-3">
           <label className="block text-sm font-medium chinese-text text-gray-700 flex items-center gap-2">
             <span className="text-lg">📅</span>
             <span>出生年份</span>
-            <span className="text-xs text-gray-500">(西元)</span>
+            <span className="text-xs text-gray-500">({input.is_lunar ? '農曆' : '西元'})</span>
           </label>
           <select
             value={input.year}
@@ -201,26 +327,70 @@ const BaziForm: React.FC<BaziFormProps> = ({ onCalculate, isLoading = false }) =
           </select>
         </motion.div>
 
-        {/* Month Selection */}
+                {/* Month Selection */}
         <motion.div variants={itemVariants} className="space-y-3">
-          <label className="block text-sm font-medium chinese-text text-gray-700 flex items-center gap-2">
-            <span className="text-lg">🗓️</span>
-            <span>出生月份</span>
-          </label>
-          <select
-            value={input.month}
-            onChange={(e) => setInput(prev => ({ ...prev, month: parseInt(e.target.value) }))}
-            className={`input-chinese ${errors.month ? 'border-red-500' : ''}`}
-            disabled={loading}
-          >
-            {generateMonthOptions().map(month => (
-              <option key={month.value} value={month.value}>
-                {month.chinese}
-              </option>
-            ))}
-          </select>
+          <div className={`flex gap-4 ${input.is_lunar ? 'items-start' : ''}`}>
+            {/* Month Selection */}
+            <div className={`space-y-3 ${input.is_lunar ? 'flex-1' : 'w-full'}`}>
+              <label className="block text-sm font-medium chinese-text text-gray-700 flex items-center gap-2">
+                <span className="text-lg">🗓️</span>
+                <span>出生月份</span>
+                {input.is_lunar && (
+                  <span className="text-xs text-gray-500">(農曆)</span>
+                )}
+              </label>
+              <select
+                value={input.month}
+                onChange={(e) => setInput(prev => ({ ...prev, month: parseInt(e.target.value) }))}
+                className={`input-chinese ${errors.month ? 'border-red-500' : ''}`}
+                disabled={loading}
+              >
+                {generateMonthOptions().map(month => (
+                  <option key={month.value} value={month.value}>
+                    {input.is_lunar ? month.label : month.chinese}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Leap Month Selection - Only show when lunar calendar is selected */}
+            {input.is_lunar && (
+              <div className="space-y-3 flex-1">
+                <label className="block text-sm font-medium chinese-text text-gray-700 flex items-center gap-2">
+                  <span className="text-lg">🌙</span>
+                  <span>閏月</span>
+                  <span className="text-xs text-gray-500">(如果該年該月有閏月)</span>
+                </label>
+                <div className="flex gap-4">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      value="false"
+                      checked={!input.is_leap_month}
+                      onChange={(e) => setInput(prev => ({ ...prev, is_leap_month: false }))}
+                      className="w-4 h-4 text-red-600 border-gray-300 focus:ring-red-500"
+                      disabled={loading}
+                    />
+                    <span className="chinese-text text-gray-700">平月</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      value="true"
+                      checked={input.is_leap_month}
+                      onChange={(e) => setInput(prev => ({ ...prev, is_leap_month: true }))}
+                      className="w-4 h-4 text-red-600 border-gray-300 focus:ring-red-500"
+                      disabled={loading}
+                    />
+                    <span className="chinese-text text-gray-700">閏月</span>
+                  </label>
+                </div>
+              </div>
+            )}
+          </div>
         </motion.div>
 
+        
         {/* Day Selection */}
         <motion.div variants={itemVariants} className="space-y-3">
           <label className="block text-sm font-medium chinese-text text-gray-700 flex items-center gap-2">
@@ -270,12 +440,24 @@ const BaziForm: React.FC<BaziFormProps> = ({ onCalculate, isLoading = false }) =
       >
         <div className="text-center chinese-text">
           <p className="text-sm text-gray-600 mb-2">您選擇的出生時間：</p>
-          <p className="text-lg font-semibold text-gray-800">
-            西元 {input.year}年 {input.month}月 {input.day}日 {input.hour}時
-          </p>
-          <p className="text-sm text-gray-600 mt-1">
-            {generateHourOptions().find(h => h.value === input.hour)?.chinese}
-          </p>
+          <div className="grid md:grid-cols-2 gap-4 text-sm">
+            <div>
+              <p className="text-lg font-semibold text-gray-800">
+                {input.is_lunar ? '農曆' : '西元'} {input.year}年 {input.month}月{input.is_leap_month ? '(閏)' : ''} {input.day}日 {input.hour}時
+              </p>
+              <p className="text-sm text-gray-600 mt-1">
+                {generateHourOptions().find(h => h.value === input.hour)?.chinese}
+              </p>
+            </div>
+            <div className="flex items-center justify-center gap-4">
+              <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
+                {input.gender === 'male' ? '👨 男性' : '👩 女性'}
+              </span>
+              <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs">
+                {input.is_lunar ? '🌙 農曆' : '🗓️ 國曆'}
+              </span>
+            </div>
+          </div>
         </div>
       </motion.div>
 
@@ -312,6 +494,10 @@ const BaziForm: React.FC<BaziFormProps> = ({ onCalculate, isLoading = false }) =
           <span>⭐</span>
         </div>
         <p>八字命理以出生時間的天干地支為基礎進行分析</p>
+        <div className="grid md:grid-cols-2 gap-4 mt-3 text-xs">
+          <p>🌙 支援農曆與國曆日期轉換</p>
+          <p>👥 性別會影響大運順逆排列</p>
+        </div>
       </motion.div>
     </motion.form>
   );
