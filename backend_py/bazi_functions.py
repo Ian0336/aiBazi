@@ -13,9 +13,11 @@ from typing import List, Dict, Any, Tuple
 sys.path.append(os.path.join(os.path.dirname(__file__), 'external', 'bazi'))
 
 # Import the data modules safely
-from datas import *
-from common import *
-from ganzhi import *
+from external.bazi.datas import *
+from external.bazi.common import *
+from external.bazi.ganzhi import *
+from bazi_data import ten_deities_map
+
 
 # Define the functions directly here (copied from bazi.py) to avoid importing the script
 def get_gen(gan, zhis):
@@ -44,9 +46,9 @@ def get_gen(gan, zhis):
             weis.append(item)
 
     if not (zhus or zhongs or weis):
-        return "无根"
+        return "無根"
     else:
-        result = result + "强：{}{}".format(''.join(zhus), chr(12288)) if zhus else result
+        result = result + "強：{}{}".format(''.join(zhus), chr(12288)) if zhus else result
         result = result + "中：{}{}".format(''.join(zhongs), chr(12288)) if zhongs else result
         result = result + "弱：{}".format(''.join(weis)) if weis else result
         return result
@@ -125,12 +127,12 @@ def calculate_ten_deities(gans, zhis, day_master):
         if seq == 2:  # Day master position
             gan_shens.append('日主')
         else:
-            gan_shens.append(ten_deities[day_master][item])
+            gan_shens.append(get_ten_deity(day_master, item))
 
     zhi_shens = []  # Main qi of earthly branches
     for item in zhis:
         d = zhi5[item]
-        zhi_shens.append(ten_deities[day_master][max(d, key=d.get)])
+        zhi_shens.append(get_ten_deity(day_master, max(d, key=d.get)))
     
     return gan_shens, zhi_shens
 
@@ -181,6 +183,10 @@ def get_empty_positions(day_gan: str, day_zhi: str, all_zhis: List[str]) -> Dict
             "empty_in_chart": [],
             "count": 0
         }
+def get_ten_deity(key, value):
+    """Get ten deity for a gan-zhi pair"""
+    original_value = ten_deities[key].get(value, "unknown")
+    return ten_deities_map.get(original_value, original_value)
 
 
 def analyze_special_stars(gans, zhis, day_master):
@@ -195,7 +201,7 @@ def analyze_special_stars(gans, zhis, day_master):
     if ten_deities[day_master].inverse[key] in zhis:
         analysis['yang_blade'] = {
             "position": ten_deities[day_master].inverse[key],
-            "description": "羊刃重重又见禄，富贵饶金玉" if ten_deities[day_master].inverse['冠'] else "劳累命"
+            "description": "羊刃重重又見祿，富貴饒金玉" if ten_deities[day_master].inverse['冠'] else "勞累命"
         }
     
     # Check for Jiang Xing (将星)
@@ -214,7 +220,7 @@ def analyze_special_stars(gans, zhis, day_master):
     if jiang_xing:
         analysis['jiang_xing'] = {
             "star": jiang_xing,
-            "description": "将星: 常欲吉星相扶，贵煞加临乃为吉庆"
+            "description": "將星: 常欲吉星相扶，貴煞加臨乃為吉慶"
         }
     
     # Check for Hua Gai (华盖)
@@ -231,7 +237,7 @@ def analyze_special_stars(gans, zhis, day_master):
     if hua_gai:
         analysis['hua_gai'] = {
             "star": hua_gai,
-            "description": "华盖: 多主孤寡，总贵亦不免孤独，作僧道艺术论"
+            "description": "華蓋: 多主孤寡，總貴亦不免孤獨，作僧道藝術論"
         }
     
     return analysis 

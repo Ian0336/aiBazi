@@ -6,7 +6,7 @@ import sys
 import json
 import time
 from datetime import datetime
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 
 import uvicorn
 from fastapi import FastAPI, HTTPException, Request
@@ -48,20 +48,74 @@ class BaziRequest(BaseModel):
     is_leap_month: bool = Field(False, description="Whether it's a leap month (lunar only)")
     gender: str = Field("male", description="Gender: 'male' or 'female'")
 
+class HiddenStem(BaseModel):
+    """Hidden stem information within earthly branches"""
+    gan: str = Field(..., description="Heavenly stem")
+    wuxing: Optional[str] = Field(None, description="Five element")
+    ten_deity: str = Field(..., description="Ten deity relationship")
+    strength: Optional[int] = Field(None, description="Strength of the hidden stem")
+
+class Pillar(BaseModel):
+    """Structure for year, month, day, and hour pillars"""
+    ganzhi: str = Field(..., description="Combined heavenly stem and earthly branch")
+    gan: str = Field(..., description="Heavenly stem")
+    zhi: str = Field(..., description="Earthly branch")
+    gan_wuxing: str = Field(..., description="Five element of heavenly stem")
+    zhi_wuxing: str = Field(..., description="Five element of earthly branch")
+    ten_deity: str = Field(..., description="Ten deity of heavenly stem")
+    zhi_ten_deity: str = Field(..., description="Twelve lifecycle stage")
+    hidden_stems: List[HiddenStem] = Field(..., description="Hidden stems in earthly branch")
+    nayin: str = Field(..., description="Nayin (sound) element")
+    harmony: str = Field(..., description="Harmony relationships")
+    is_treasury: bool = Field(..., description="Whether the branch is a treasury")
+
+class LiunianEntry(BaseModel):
+    """Annual fortune entry within a major period"""
+    year: int = Field(..., description="Calendar year")
+    age: int = Field(..., description="Age during this year")
+    ganzhi: str = Field(..., description="Ganzhi for this year")
+    gan: str = Field(..., description="Heavenly stem")
+    zhi: str = Field(..., description="Earthly branch")
+    gan_ten_deity: str = Field(..., description="Ten deity of heavenly stem")
+    zhi_ten_deity: str = Field(..., description="Twelve lifecycle stage")
+    hidden_stems: List[HiddenStem] = Field(..., description="Hidden stems")
+    zhi_relationships: List[str] = Field(..., description="Branch relationships")
+    is_empty: bool = Field(..., description="Whether in empty position")
+    is_repeated: bool = Field(..., description="Whether there's repetition")
+    nayin: str = Field(..., description="Nayin element")
+    special_combinations: List[str] = Field(..., description="Special combinations")
+    special_patterns: List[str] = Field(..., description="Special patterns")
+
+class DayunEntry(BaseModel):
+    """Major fortune period entry"""
+    start_age: int = Field(..., description="Starting age for this period")
+    ganzhi: str = Field(..., description="Ganzhi for this period")
+    gan: str = Field(..., description="Heavenly stem")
+    zhi: str = Field(..., description="Earthly branch")
+    gan_ten_deity: str = Field(..., description="Ten deity of heavenly stem")
+    zhi_ten_deity: str = Field(..., description="Twelve lifecycle stage")
+    gan_yinyang: str = Field(..., description="Yin/Yang of heavenly stem")
+    zhi_yinyang: str = Field(..., description="Yin/Yang of earthly branch")
+    hidden_stems: List[HiddenStem] = Field(..., description="Hidden stems")
+    zhi_relationships: List[str] = Field(..., description="Branch relationships")
+    is_empty: bool = Field(..., description="Whether in empty position")
+    is_repeated: bool = Field(..., description="Whether there's repetition")
+    nayin: str = Field(..., description="Nayin element")
+    special_combinations: List[str] = Field(..., description="Special combinations")
+    liunian: List[LiunianEntry] = Field(..., description="Annual fortune within this period")
+
 class BaziResponse(BaseModel):
-    year_ganzhi: str
-    month_ganzhi: str
-    day_ganzhi: str
-    hour_ganzhi: str
-    year_pillar: Dict[str, Any]
-    month_pillar: Dict[str, Any]
-    day_pillar: Dict[str, Any]
-    hour_pillar: Dict[str, Any]
-    lunar_date: str
-    solar_date: str
-    nayin: Dict[str, str]
-    empty_positions: Dict[str, Any]
-    analysis: Dict[str, Any]
+    """Complete Bazi calculation response"""
+    year_pillar: Pillar = Field(..., description="Year pillar information")
+    month_pillar: Pillar = Field(..., description="Month pillar information")
+    day_pillar: Pillar = Field(..., description="Day pillar information")
+    hour_pillar: Pillar = Field(..., description="Hour pillar information")
+    dayun: List[DayunEntry] = Field(..., description="Major fortune periods")
+    lunar_date: str = Field(..., description="Corresponding lunar date")
+    solar_date: str = Field(..., description="Solar calendar date")
+    nayin: Dict[str, str] = Field(..., description="Nayin elements for each pillar")
+    empty_positions: Dict[str, Any] = Field(..., description="Empty position analysis")
+    analysis: Dict[str, Any] = Field(..., description="Detailed Bazi analysis")
 
 class AnalysisRequest(BaseModel):
     year_ganzhi: str = Field(..., description="Year pillar (干支)")
