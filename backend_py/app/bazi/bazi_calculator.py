@@ -11,7 +11,6 @@ import collections
 sys.path.append(os.path.join(os.path.dirname(__file__), 'external', 'bazi'))
 
 from lunar_python import Lunar, Solar
-from bazi.bazi_data import nayins_map
 
 # Import from the bazi library and our safe wrapper
 try:
@@ -22,7 +21,7 @@ try:
     from bazi.bazi_functions import (
         get_gen, gan_zhi_he, get_gong, is_ku, zhi_ku, gan_ke, jin_jiao,
         calculate_wuxing_scores, calculate_ten_deities, check_day_master_strength,
-        get_nayin_for_ganzhi, get_empty_positions, analyze_special_stars, get_ten_deity
+        get_nayin_for_ganzhi, get_empty_positions, analyze_special_stars, get_ten_deity, get_nayin
     )
 except ImportError as e:
     print(f"Error importing bazi modules: {e}")
@@ -105,7 +104,7 @@ class BaziCalculator:
             # Calculate detailed information for each pillar using enhanced methods
             year_pillar = self._get_pillar_details(gans.year, zhis.year, day_master, gans, zhis)
             month_pillar = self._get_pillar_details(gans.month, zhis.month, day_master, gans, zhis)
-            day_pillar = self._get_pillar_details(gans.day, zhis.day, day_master, gans, zhis)
+            day_pillar = self._get_pillar_details(gans.day, zhis.day, day_master, gans, zhis, True)
             hour_pillar = self._get_pillar_details(gans.time, zhis.time, day_master, gans, zhis)
 
             # Calculate dayun (大運)
@@ -143,16 +142,15 @@ class BaziCalculator:
         except Exception as e:
             raise ValueError(f"Failed to calculate bazi: {str(e)}")
     
-    def _get_pillar_details(self, gan: str, zhi: str, day_master: str, gans, zhis) -> Dict[str, Any]:
+    def _get_pillar_details(self, gan: str, zhi: str, day_master: str, gans, zhis, is_day_master = False) -> Dict[str, Any]:
         """Get detailed information for a pillar using enhanced bazi logic"""
         try:
             # Get ten deities relationship (same as bazi.py)
-            ten_deity = get_ten_deity(day_master, gan) if gan != day_master else "日主"
-            zhi_ten_deity = get_ten_deity(day_master, zhi) if zhi != day_master else "日主"
+            ten_deity = get_ten_deity(day_master, gan) if not is_day_master else "日主"
+            zhi_ten_deity = get_ten_deity(day_master, zhi)
             # Get five elements
             gan_wuxing = gan5.get(gan, "unknown")
             zhi_wuxing = zhi5.get(zhi, {})
-            
             # Get zhi hidden stems (藏干) with enhanced information
             hidden_stems = []
             if zhi in zhi5_list:
@@ -163,7 +161,7 @@ class BaziCalculator:
                         "ten_deity": get_ten_deity(day_master, hidden_gan)
                     })
             # Get Nayin
-            nayin = nayins_map.get(nayins.get((gan, zhi), "unknown"), "unknown")
+            nayin = get_nayin(gan, zhi)
             
             # Check for gan-zhi harmony using our function
             harmony = gan_zhi_he((gan, zhi))
@@ -171,13 +169,12 @@ class BaziCalculator:
             
             # Check if this is a treasury position using our function
             is_treasury = is_ku(zhi)
-            
             return {
                 "ganzhi": f"{gan}{zhi}",
                 "gan": gan,
                 "zhi": zhi,
                 "gan_wuxing": gan_wuxing,
-                "zhi_wuxing": list(zhi_wuxing.keys())[0] if zhi_wuxing else "unknown",
+                "zhi_wuxing": gan5.get(list(zhi_wuxing.keys())[0], "unknown") if zhi_wuxing else "unknown",
                 "ten_deity": ten_deity,
                 "zhi_ten_deity": zhi_ten_deity,
                 "hidden_stems": hidden_stems,
@@ -321,9 +318,13 @@ class BaziCalculator:
             day_zhu = (gans[2], zhis[2])  # Day pillar
             
             # Skip first item as it's the starting period, analyze from second onwards
-            for dayun_item in yun.getDaYun()[1:]:
-                gan_ = dayun_item.getGanZhi()[0]
-                zhi_ = dayun_item.getGanZhi()[1]
+            for idx, dayun_item in enumerate(yun.getDaYun()):
+                if idx == 0:
+                    gan_ = yun.getDaYun()[1].getGanZhi()[0]
+                    zhi_ = yun.getDaYun()[1].getGanZhi()[1]
+                else:
+                    gan_ = dayun_item.getGanZhi()[0]
+                    zhi_ = dayun_item.getGanZhi()[1]
                 start_age = dayun_item.getStartAge()
                 
                 # Check if this dayun gan-zhi appears in original chart
@@ -356,7 +357,7 @@ class BaziCalculator:
                 is_empty = zhi_ in empties.get(day_zhu, ())
                 
                 # Get nayin for this dayun
-                nayin = nayins_map.get(nayins.get((gan_, zhi_), "unknown"), "unknown")
+                nayin = get_nayin(gan_, zhi_)
                 
                 # Check for special combinations (夾、拱)
                 special_combinations = []
@@ -422,7 +423,7 @@ class BaziCalculator:
                     ln_is_empty = zhi2_ in empties.get(day_zhu, ())
                     
                     # Get nayin for liunian
-                    ln_nayin = nayins_map.get(nayins.get((gan2_, zhi2_), "unknown"), "unknown")
+                    ln_nayin = get_nayin(gan2_, zhi2_)
                     
                     # Check for special combinations in liunian
                     ln_special_combinations = []

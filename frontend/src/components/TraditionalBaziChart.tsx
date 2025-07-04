@@ -2,18 +2,33 @@
 
 import { motion } from 'framer-motion';
 import { BaziChart } from '@/types/bazi';
-
+import { Gan2Wuxing, Zhi2Wuxing } from '@/util/toWuxing';
+import React from 'react';
 interface TraditionalBaziChartProps {
   chart: BaziChart;
 }
+// Get element styling
+const getElementClass = (element: string) => {
+  const classMap: Record<string, string> = {
+    '木': 'bg-green-100 text-green-800 border-green-200',
+    '火': 'bg-red-100 text-red-800 border-red-200', 
+    '土': 'bg-[#D7CCC8] text-[#4E342E] border-[#BCAAA4]',  
+    '金': 'bg-yellow-100 text-yellow-800 border-yellow-200',
+    '水': 'bg-blue-100 text-blue-800 border-blue-200'
+  };
+  if (!classMap[element]) {
+    console.log(element);
+  }
+  return classMap[element] || 'bg-gray-100 text-gray-800 border-gray-200';
+};
 
 const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) => {
-  // 计算年龄（简化版）
+  // Calculate current age
   const currentYear = new Date().getFullYear();
   const birthYear = parseInt(chart.solar_date.split('年')[0]);
   const age = currentYear - birthYear;
 
-  // 获取生肖信息和图标
+  // Get zodiac information
   const getZodiac = (yearZhi: string) => {
     const zodiacMap: Record<string, { name: string; icon: string }> = {
       '子': { name: '鼠', icon: '🐭' }, '丑': { name: '牛', icon: '🐂' }, 
@@ -26,367 +41,527 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) =>
     return zodiacMap[yearZhi] || { name: '未知', icon: '❓' };
   };
 
-  // 获取五行样式类
-  const getElementClass = (element: string) => {
-    const classMap: Record<string, string> = {
-      '木': 'element-wood',
-      '火': 'element-fire', 
-      '土': 'element-earth',
-      '金': 'element-metal',
-      '水': 'element-water'
-    };
-    return classMap[element] || 'bg-gray-300 text-black';
-  };
-
-  // 获取五行图标
-  const getElementIcon = (element: string) => {
-    const iconMap: Record<string, string> = {
-      '木': '🌳', '火': '🔥', '土': '🏔️', '金': '⚡', '水': '💧'
-    };
-    return iconMap[element] || '⭐';
-  };
-
-  // 获取柱的传统名称和图标
-  const getPillarInfo = (pillarType: string) => {
-    const pillarMap: Record<string, { name: string; icon: string; desc: string }> = {
-      'hour': { name: '時柱', icon: '🌙', desc: '晚景' },
-      'day': { name: '日柱', icon: '☀️', desc: '命主' },
-      'month': { name: '月柱', icon: '🌸', desc: '青春' },
-      'year': { name: '年柱', icon: '🏛️', desc: '根基' }
-    };
-    return pillarMap[pillarType] || { name: '未知', icon: '❓', desc: '' };
-  };
+  
 
   const zodiacInfo = getZodiac(chart.year_pillar.zhi);
+
+  // Calculate current Dayun (Major Fortune Period)
+  const getCurrentDayun = () => {
+    if (!chart.dayun || chart.dayun.length === 0) return 0;
+    
+    for (let i = 0; i < chart.dayun.length; i++) {
+      const dayun = chart.dayun[i];
+      const nextDayun = chart.dayun[i + 1];
+      
+      if (nextDayun) {
+        if (age >= dayun.start_age && age < nextDayun.start_age) {
+          return i;
+        }
+      } else {
+        // Last dayun period
+        if (age >= dayun.start_age) {
+          return i;
+        }
+      }
+    }
+    
+    return 0; // Fallback to first period
+  };
+
+  // Calculate current Liunian (Annual Fortune)
+  const getCurrentLiunian = () => {
+    const currentDayunIdx = getCurrentDayun();
+    const currentDayunData = chart.dayun[currentDayunIdx];
+    if (!currentDayunData || !currentDayunData.liunian) return 0;
+    
+    const currentYear = new Date().getFullYear();
+    const currentLiunianIdx = currentDayunData.liunian.findIndex(ln => ln.year === currentYear);
+    
+    return currentLiunianIdx !== -1 ? currentLiunianIdx : 0; // Fallback to first year in period
+  };
+
+  // State for selected dayun and liunian
+  const [selectedDayunIdx, setSelectedDayunIdx] = React.useState(getCurrentDayun());
+  const [selectedLiunianIdx, setSelectedLiunianIdx] = React.useState(getCurrentLiunian());
+  
+  const selectedDayun = chart.dayun[selectedDayunIdx];
+  const selectedLiunian = chart.dayun[selectedDayunIdx]?.liunian[selectedLiunianIdx];
 
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: {
-        staggerChildren: 0.15
-      }
+      transition: { staggerChildren: 0.1 }
     }
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 30, rotate: -1 },
+    hidden: { opacity: 0, y: 20 },
     visible: {
       opacity: 1,
       y: 0,
-      rotate: 0,
-      transition: { duration: 0.6, type: "spring", stiffness: 100 }
+      transition: { duration: 0.6 }
     }
   };
-
-  const pillarVariants = {
-    hidden: { opacity: 0, scale: 0.8, y: 20 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      y: 0,
-      transition: { duration: 0.8, ease: "easeOut" }
-    },
-    hover: {
-      scale: 1.05,
-      y: -8,
-      transition: { duration: 0.3 }
-    }
-  };
-
-  const renderPillar = (pillar: any, pillarType: string, index: number) => {
-    const pillarInfo = getPillarInfo(pillarType);
-    
-    return (
-      <motion.div
-        key={pillarType}
-        variants={pillarVariants}
-        whileHover="hover"
-        className="bazi-pillar lotus-pattern"
-        style={{ animationDelay: `${index * 0.1}s` }}
-      >
-        <div className="text-center space-y-4">
-          {/* 柱名 */}
-          <div className="flex items-center justify-center gap-2 mb-3">
-            <span className="text-xl">{pillarInfo.icon}</span>
-            <div>
-              <div className="text-lg font-bold chinese-text text-gray-800">
-                {pillarInfo.name}
-              </div>
-              <div className="text-xs chinese-text text-gray-600">
-                {pillarInfo.desc}
-              </div>
-            </div>
-          </div>
-          
-          {/* 天干 */}
-          <div className="space-y-3">
-            <div className="text-center">
-              <div className="text-xs chinese-text text-gray-500 mb-1">天干</div>
-              <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-lg font-bold ${getElementClass(pillar.gan_wuxing)}`}>
-                <span>{getElementIcon(pillar.gan_wuxing)}</span>
-                <span className="text-2xl font-bold">{pillar.gan}</span>
-              </div>
-            </div>
-            
-            {/* 地支 */}
-            <div className="text-center">
-              <div className="text-xs chinese-text text-gray-500 mb-1">地支</div>
-              <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-lg font-bold ${getElementClass(pillar.zhi_wuxing)}`}>
-                <span>{getElementIcon(pillar.zhi_wuxing)}</span>
-                <span className="text-2xl font-bold">{pillar.zhi}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* 十神 */}
-          {pillar.ten_deity && (
-            <div className="chinese-card p-2 bg-gradient-to-r from-purple-50 to-pink-50">
-              <div className="text-xs chinese-text text-gray-500">十神</div>
-              <div className="text-sm font-semibold chinese-text text-purple-700">
-                {pillar.ten_deity}
-              </div>
-            </div>
-          )}
-
-          {/* 藏干 */}
-          {pillar.hidden_stems && pillar.hidden_stems.length > 0 && (
-            <div className="space-y-2">
-              <div className="text-xs chinese-text text-gray-500">藏干</div>
-              <div className="grid grid-cols-2 gap-2">
-                {pillar.hidden_stems.slice(0, 4).map((stem: any, idx: number) => (
-                  <div key={idx} className="chinese-card p-2 bg-gray-50">
-                    <div className="text-xs font-bold chinese-text text-gray-700">
-                      {stem.gan}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      </motion.div>
-    );
-  };
-
+  console.log(chart.dayun.length)
   return (
     <motion.div 
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="w-full max-w-7xl mx-auto space-y-8"
+      className="w-full max-w-6xl mx-auto space-y-8"
     >
-      {/* 标题区域 */}
+      {/* Header Section */}
       <motion.div 
         variants={itemVariants}
-        className="chinese-card p-8 text-center brush-border"
+        className="chinese-card p-6 text-center brush-border"
       >
         <div className="space-y-4">
-          <h1 className="text-5xl md:text-6xl font-bold chinese-title mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold chinese-title mb-4">
             八字命盤
           </h1>
           
-          {/* 生肖和基本信息徽章 */}
-          <div className="flex flex-wrap justify-center items-center gap-4">
-            <div className="chinese-card px-4 py-2 bg-gradient-to-r from-red-100 to-yellow-100 flex items-center gap-2">
-              <span className="text-2xl">{zodiacInfo.icon}</span>
-              <span className="chinese-text font-semibold text-red-700">
-                {zodiacInfo.name}年生
-              </span>
+          <div className="flex flex-wrap justify-center items-center gap-4 text-sm chinese-text">
+            <div className="flex items-center gap-2 px-3 py-1 bg-red-50 rounded-lg border">
+              <span>生辰：</span>
+              <span className="font-semibold">{chart.solar_date}</span>
             </div>
-            <div className="chinese-card px-4 py-2 bg-gradient-to-r from-blue-100 to-green-100 flex items-center gap-2">
-              <span className="text-lg">🎂</span>
-              <span className="chinese-text font-semibold text-blue-700">
-                {birthYear}年 · {age}歲
-              </span>
+            <div className="flex items-center gap-2 px-3 py-1 bg-blue-50 rounded-lg border">
+              <span>農曆：</span>
+              <span className="font-semibold">{chart.lunar_date}</span>
             </div>
-            <div className="chinese-card px-4 py-2 bg-gradient-to-r from-purple-100 to-pink-100 flex items-center gap-2">
-              <span className="text-lg">{chart.analysis?.gender === 'male' ? '👨' : '👩'}</span>
-              <span className="chinese-text font-semibold text-purple-700">
-                {chart.analysis?.gender === 'male' ? '男命' : '女命'}
-              </span>
+            <div className="flex items-center gap-2 px-3 py-1 bg-yellow-50 rounded-lg border">
+              <span className="text-xl">{zodiacInfo.icon}</span>
+              <span className="font-semibold">{zodiacInfo.name}年</span>
+            </div>
+            <div className="flex items-center gap-2 px-3 py-1 bg-green-50 rounded-lg border">
+              <span>現年：</span>
+              <span className="font-semibold">{age}歲</span>
             </div>
           </div>
         </div>
       </motion.div>
 
-      {/* 基本信息 */}
+      {/* Main Bazi Chart Table */}
       <motion.div 
         variants={itemVariants}
         className="chinese-card p-6 brush-border"
       >
-        <div className="text-center mb-4">
-          <h3 className="text-2xl chinese-title">生辰資訊</h3>
-          <div className="flex justify-center items-center gap-4 mt-2">
-            <div className="w-12 h-0.5 bg-gradient-to-r from-transparent via-red-600 to-transparent"></div>
-            <span className="text-lg">📅</span>
-            <div className="w-12 h-0.5 bg-gradient-to-r from-transparent via-yellow-600 to-transparent"></div>
-          </div>
+        <div className="text-center mb-6">
+          <h2 className="text-2xl chinese-title mb-2">八字排盤</h2>
+          <div className="w-20 h-0.5 bg-gradient-to-r from-transparent via-red-600 to-transparent mx-auto"></div>
         </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="chinese-card p-4 bg-gradient-to-br from-red-50 to-orange-50">
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">🗓️</span>
-              <div>
-                <div className="text-sm chinese-text text-gray-600">西元日期</div>
-                <div className="text-lg font-bold chinese-text text-gray-800">
-                  {chart.solar_date}
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div className="chinese-card p-4 bg-gradient-to-br from-yellow-50 to-green-50">
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">🌙</span>
-              <div>
-                <div className="text-sm chinese-text text-gray-600">農曆日期</div>
-                <div className="text-lg font-bold chinese-text text-gray-800">
-                  {chart.lunar_date}
-                </div>
-              </div>
-            </div>
-          </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full chinese-text border-collapse">
+            {/* Header Row */}
+            <thead>
+              <tr className="border-b-2 border-gray-300">
+                <th className="p-3 text-left font-bold text-gray-700 w-20"></th>
+                <th className="p-3 text-center font-bold text-gray-700">流年</th>
+                <th className="p-3 text-center font-bold text-gray-700">大運</th>
+                <th className="p-3 text-center font-bold text-gray-700">時柱</th>
+                <th className="p-3 text-center font-bold text-gray-700">日柱</th>
+                <th className="p-3 text-center font-bold text-gray-700">月柱</th>
+                <th className="p-3 text-center font-bold text-gray-700">年柱</th>
+              </tr>
+            </thead>
+            <tbody>
+              
+
+              {/* Ten Deities Row */}
+              <tr className="border-b border-gray-200">
+                <td className="p-3 font-semibold text-gray-700">主星</td>
+                <td className="p-3 text-center">
+                  <div className="text-purple-700 font-semibold">
+                    {selectedLiunian?.gan_ten_deity || '-'}
+                  </div>
+                </td>
+                <td className="p-3 text-center">
+                  <div className="text-purple-700 font-semibold">
+                    {selectedDayun?.gan_ten_deity || '-'}
+                  </div>
+                </td>
+                <td className="p-3 text-center">
+                  <div className="text-purple-700 font-semibold">
+                    {chart.hour_pillar.ten_deity}
+                  </div>
+                </td>
+                <td className="p-3 text-center">
+                  <div className="text-purple-700 font-semibold">
+                    {chart.day_pillar.ten_deity}
+                  </div>
+                </td>
+                <td className="p-3 text-center">
+                  <div className="text-purple-700 font-semibold">
+                    {chart.month_pillar.ten_deity}
+                  </div>
+                </td>
+                <td className="p-3 text-center">
+                  <div className="text-purple-700 font-semibold">
+                    {chart.year_pillar.ten_deity}
+                  </div>
+                </td>
+              </tr>
+
+              {/* Heavenly Stems Row */}
+              <tr className="border-b border-gray-200">
+                <td className="p-3 font-semibold text-gray-700">天干</td>
+                <td className="p-3 text-center">
+                  {selectedLiunian && (
+                    <div className={`inline-block px-4 py-2 rounded-lg border font-bold text-xl ${getElementClass(Gan2Wuxing(selectedLiunian.gan))}`}>
+                      {selectedLiunian.gan}
+                    </div>
+                  )}
+                </td>
+                <td className="p-3 text-center">
+                  {selectedDayun && (
+                    <div className={`inline-block px-4 py-2 rounded-lg border font-bold text-xl ${getElementClass(Gan2Wuxing(selectedDayun.gan))}`}>
+                      {selectedDayun.gan}
+                    </div>
+                  )}
+                </td>
+                <td className="p-3 text-center">
+                  <div className={`inline-block px-4 py-2 rounded-lg border font-bold text-xl ${getElementClass(chart.hour_pillar.gan_wuxing)}`}>
+                    {chart.hour_pillar.gan}
+                  </div>
+                </td>
+                <td className="p-3 text-center">
+                  <div className={`inline-block px-4 py-2 rounded-lg border font-bold text-xl ${getElementClass(chart.day_pillar.gan_wuxing)}`}>
+                    {chart.day_pillar.gan}
+                  </div>
+                </td>
+                <td className="p-3 text-center">
+                  <div className={`inline-block px-4 py-2 rounded-lg border font-bold text-xl ${getElementClass(chart.month_pillar.gan_wuxing)}`}>
+                    {chart.month_pillar.gan}
+                  </div>
+                </td>
+                <td className="p-3 text-center">
+                  <div className={`inline-block px-4 py-2 rounded-lg border font-bold text-xl ${getElementClass(chart.year_pillar.gan_wuxing)}`}>
+                    {chart.year_pillar.gan}
+                  </div>
+                </td>
+              </tr>
+
+              {/* Earthly Branches Row */}
+              <tr className="border-b border-gray-200">
+                <td className="p-3 font-semibold text-gray-700">地支</td>
+                <td className="p-3 text-center">
+                  {selectedLiunian && (
+                    <div className={`inline-block px-4 py-2 rounded-lg border font-bold text-xl ${getElementClass(Zhi2Wuxing(selectedLiunian.zhi))}`}>
+                      {selectedLiunian.zhi}
+                    </div>
+                  )}
+                </td>
+                <td className="p-3 text-center">
+                  {selectedDayun && (
+                    <div className={`inline-block px-4 py-2 rounded-lg border font-bold text-xl ${getElementClass(Zhi2Wuxing(selectedDayun.zhi))}`}>
+                      {selectedDayun.zhi}
+                    </div>
+                  )}
+                </td>
+                <td className="p-3 text-center">
+                  <div className={`inline-block px-4 py-2 rounded-lg border font-bold text-xl ${getElementClass(chart.hour_pillar.zhi_wuxing)}`}>
+                    {chart.hour_pillar.zhi}
+                  </div>
+                </td>
+                <td className="p-3 text-center">
+                  <div className={`inline-block px-4 py-2 rounded-lg border font-bold text-xl ${getElementClass(chart.day_pillar.zhi_wuxing)}`}>
+                    {chart.day_pillar.zhi}
+                  </div>
+                </td>
+                <td className="p-3 text-center">
+                  <div className={`inline-block px-4 py-2 rounded-lg border font-bold text-xl ${getElementClass(chart.month_pillar.zhi_wuxing)}`}>
+                    {chart.month_pillar.zhi}
+                  </div>
+                </td>
+                <td className="p-3 text-center">
+                  <div className={`inline-block px-4 py-2 rounded-lg border font-bold text-xl ${getElementClass(chart.year_pillar.zhi_wuxing)}`}>
+                    {chart.year_pillar.zhi}
+                  </div>
+                </td>
+              </tr>
+
+              {/* Twelve Lifecycles Row */}
+              <tr className="border-b border-gray-200">
+                <td className="p-3 font-semibold text-gray-700">星運</td>
+                <td className="p-3 text-center text-sm text-indigo-600 font-medium">
+                  {selectedLiunian?.zhi_ten_deity || '-'}
+                </td>
+                <td className="p-3 text-center text-sm text-indigo-600 font-medium">
+                  {selectedDayun?.zhi_ten_deity || '-'}
+                </td>
+                <td className="p-3 text-center text-sm text-indigo-600 font-medium">
+                  {chart.hour_pillar.zhi_ten_deity}
+                </td>
+                <td className="p-3 text-center text-sm text-indigo-600 font-medium">
+                  {chart.day_pillar.zhi_ten_deity}
+                </td>
+                <td className="p-3 text-center text-sm text-indigo-600 font-medium">
+                  {chart.month_pillar.zhi_ten_deity}
+                </td>
+                <td className="p-3 text-center text-sm text-indigo-600 font-medium">
+                  {chart.year_pillar.zhi_ten_deity}
+                </td>
+              </tr>
+
+              {/* Hidden Stems Row */}
+              <tr className="border-b border-gray-200">
+                <td className="p-3 font-semibold text-gray-700">藏干</td>
+                <td className="p-3 text-center">
+                  {selectedLiunian && (
+                    <div className="space-y-1">
+                      {selectedLiunian.hidden_stems.map((stem, idx) => (
+                        <div key={idx} className={`text-xs px-2 py-1 rounded border ${getElementClass(Gan2Wuxing(stem.gan))}`}>
+                          <span className="font-medium">{stem.gan}</span>
+                          <span className="text-gray-600 ml-1">({stem.ten_deity})</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </td>
+                <td className="p-3 text-center">
+                  {selectedDayun && (
+                    <div className="space-y-1">
+                      {selectedDayun.hidden_stems.map((stem, idx) => (
+                        <div key={idx} className={`text-xs px-2 py-1 rounded border ${getElementClass(Gan2Wuxing(stem.gan))}`}>
+                          <span className="font-medium">{stem.gan}</span>
+                          <span className="text-gray-600 ml-1">({stem.ten_deity})</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </td>
+                <td className="p-3 text-center">
+                  <div className="space-y-1">
+                    {chart.hour_pillar.hidden_stems.map((stem, idx) => (
+                      <div key={idx} className={`text-xs px-2 py-1 rounded border ${getElementClass(Gan2Wuxing(stem.gan))}`}>
+                        <span className="font-medium">{stem.gan}</span>
+                        <span className="text-gray-600 ml-1">({stem.ten_deity})</span>
+                      </div>
+                    ))}
+                  </div>
+                </td>
+                <td className="p-3 text-center">
+                  <div className="space-y-1">
+                    {chart.day_pillar.hidden_stems.map((stem, idx) => (
+                      <div key={idx} className={`text-xs px-2 py-1 rounded border ${getElementClass(Gan2Wuxing(stem.gan))}`}>
+                        <span className="font-medium">{stem.gan}</span>
+                        <span className="text-gray-600 ml-1">({stem.ten_deity})</span>
+                      </div>
+                    ))}
+                  </div>
+                </td>
+                <td className="p-3 text-center">
+                  <div className="space-y-1">
+                    {chart.month_pillar.hidden_stems.map((stem, idx) => (
+                      <div key={idx} className={`text-xs px-2 py-1 rounded border ${getElementClass(Gan2Wuxing(stem.gan))}`}>
+                        <span className="font-medium">{stem.gan}</span>
+                        <span className="text-gray-600 ml-1">({stem.ten_deity})</span>
+                      </div>
+                    ))}
+                  </div>
+                </td>
+                <td className="p-3 text-center">
+                  <div className="space-y-1">
+                    {chart.year_pillar.hidden_stems.map((stem, idx) => (
+                      <div key={idx} className={`text-xs px-2 py-1 rounded border ${getElementClass(Gan2Wuxing(stem.gan))}`}>
+                        <span className="font-medium">{stem.gan}</span>
+                        <span className="text-gray-600 ml-1">({stem.ten_deity})</span>
+                      </div>
+                    ))}
+                  </div>
+                </td>
+              </tr>
+
+              {/* Nayin Row */}
+              <tr className="border-b border-gray-200">
+                <td className="p-3 font-semibold text-gray-700">納音</td>
+                <td className={`p-3 text-center text-sm font-medium ${selectedLiunian ? getElementClass(selectedLiunian.nayin[selectedLiunian.nayin.length - 1]) : ''}`}>
+                  {selectedLiunian?.nayin || '-'}
+                </td>
+                <td className={`p-3 text-center text-sm font-medium ${selectedDayun ? getElementClass(selectedDayun.nayin[selectedDayun.nayin.length - 1]) : ''}`}>
+                  {selectedDayun?.nayin || '-'}
+                </td>
+                <td className={`p-3 text-center text-sm font-medium ${getElementClass(chart.hour_pillar.nayin[chart.hour_pillar.nayin.length - 1])}`}>
+                  {chart.hour_pillar.nayin}
+                </td>
+                <td className={`p-3 text-center text-sm font-medium ${getElementClass(chart.day_pillar.nayin[chart.day_pillar.nayin.length - 1])}`}>
+                  {chart.day_pillar.nayin}
+                </td>
+                <td className={`p-3 text-center text-sm font-medium ${getElementClass(chart.month_pillar.nayin[chart.month_pillar.nayin.length - 1])}`}>
+                  {chart.month_pillar.nayin}
+                </td>
+                <td className={`p-3 text-center text-sm font-medium ${getElementClass(chart.year_pillar.nayin[chart.year_pillar.nayin.length - 1])}`}>
+                  {chart.year_pillar.nayin}
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </motion.div>
 
-      {/* 四柱主体 */}
-      <motion.div 
-        variants={itemVariants}
-        className="chinese-card p-8 brush-border lotus-pattern"
-      >
-        <div className="text-center mb-8">
-          <h2 className="text-3xl chinese-title mb-4">
-            四柱八字
-          </h2>
-          <div className="flex justify-center items-center gap-4">
-            <div className="w-16 h-0.5 bg-gradient-to-r from-transparent via-red-600 to-transparent"></div>
-            <span className="text-xl">🎋</span>
-            <div className="w-16 h-0.5 bg-gradient-to-r from-transparent via-yellow-600 to-transparent"></div>
-          </div>
-          <p className="chinese-text text-gray-600 mt-4 text-lg">
-            天干地支 · 命理根基
-          </p>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {renderPillar(chart.hour_pillar, 'hour', 0)}
-          {renderPillar(chart.day_pillar, 'day', 1)}
-          {renderPillar(chart.month_pillar, 'month', 2)}
-          {renderPillar(chart.year_pillar, 'year', 3)}
-        </div>
-      </motion.div>
+      {/* Fortune Periods Section */}
+      {chart.dayun && chart.dayun.length > 0 && (
+        <motion.div 
+          variants={itemVariants}
+          className="chinese-card p-6 brush-border"
+        >
+          <DayunCard 
+            chart={chart} 
+            _currentDayun={selectedDayunIdx} 
+            _currentLiunian={selectedLiunianIdx}
+            onDayunChange={setSelectedDayunIdx}
+            onLiunianChange={setSelectedLiunianIdx}
+          />
+        </motion.div>
+      )}
 
-      {/* 纳音和空亡信息 */}
+      {/* Analysis Section */}
       <motion.div 
         variants={itemVariants}
-        className="grid md:grid-cols-2 gap-6"
+        className="chinese-card p-6 brush-border"
       >
-        {/* 纳音 */}
-        {chart.nayin && (
-          <div className="chinese-card p-6 brush-border">
-            <div className="text-center mb-4">
-              <h3 className="text-xl chinese-title flex items-center justify-center gap-2">
-                <span>🎵</span>
-                <span>納音五行</span>
-              </h3>
-            </div>
-            <div className="space-y-3">
-              {Object.entries(chart.nayin).map(([pillar, sound]) => (
-                <div key={pillar} className="chinese-card p-3 bg-gradient-to-r from-blue-50 to-purple-50">
-                  <div className="flex justify-between items-center chinese-text">
-                    <span className="font-semibold text-gray-700">
-                      {pillar === 'year' ? '年柱' : pillar === 'month' ? '月柱' : pillar === 'day' ? '日柱' : '時柱'}
-                    </span>
-                    <span className="font-bold text-blue-700">{sound}</span>
+        <div className="text-center mb-6">
+          <h2 className="text-2xl chinese-title mb-2">命理分析</h2>
+          <div className="w-20 h-0.5 bg-gradient-to-r from-transparent via-green-600 to-transparent mx-auto"></div>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          {/* Five Elements Analysis */}
+          <div className="space-y-4">
+            <h3 className="text-lg chinese-text font-semibold text-gray-700">五行分布</h3>
+            <div className="space-y-2">
+              {['木', '火', '土', '金', '水'].map((element) => (
+                <div key={element} className="flex items-center gap-3">
+                  <span className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold ${
+                    element === '木' ? 'bg-green-500' :
+                    element === '火' ? 'bg-red-500' :
+                    element === '土' ? 'bg-yellow-500' :
+                    element === '金' ? 'bg-gray-500' : 'bg-blue-500'
+                  }`}>
+                    {element}
+                  </span>
+                  <div className="flex-1">
+                    <div className="flex justify-between items-center">
+                      <span className="chinese-text">{element}行</span>
+                      <span className="text-sm text-gray-600">
+                        {[chart.year_pillar, chart.month_pillar, chart.day_pillar, chart.hour_pillar]
+                          .filter(p => p.gan_wuxing === element || p.zhi_wuxing === element).length}
+                      </span>
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
           </div>
-        )}
 
-                 {/* 空亡 */}
-         {chart.empty_positions && (
-           <div className="chinese-card p-6 brush-border">
-             <div className="text-center mb-4">
-               <h3 className="text-xl chinese-title flex items-center justify-center gap-2">
-                 <span>🕳️</span>
-                 <span>空亡信息</span>
-               </h3>
-             </div>
-             <div className="chinese-card p-4 bg-gradient-to-r from-gray-50 to-blue-50">
-               <div className="text-center chinese-text">
-                 <div className="text-sm text-gray-600 mb-2">當前空亡</div>
-                 <div className="text-lg font-bold text-gray-800">
-                   {chart.empty_positions.empty_pair.join('、')}
-                 </div>
-                 {chart.empty_positions.empty_in_chart.length > 0 && (
-                   <div className="text-sm text-gray-600 mt-2">
-                     命中空亡：{chart.empty_positions.empty_in_chart.join('、')}
-                   </div>
-                 )}
-               </div>
-             </div>
-           </div>
-         )}
-      </motion.div>
-
-      {/* 日主强弱分析 */}
-      {chart.analysis?.day_master_strength && (
-        <motion.div 
-          variants={itemVariants}
-          className="chinese-card p-6 brush-border lotus-pattern"
-        >
-          <div className="text-center mb-6">
-            <h3 className="text-2xl chinese-title flex items-center justify-center gap-3">
-              <span>⚖️</span>
-              <span>日主強弱</span>
-              <span>⚖️</span>
-            </h3>
-          </div>
-          
-          <div className="chinese-card p-6 bg-gradient-to-br from-yellow-50 via-orange-50 to-red-50">
-            <div className="text-center space-y-4">
-              <div className="flex justify-center items-center gap-4">
-                <span className="text-3xl">
-                  {chart.analysis.day_master_strength.is_strong ? '💪' : '🌱'}
-                </span>
-                <div>
-                  <div className="text-lg chinese-text font-bold text-gray-800">
-                    日主{chart.analysis.day_master_strength.is_strong ? '偏強' : '偏弱'}
-                  </div>
-                  <div className="text-sm chinese-text text-gray-600">
-                    {chart.analysis.day_master_strength.is_strong ? '命格較為強勢' : '命格相對溫和'}
-                  </div>
+          {/* Special Notes */}
+          <div className="space-y-4">
+            <h3 className="text-lg chinese-text font-semibold text-gray-700">特殊格局</h3>
+            <div className="space-y-2">
+              {chart.year_pillar.is_treasury && (
+                <div className="chinese-card p-3 bg-yellow-50 border border-yellow-200">
+                  <span className="text-yellow-700 font-semibold">年支為庫</span>
                 </div>
-              </div>
+              )}
+              {chart.month_pillar.is_treasury && (
+                <div className="chinese-card p-3 bg-yellow-50 border border-yellow-200">
+                  <span className="text-yellow-700 font-semibold">月支為庫</span>
+                </div>
+              )}
+              {chart.day_pillar.is_treasury && (
+                <div className="chinese-card p-3 bg-yellow-50 border border-yellow-200">
+                  <span className="text-yellow-700 font-semibold">日支為庫</span>
+                </div>
+              )}
+              {chart.hour_pillar.is_treasury && (
+                <div className="chinese-card p-3 bg-yellow-50 border border-yellow-200">
+                  <span className="text-yellow-700 font-semibold">時支為庫</span>
+                </div>
+              )}
               
-              <div className="chinese-text text-gray-700 leading-relaxed">
-                {chart.analysis.day_master_strength.description}
+              <div className="chinese-card p-3 bg-blue-50 border border-blue-200">
+                <div className="text-blue-700 font-semibold mb-2">重要提示</div>
+                <div className="text-sm chinese-text text-blue-600">
+                  日柱為命主本身，其他三柱分別代表祖宮、父母宮、子女宮的運勢影響
+                </div>
               </div>
             </div>
           </div>
-        </motion.div>
-      )}
-
-      {/* 传统底部装饰 */}
-      <motion.div 
-        variants={itemVariants}
-        className="text-center chinese-text text-gray-500 py-6"
-      >
-        <div className="flex justify-center items-center gap-4 mb-3">
-          <span>🪷</span>
-          <span>命由天定 · 運靠自己</span>
-          <span>🪷</span>
-        </div>
-        <div className="text-sm">
-          八字命理僅供參考，人生路上仍需自己努力前行
         </div>
       </motion.div>
     </motion.div>
   );
 };
+const DayunCard = ({ chart, _currentDayun, _currentLiunian, onDayunChange, onLiunianChange }: { chart: BaziChart, _currentDayun: number, _currentLiunian: number, onDayunChange: React.Dispatch<React.SetStateAction<number>>, onLiunianChange: React.Dispatch<React.SetStateAction<number>> }) => {
+  const [currentDayunIdx, setCurrentDayunIdx] = React.useState(_currentDayun)
+  React.useEffect(() => {
+    setCurrentDayunIdx(_currentDayun)
+  }, [_currentDayun])
+  console.log(currentDayunIdx)
+  return (
+    <>
+      <div className="text-center mb-6">
+        <h2 className="text-2xl chinese-title mb-2">大運流年</h2>
+        <div className="w-20 h-0.5 bg-gradient-to-r from-transparent via-blue-600 to-transparent mx-auto"></div>
+      </div>
 
+      {/* Major Fortune Periods */}
+      <div className="mb-6">
+        <h3 className="text-lg chinese-text font-semibold mb-4 text-gray-700">大運</h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-9 gap-3">
+          {chart.dayun.slice(0, 9).map((dayun, idx) => (
+            <div 
+              key={idx} 
+              className={`chinese-card p-3 text-center bg-gradient-to-b from-blue-50 to-white border-2 cursor-pointer hover:shadow-md transition-all ${currentDayunIdx === idx ? 'bg-blue/0 border-blue-400' : ''}`}
+              onClick={() => {
+                setCurrentDayunIdx(idx);
+              }}
+            >
+              <div className="text-xs text-gray-500 mb-1">{dayun.liunian[0].year} </div>
+              <div className="text-xs text-gray-500 mb-1">{dayun.start_age}歲</div>
+              <div className="space-y-2">
+                <div className={`px-2 py-1 rounded text-sm font-bold ${getElementClass(Gan2Wuxing(dayun.gan))}`}>
+                  {dayun.gan}
+                </div>
+                <div className={`px-2 py-1 rounded text-sm font-bold ${getElementClass(Zhi2Wuxing(dayun.zhi))}`}>
+                  {dayun.zhi}
+                </div>
+              </div>
+              <div className="text-xs text-purple-600 mt-1 font-medium">
+                {dayun.gan_ten_deity}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Current Year Fortune */}
+      <div>
+        <h3 className="text-lg chinese-text font-semibold mb-4 text-gray-700">流年</h3>
+        <div className="grid grid-cols-2 md:grid-cols-5 lg:grid-cols-10 gap-2">
+          {chart.dayun[currentDayunIdx]?.liunian?.slice(0, 10).map((liunian, idx) => (
+            <div 
+              key={idx} 
+              className={`chinese-card p-2 text-center bg-gradient-to-b from-green-50 to-white border-2 text-xs cursor-pointer hover:shadow-md transition-all ${_currentLiunian === idx && _currentDayun === currentDayunIdx ? 'bg-green/0 border-green-400' : ''}`}
+            >
+              <div className="text-gray-500 mb-1">{liunian.year}</div>
+              <div className="text-xs text-gray-500 mb-1">{liunian.age}歲</div>
+              <div className={`px-1 py-0.5 rounded text-xs font-bold ${getElementClass(Gan2Wuxing(liunian.gan))}`}>
+                {liunian.gan}
+              </div>
+              <div className={`px-1 py-0.5 rounded text-xs font-bold mt-1 ${getElementClass(Zhi2Wuxing(liunian.zhi))}`}>
+                {liunian.zhi}
+              </div>
+              <div className="text-purple-600 mt-1 font-medium text-xs">
+                {liunian.gan_ten_deity}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </>
+  )
+}
 export default TraditionalBaziChart; 

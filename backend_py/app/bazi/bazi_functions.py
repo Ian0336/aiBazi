@@ -16,7 +16,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), 'external', 'bazi'))
 from external.bazi.datas import *
 from external.bazi.common import *
 from external.bazi.ganzhi import *
-from bazi.bazi_data import ten_deities_map
+from bazi.bazi_data import ten_deities_map, nayins_map
 
 
 # Define the functions directly here (copied from bazi.py) to avoid importing the script
@@ -187,7 +187,10 @@ def get_ten_deity(key, value):
     """Get ten deity for a gan-zhi pair"""
     original_value = ten_deities[key].get(value, "unknown")
     return ten_deities_map.get(original_value, original_value)
-
+def get_nayin(gan, zhi):
+    """Get nayin for a gan-zhi pair"""
+    original_value = nayins.get((gan, zhi), "unknown")
+    return nayins_map.get(original_value, original_value)
 
 def analyze_special_stars(gans, zhis, day_master):
     """Analyze special stars and patterns"""
