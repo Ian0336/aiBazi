@@ -17,7 +17,7 @@ from pydantic import BaseModel, Field
 # Add the external bazi directory to Python path
 sys.path.append(os.path.join(os.path.dirname(__file__), 'external', 'bazi'))
 
-from bazi_calculator import BaziCalculator
+from bazi.bazi_calculator import BaziCalculator
 
 app = FastAPI(
     title="AI Bazi Backend (Python)",

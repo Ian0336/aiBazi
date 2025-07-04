@@ -16,7 +16,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), 'external', 'bazi'))
 from external.bazi.datas import *
 from external.bazi.common import *
 from external.bazi.ganzhi import *
-from bazi_data import ten_deities_map
+from bazi.bazi_data import ten_deities_map
 
 
 # Define the functions directly here (copied from bazi.py) to avoid importing the script

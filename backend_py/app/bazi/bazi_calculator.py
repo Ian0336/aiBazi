@@ -11,7 +11,7 @@ import collections
 sys.path.append(os.path.join(os.path.dirname(__file__), 'external', 'bazi'))
 
 from lunar_python import Lunar, Solar
-from bazi_data import nayins_map
+from bazi.bazi_data import nayins_map
 
 # Import from the bazi library and our safe wrapper
 try:
@@ -19,7 +19,7 @@ try:
     from external.bazi.common import *
     from external.bazi.ganzhi import *
     # Import from our safe wrapper instead of directly from bazi.py
-    from bazi_functions import (
+    from bazi.bazi_functions import (
         get_gen, gan_zhi_he, get_gong, is_ku, zhi_ku, gan_ke, jin_jiao,
         calculate_wuxing_scores, calculate_ten_deities, check_day_master_strength,
         get_nayin_for_ganzhi, get_empty_positions, analyze_special_stars, get_ten_deity
