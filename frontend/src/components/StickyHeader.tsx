@@ -42,7 +42,7 @@ const StickyHeader: React.FC<StickyHeaderProps> = ({ input, onEdit }) => {
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: -50, scale: 0.95 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className="sticky top-0 z-50 backdrop-blur-md bg-transparentshadow-lg"
+      className="sticky top-0 z-50 backdrop-blur-md bg-transparentshadow-lg fixed-header"
     >
       <div className="max-w-7xl mx-auto px-1 md:px-4 py-4">
         <div className="chinese-card p-4 bg-gradient-to-r from-red-50/30 via-yellow-50/30 to-orange-50/30">

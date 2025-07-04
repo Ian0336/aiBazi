@@ -271,7 +271,7 @@ export default function HomePage() {
                 variants={chartSectionVariants}
                 initial="hidden"
                 animate="visible"
-                className="animate-lotus-bloom"
+                className="animate-lotus-bloom wuxing-analysis"
                 style={{ animationDelay: '0.3s' }}
               >
                 <FiveElementsBalance chart={chart} />
@@ -282,7 +282,7 @@ export default function HomePage() {
                 variants={chartSectionVariants}
                 initial="hidden"
                 animate="visible"
-                className="animate-ink-drop"
+                className="animate-ink-drop pattern-analysis"
                 style={{ animationDelay: '0.6s' }}
               >
                 <div className="chinese-card p-8 brush-border lotus-pattern">

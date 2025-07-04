@@ -413,5 +413,294 @@
     opacity: 0.1;
     filter: blur(4px);
   }
+
+  /* Print Styles */
+  .print-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+    background: linear-gradient(45deg, var(--chinese-red), var(--chinese-gold));
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-family: 'Noto Serif SC', serif;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+  }
+
+  .print-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+  }
+
+  @media print {
+    /* Hide everything except the bazi chart */
+    body {
+      background: white !important;
+      color: black !important;
+      font-size: 12pt;
+      line-height: 1.3;
+      margin: 0;
+      padding: 0;
+    }
+
+    body::before {
+      display: none !important;
+    }
+
+    /* Hide print button and interactive elements */
+    .print-button,
+    .hover\:shadow-md,
+    .cursor-pointer,
+    .transition-all {
+      display: none !important;
+    }
+
+    /* Hide analysis section and other non-essential parts for print */
+    .analysis-section,
+    .wuxing-analysis,
+    .fixed-header,
+    .pattern-analysis {
+      display: none !important;
+    }
+
+    /* Show only core sections: header, bazi chart, and fortune periods */
+    .print-show {
+      display: block !important;
+    }
+
+    /* Optimize layout for A4 paper */
+    .chinese-card {
+      background: white !important;
+      border: 1px solid #000 !important;
+      box-shadow: none !important;
+      margin: 0 !important;
+      padding: 8pt !important;
+      page-break-inside: avoid;
+    }
+
+    .brush-border {
+      border: 2px solid #000 !important;
+      background: white !important;
+    }
+
+    .brush-border::before,
+    .lotus-pattern::after {
+      display: none !important;
+    }
+
+    /* Table optimizations */
+    table {
+      width: 100% !important;
+      border-collapse: collapse !important;
+      margin: 0 !important;
+      page-break-inside: avoid;
+    }
+
+    th, td {
+      border: 1px solid #000 !important;
+      padding: 4pt !important;
+      font-size: 10pt !important;
+      text-align: center !important;
+    }
+
+    th {
+      background: #f0f0f0 !important;
+      font-weight: bold !important;
+    }
+
+    /* Element colors - grayscale for print */
+    .element-wood, 
+    .bg-green-100 {
+      background: #f8f8f8 !important;
+      color: #000 !important;
+      border: 1px solid #666 !important;
+    }
+
+    .element-fire, 
+    .bg-red-100 {
+      background: #e8e8e8 !important;
+      color: #000 !important;
+      border: 1px solid #666 !important;
+    }
+
+    .element-earth, 
+    .bg-yellow-100 {
+      background: #f0f0f0 !important;
+      color: #000 !important;
+      border: 1px solid #666 !important;
+    }
+
+    .element-metal, 
+    .bg-gray-100 {
+      background: #e0e0e0 !important;
+      color: #000 !important;
+      border: 1px solid #666 !important;
+    }
+
+    .element-water, 
+    .bg-blue-100 {
+      background: #d8d8d8 !important;
+      color: #000 !important;
+      border: 1px solid #666 !important;
+    }
+
+    /* Day pillar highlighting */
+    .bg-red-50 {
+      background: #f0f0f0 !important;
+      border: 2px solid #000 !important;
+    }
+
+    /* Typography for print */
+    .chinese-text {
+      font-family: "Times New Roman", serif !important;
+    }
+
+    .chinese-title {
+      background: none !important;
+      -webkit-text-fill-color: black !important;
+      color: black !important;
+      filter: none !important;
+      font-weight: bold !important;
+    }
+
+    /* Important borders */
+    .border-l-2 {
+      border-left: 2px solid #000 !important;
+    }
+
+    /* Hide decorative elements */
+    .w-20.h-0\.5 {
+      display: none !important;
+    }
+
+    /* Compact spacing */
+    .space-y-8 > * + * {
+      margin-top: 12pt !important;
+    }
+
+    .space-y-6 > * + * {
+      margin-top: 8pt !important;
+    }
+
+    .space-y-4 > * + * {
+      margin-top: 6pt !important;
+    }
+
+    /* Grid layout adjustments for print */
+    .grid {
+      display: block !important;
+    }
+
+    .grid > * {
+      display: inline-block !important;
+      margin: 2pt !important;
+      vertical-align: top !important;
+    }
+
+    /* Additional Tailwind utility overrides for print */
+    .backdrop-filter,
+    .backdrop-blur-12 {
+      backdrop-filter: none !important;
+    }
+
+    .bg-gradient-to-b,
+    .bg-gradient-to-r {
+      background: white !important;
+    }
+
+    .text-purple-700,
+    .text-indigo-600,
+    .text-blue-600,
+    .text-gray-600 {
+      color: black !important;
+    }
+
+    .hover\:scale-\[1\.02\],
+    .hover\:shadow-lg {
+      transform: none !important;
+    }
+
+    /* Motion div overrides */
+    .motion-div {
+      animation: none !important;
+      transform: none !important;
+    }
+
+    /* Ensure visibility of all content */
+    .overflow-hidden {
+      overflow: visible !important;
+    }
+
+    /* Print page settings */
+    @page {
+      margin: 1cm;
+      size: A4;
+    }
+
+    /* Specific Bazi Chart Print Styles */
+    .chinese-card table {
+      font-size: 9pt !important;
+      line-height: 1.2 !important;
+    }
+
+    .chinese-card th {
+      font-size: 8pt !important;
+      font-weight: bold !important;
+      background: #e8e8e8 !important;
+      padding: 3pt !important;
+    }
+
+    .chinese-card td {
+      padding: 3pt !important;
+      vertical-align: middle !important;
+    }
+
+    /* Prevent breaking inside table rows */
+    tbody tr {
+      page-break-inside: avoid !important;
+    }
+
+    /* Print specific spacing */
+    .print-section {
+      margin-bottom: 8pt !important;
+    }
+
+    /* Hide specific elements that shouldn't print */
+    .no-print {
+      display: none !important;
+    }
+
+    /* Ensure proper black borders for important separations */
+    .border-l-2.border-gray-400 {
+      border-left: 2px solid #000 !important;
+    }
+
+    /* Day pillar highlighting for print */
+    .bg-red-50 {
+      background: #f8f8f8 !important;
+      border: 1px solid #000 !important;
+      font-weight: bold !important;
+    }
+
+    /* Compact header for print */
+    .print-header {
+      margin-bottom: 6pt !important;
+      text-align: center !important;
+    }
+
+    .print-header h1 {
+      font-size: 16pt !important;
+      margin-bottom: 4pt !important;
+    }
+
+    .print-header .chinese-text {
+      font-size: 8pt !important;
+    }
+  }
 }
 
