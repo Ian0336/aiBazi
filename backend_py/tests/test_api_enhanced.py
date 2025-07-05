@@ -19,7 +19,7 @@ def test_enhanced_api():
     if response.status_code == 200:
         data = response.json()
         print('✅ Enhanced API Test Success!')
-        print(json.dumps(data, indent=4, ensure_ascii=False))
+        # print(json.dumps(data, indent=4, ensure_ascii=False))
         # print('📅 Basic Info:')
         # print(f'   Ganzhi: {data["year_ganzhi"]} {data["month_ganzhi"]} {data["day_ganzhi"]} {data["hour_ganzhi"]}')
         # print(f'   Solar Date: {data["solar_date"]}')

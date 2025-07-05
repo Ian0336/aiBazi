@@ -21,7 +21,7 @@ try:
     from bazi.bazi_functions import (
         get_gen, gan_zhi_he, get_gong, is_ku, zhi_ku, gan_ke, jin_jiao,
         calculate_wuxing_scores, calculate_ten_deities, check_day_master_strength,
-        get_nayin_for_ganzhi, get_empty_positions, analyze_special_stars, get_ten_deity, get_nayin
+        get_nayin_for_ganzhi, get_empty_positions, analyze_special_stars, get_ten_deity, get_nayin, apply_shensha_rules, apply_shensha_other_rules, apply_xiao_er_guan_sha_rules
     )
 except ImportError as e:
     print(f"Error importing bazi modules: {e}")
@@ -100,12 +100,21 @@ class BaziCalculator:
             
             # Day master (日主) - same as bazi.py
             day_master = gans.day
-            
             # Calculate detailed information for each pillar using enhanced methods
+
             year_pillar = self._get_pillar_details(gans.year, zhis.year, day_master, gans, zhis)
             month_pillar = self._get_pillar_details(gans.month, zhis.month, day_master, gans, zhis)
             day_pillar = self._get_pillar_details(gans.day, zhis.day, day_master, gans, zhis, True)
             hour_pillar = self._get_pillar_details(gans.time, zhis.time, day_master, gans, zhis)
+
+            # Calculate shensha (神煞)
+            shensha = self._get_shansha({"gan": gans._asdict(), "zhi": zhis._asdict()}, year)
+            
+            year_pillar["shensha"] = shensha["year"]
+            month_pillar["shensha"] = shensha["month"]
+            day_pillar["shensha"] = shensha["day"]
+            hour_pillar["shensha"] = shensha["time"]
+            print(shensha)
 
             # Calculate dayun (大運)
             yun = ba.getYun(gender == "male")
@@ -507,6 +516,42 @@ class BaziCalculator:
                     "error": f"Detailed analysis failed: {str(e)}"
                 })
             return simple_dayun
+    def _get_shansha(self, data, year):
+        """
+        Calculate 神煞 (special stars) for the bazi chart
+        
+        Args:
+            data: Dictionary containing gan and zhi information
+            year: Birth year to determine if person is a child
+            
+        Returns:
+            Dictionary with shensha information for each pillar
+        """
+        # age of this person < 11 years old
+        is_child = (datetime.datetime.now().year - year) < 11
+        
+        # Initialize result structure
+        shensha = {
+            "year": set(),
+            "month": set(),
+            "day": set(),
+            "time": set()
+        }
+
+        # Apply different rules based on age
+        try:
+            shensha = apply_shensha_rules(shensha, data)
+            shensha = apply_shensha_other_rules(shensha, data)
+        except Exception as e:
+            print(e)
+            shensha = []
+        
+        if is_child:
+            # Apply children-specific rules (小兒關煞)
+            shensha = apply_xiao_er_guan_sha_rules(shensha, data)
+            
+        
+        return {"year": list(shensha["year"]), "month": list(shensha["month"]), "day": list(shensha["day"]), "time": list(shensha["time"])}
     
     def analyze_bazi(
         self,

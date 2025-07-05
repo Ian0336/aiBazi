@@ -27,6 +27,7 @@ export interface Pillar {
   nayin: string;
   harmony: string;
   is_treasury: boolean;
+  shensha?: string[];
 }
 
 export interface LiunianEntry {

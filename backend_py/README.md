@@ -25,25 +25,46 @@ Python FastAPI backend for Chinese Bazi (八字) calculation and analysis, desig
 
 ### Installation
 
-1. **Install dependencies**:
+1. **Clone the main repository**:
    ```bash
-   cd backend_py
+   git clone <your-repository-url>
+   cd aiBazi/backend_py
+   ```
+
+2. **Clone the external bazi library**:
+   ```bash
+   cd app/external/
+   git clone https://github.com/china-testing/bazi.git
+   cd bazi
+   ```
+
+3. **Add __init__.py files for Python imports**:
+   ```bash
+   # Create __init__.py in the bazi directory
+   touch __init__.py
+   
+   # Go back to backend_py root
+   cd ../../..
+   ```
+
+4. **Install dependencies**:
+   ```bash
    pip install -r requirements.txt
    ```
 
-2. **Test the calculator** (verify problematic dates work):
+5. **Test the calculator** (verify problematic dates work):
    ```bash
    python test_bazi.py
    ```
 
-3. **Start the server**:
+6. **Start the server**:
    ```bash
    python main.py
    # or
    python run.py
    ```
 
-4. **Verify it's running**:
+7. **Verify it's running**:
    ```bash
    curl http://localhost:8000/health
    ```
@@ -164,14 +185,19 @@ backend_py/
 ├── run.py                  # Simple startup script
 ├── test_bazi.py           # Test script for problematic dates
 ├── requirements.txt        # Python dependencies
-├── external/
-│   └── bazi/              # Third-party bazi calculation library
-│       ├── bazi.py        # Main bazi calculation script
-│       ├── datas.py       # Bazi data (ganzhis, wuxing, etc.)
-│       ├── common.py      # Common utilities
-│       └── ...            # Other library files
+├── app/
+│   └── external/
+│       └── bazi/          # Third-party bazi calculation library (git submodule)
+│           ├── __init__.py    # Python package init (manually added)
+│           ├── bazi.py        # Main bazi calculation script
+│           ├── datas.py       # Bazi data (ganzhis, wuxing, etc.)
+│           ├── common.py      # Common utilities
+│           ├── ganzhi.py      # Ganzhi calculation functions
+│           └── ...            # Other library files from china-testing/bazi
 └── README.md              # This file
 ```
+
+> **Important**: The `app/external/bazi/` directory contains the [china-testing/bazi](https://github.com/china-testing/bazi) library, which is a powerful Python八字排盘软件 that provides reliable bazi calculations. This library must be cloned separately and requires manual addition of `__init__.py` for Python module imports.
 
 ## 📊 Key Differences from Go Backend
 
@@ -203,10 +229,29 @@ If you encounter issues:
    pip install -r requirements.txt
    ```
 
-3. **Verify the bazi library**:
+3. **Verify the external bazi library is properly installed**:
    ```bash
-   cd external/bazi
+   # Check if the external library exists
+   ls -la app/external/bazi/
+   
+   # Verify __init__.py exists
+   ls -la app/external/bazi/__init__.py
+   
+   # Test the bazi library directly
+   cd app/external/bazi
    python bazi.py 2003 1 15 10 -g
+   cd ../../..
+   ```
+
+4. **If you get import errors**, ensure the bazi library is properly set up:
+   ```bash
+   # Re-clone if needed
+   rm -rf app/external/bazi
+   cd app/external/
+   git clone https://github.com/china-testing/bazi.git
+   cd bazi
+   touch __init__.py
+   cd ../../..
    ```
 
 ## 📈 Performance

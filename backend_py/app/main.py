@@ -68,6 +68,7 @@ class Pillar(BaseModel):
     nayin: str = Field(..., description="Nayin (sound) element")
     harmony: str = Field(..., description="Harmony relationships")
     is_treasury: bool = Field(..., description="Whether the branch is a treasury")
+    shensha: List[str] = Field(..., description="List of shensha (神煞) influences")
 
 class LiunianEntry(BaseModel):
     """Annual fortune entry within a major period"""

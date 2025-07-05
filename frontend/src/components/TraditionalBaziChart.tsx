@@ -26,7 +26,7 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) =>
   // Calculate current age
   const currentYear = new Date().getFullYear();
   const birthYear = parseInt(chart.solar_date.split('年')[0]);
-  const age = currentYear - birthYear;
+  const age = currentYear - birthYear + 1;
 
   // Get zodiac information
   const getZodiac = (yearZhi: string) => {
@@ -108,7 +108,6 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) =>
       transition: { duration: 0.6 }
     }
   };
-  console.log(chart.dayun.length)
   return (
     <>
       {/* Print Button */}
@@ -426,7 +425,7 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) =>
                     </tr>
 
                                     {/* Nayin Row */}
-                    <tr>
+                    <tr className="border-b border-gray-100">
                       <td className={`p-1 text-center  ${selectedLiunian ? getElementClass(selectedLiunian.nayin[selectedLiunian.nayin.length - 1]) : ''}`}>
                         <div className="">{selectedLiunian?.nayin || '-'}</div>
                       </td>
@@ -436,7 +435,7 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) =>
                       <td className={`p-1 text-center border-l-2 border-gray-400 ${getElementClass(chart.hour_pillar.nayin[chart.hour_pillar.nayin.length - 1])}`}>
                         <div className="">{chart.hour_pillar.nayin}</div>
                       </td>
-                      <td className={`p-1 text-center  bg-red-50 ${getElementClass(chart.day_pillar.nayin[chart.day_pillar.nayin.length - 1])}`}>
+                      <td className={`p-1 text-center  ${getElementClass(chart.day_pillar.nayin[chart.day_pillar.nayin.length - 1])}`}>
                         <div className="">{chart.day_pillar.nayin}</div>
                       </td>
                       <td className={`p-1 text-center  ${getElementClass(chart.month_pillar.nayin[chart.month_pillar.nayin.length - 1])}`}>
@@ -446,6 +445,75 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) =>
                         <div className="">{chart.year_pillar.nayin}</div>
                       </td>
                       <td className="p-2 font-semibold text-gray-700  bg-gray-50">納音</td>
+                    </tr>
+
+                    {/* shensha Row */}
+                    <tr>
+                      <td className="p-1 text-center">
+                        <div className="flex flex-col gap-0.5">
+                          {/* 流年神煞暫時顯示為空 */}
+                          <div className="text-orange-600 text-xs">-</div>
+                        </div>
+                      </td>
+                      <td className="p-1 text-center">
+                        <div className="flex flex-col gap-0.5">
+                          {/* 大運神煞暫時顯示為空 */}
+                          <div className="text-orange-600 text-xs">-</div>
+                        </div>
+                      </td>
+                      <td className="p-1 text-center border-l-2 border-gray-400">
+                        <div className="flex flex-col gap-0.5">
+                          {chart.hour_pillar.shensha && chart.hour_pillar.shensha.length > 0 ? (
+                            chart.hour_pillar.shensha.map((star, idx) => (
+                              <div key={idx} className="text-orange-600 text-xs px-1 py-0.5 bg-orange-50 rounded">
+                                {star}
+                              </div>
+                            ))
+                          ) : (
+                            <div className="text-gray-400 text-xs">-</div>
+                          )}
+                        </div>
+                      </td>
+                      <td className="p-1 text-center">
+                        <div className="flex flex-col gap-0.5">
+                          {chart.day_pillar.shensha && chart.day_pillar.shensha.length > 0 ? (
+                            chart.day_pillar.shensha.map((star, idx) => (
+                              <div key={idx} className="text-orange-600 text-xs px-1 py-0.5 bg-orange-50 rounded">
+                                {star}
+                              </div>
+                            ))
+                          ) : (
+                            <div className="text-gray-400 text-xs">-</div>
+                          )}
+                        </div>
+                      </td>
+                      <td className="p-1 text-center">
+                        <div className="flex flex-col gap-0.5">
+                          {chart.month_pillar.shensha && chart.month_pillar.shensha.length > 0 ? (
+                            chart.month_pillar.shensha.map((star, idx) => (
+                              <div key={idx} className="text-orange-600 text-xs px-1 py-0.5 bg-orange-50 rounded">
+                                {star}
+                              </div>
+                            ))
+                          ) : (
+                            <div className="text-gray-400 text-xs">-</div>
+                          )}
+                        </div>
+                      </td>
+                      <td className="p-1 text-center">
+                        <div className="flex flex-col gap-0.5">
+                          {chart.year_pillar.shensha && chart.year_pillar.shensha.length > 0 ? (
+                            chart.year_pillar.shensha.map((star, idx) => (
+                              <div key={idx} className="text-orange-600 text-xs px-1 py-0.5 bg-orange-50 rounded">
+                                {star}
+                              </div>
+                            ))
+                          ) : (
+                            <div className="text-gray-400 text-xs">-</div>
+                          )}
+                        </div>
+                      </td>
+                      <td className="p-2 font-semibold text-gray-700  bg-gray-50">神煞</td>
                     </tr>
                 </tbody>
               </table>

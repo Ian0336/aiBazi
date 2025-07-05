@@ -406,7 +406,7 @@ xiao_er_guan_sha_rules = [
     "key_type": "gan",
     "value_type": "zhi",
     "key_pillar": ["day", "year"],
-    "value_pillar": "hour",
+    "value_pillar": "time",
     "mapping": {
       "甲": ["巳"],
       "乙": ["子"],
@@ -425,7 +425,7 @@ xiao_er_guan_sha_rules = [
     "key_type": "gan",
     "value_type": "zhi",
     "key_pillar": ["day", "year"],
-    "value_pillar": "hour",
+    "value_pillar": "time",
     "mapping": {
       "甲": ["巳", "酉", "丑"],
       "乙": ["子"],
@@ -444,7 +444,7 @@ xiao_er_guan_sha_rules = [
     "key_type": "gan",
     "value_type": "zhi",
     "key_pillar": ["day", "year"],
-    "value_pillar": "hour",
+    "value_pillar": "time",
     "mapping": {
       "甲": ["申", "子", "辰"],
       "乙": ["申", "子", "辰"],
@@ -463,7 +463,7 @@ xiao_er_guan_sha_rules = [
     "key_type": "gan",
     "value_type": "zhi",
     "key_pillar": ["day", "year"],
-    "value_pillar": "hour",
+    "value_pillar": "time",
     "mapping": {
       "甲": ["午"],
       "乙": ["戌"],
@@ -500,7 +500,7 @@ xiao_er_guan_sha_rules = [
     "key_type": "gan",
     "value_type": "zhi",
     "key_pillar": ["day", "year"],
-    "value_pillar": "hour",
+    "value_pillar": "time",
     "mapping": {
       "甲": ["辰", "午"],
       "乙": ["辰", "午"],
@@ -519,7 +519,7 @@ xiao_er_guan_sha_rules = [
 #     "key_type": "gan",
 #     "value_type": "zhi",
 #     "key_pillar": "day",
-#     "value_pillar": "hour",
+#     "value_pillar": "time",
 #     "mapping": {
 #       "甲": ["申", "酉"],
 #       "乙": ["申", "酉"],
@@ -538,7 +538,7 @@ xiao_er_guan_sha_rules = [
     "key_type": "gan",
     "value_type": "zhi",
     "key_pillar": ["day", "year"],
-    "value_pillar": "hour",
+    "value_pillar": "time",
     "mapping": {
       "甲": ["辰"],
       "乙": ["辰"],
@@ -557,7 +557,7 @@ xiao_er_guan_sha_rules = [
     "key_type": "gan",
     "value_type": "zhi",
     "key_pillar": ["day", "year"],
-    "value_pillar": "hour",
+    "value_pillar": "time",
     "mapping": {
       "甲": ["酉"],
       "乙": ["酉"],
@@ -576,7 +576,7 @@ xiao_er_guan_sha_rules = [
     "key_type": "zhi",
     "value_type": "zhi",
     "key_pillar": ["day", "year"],
-    "value_pillar": "hour",
+    "value_pillar": "time",
     "mapping": {
       "子": ["酉"],
       "丑": ["午"],
@@ -597,7 +597,7 @@ xiao_er_guan_sha_rules = [
     "key_type": "zhi", 
     "value_type": "zhi",
     "key_pillar": ["day", "year"],
-    "value_pillar": "hour",
+    "value_pillar": "time",
     "mapping": {
       "子": ["辰"],
       "丑": ["卯"],
@@ -618,7 +618,7 @@ xiao_er_guan_sha_rules = [
     "key_type": "zhi",
     "value_type": "zhi",
     "key_pillar": ["day", "year"],
-    "value_pillar": "hour",
+    "value_pillar": "time",
     "mapping": {
       "子": ["戌"],
       "丑": ["亥"],
@@ -639,7 +639,7 @@ xiao_er_guan_sha_rules = [
     "key_type": "zhi",
     "value_type": "zhi",
     "key_pillar": ["day", "year"],
-    "value_pillar": "hour",
+    "value_pillar": "time",
     "mapping": {
       "子": ["丑"],
       "丑": ["卯"],
@@ -660,7 +660,7 @@ xiao_er_guan_sha_rules = [
     "key_type": "zhi",
     "value_type": "zhi",
     "key_pillar": ["day", "year"],
-    "value_pillar": "hour",
+    "value_pillar": "time",
     "mapping": {
       "子": ["巳", "午"],
       "丑": ["子", "卯"],
@@ -681,7 +681,7 @@ xiao_er_guan_sha_rules = [
     "key_type": "zhi",
     "value_type": "zhi",
     "key_pillar": ["day", "year"],
-    "value_pillar": "hour",
+    "value_pillar": "time",
     "mapping": {
       "子": ["巳"],
       "丑": ["寅"],
@@ -702,7 +702,7 @@ xiao_er_guan_sha_rules = [
     "key_type": "zhi",
     "value_type": "zhi",
     "key_pillar": ["day", "year"],
-    "value_pillar": "hour",
+    "value_pillar": "time",
     "mapping": {
       "子": ["辰", "戌", "丑", "未"],
       "丑": ["子", "午", "卯", "酉"],
@@ -723,7 +723,7 @@ xiao_er_guan_sha_rules = [
     "key_type": "zhi",
     "value_type": "zhi",
     "key_pillar": ["day", "year"],
-    "value_pillar": "hour",
+    "value_pillar": "time",
     "mapping": {
       "子": ["午"],
       "丑": ["未"],
@@ -744,7 +744,7 @@ xiao_er_guan_sha_rules = [
     "key_type": "zhi", 
     "value_type": "zhi",
     "key_pillar": ["day", "year"],
-    "value_pillar": "hour",
+    "value_pillar": "time",
     "mapping": {
       "子": ["未"],
       "丑": ["酉"],
@@ -765,7 +765,7 @@ xiao_er_guan_sha_rules = [
     "key_type": "zhi",
     "value_type": "zhi",
     "key_pillar": ["day", "year"],
-    "value_pillar": "hour",
+    "value_pillar": "time",
     "mapping": {
       "子": ["巳"],
       "丑": ["未"],
@@ -786,7 +786,7 @@ xiao_er_guan_sha_rules = [
 #     "key_type": "zhi",
 #     "value_type": "zhi",
 #     "key_pillar": ["month"],
-#     "value_pillar": "hour",
+#     "value_pillar": "time",
 #     "mapping": {
 #       "寅": ["午"],
 #       "卯": ["午"],
@@ -807,7 +807,7 @@ xiao_er_guan_sha_rules = [
     "key_type": "zhi",
     "value_type": "zhi",
     "key_pillar": ["month"],
-    "value_pillar": "hour",
+    "value_pillar": "time",
     "mapping": {
       "寅": ["未", "戌"],
       "卯": ["未", "戌"],
@@ -828,7 +828,7 @@ xiao_er_guan_sha_rules = [
     "key_type": "zhi",
     "value_type": "zhi",
     "key_pillar": ["month"],
-    "value_pillar": "hour",
+    "value_pillar": "time",
     "mapping": {
       "寅": ["寅", "申"],
       "卯": ["寅", "申"],
@@ -849,7 +849,7 @@ xiao_er_guan_sha_rules = [
     "key_type": "zhi",
     "value_type": "zhi",
     "key_pillar": ["month"],
-    "value_pillar": "hour",
+    "value_pillar": "time",
     "mapping": {
       "寅": ["巳", "亥"],
       "卯": ["辰", "戌"],
@@ -870,7 +870,7 @@ xiao_er_guan_sha_rules = [
     "key_type": "zhi",
     "value_type": "zhi",
     "key_pillar": ["month"],
-    "value_pillar": "hour",
+    "value_pillar": "time",
     "mapping": {
       "寅": ["酉", "戌", "辰"],
       "卯": ["酉", "戌", "辰"],
@@ -891,7 +891,7 @@ xiao_er_guan_sha_rules = [
     "key_type": "zhi",
     "value_type": "zhi",
     "key_pillar": ["month"],
-    "value_pillar": "hour",
+    "value_pillar": "time",
     "mapping": {
       "寅": ["辰"],  # Spring - Dragon
       "卯": ["辰"],  # Spring - Dragon
@@ -912,7 +912,7 @@ xiao_er_guan_sha_rules = [
     "key_type": "zhi",
     "value_type": "zhi",
     "key_pillar": ["month"],
-    "value_pillar": "hour",
+    "value_pillar": "time",
     "mapping": {
       "寅": ["丑", "未"],
       "卯": ["丑", "未"],
@@ -933,7 +933,7 @@ xiao_er_guan_sha_rules = [
     "key_type": "zhi",
     "value_type": "zhi",
     "key_pillar": ["month"],
-    "value_pillar": "hour",
+    "value_pillar": "time",
     "mapping": {
       "寅": ["寅", "酉", "子"],
       "卯": ["寅", "酉", "子"],
@@ -954,7 +954,7 @@ xiao_er_guan_sha_rules = [
     "key_type": "zhi",
     "value_type": "zhi",
     "key_pillar": ["month"],
-    "value_pillar": "hour",
+    "value_pillar": "time",
     "mapping": {
       "寅": ["辰", "戌", "丑", "未"],
       "卯": ["寅", "申", "巳", "亥"],
@@ -975,7 +975,7 @@ xiao_er_guan_sha_rules = [
     "key_type": "zhi",
     "value_type": "zhi",
     "key_pillar": ["month"],
-    "value_pillar": "hour",
+    "value_pillar": "time",
     "mapping": {
       "寅": ["丑", "巳"],
       "卯": ["丑", "巳"],
@@ -996,7 +996,7 @@ xiao_er_guan_sha_rules = [
     "key_type": "zhi",
     "value_type": "zhi",
     "key_pillar": ["month"],
-    "value_pillar": "hour",
+    "value_pillar": "time",
     "mapping": {
       "寅": ["申"],
       "卯": ["酉"],
@@ -1017,7 +1017,7 @@ xiao_er_guan_sha_rules = [
     "key_type": "zhi",
     "value_type": "zhi", 
     "key_pillar": ["month"],
-    "value_pillar": "hour",
+    "value_pillar": "time",
     "mapping": {
       "寅": ["寅"],
       "卯": ["卯"],
@@ -1038,7 +1038,7 @@ xiao_er_guan_sha_rules = [
     "key_type": "zhi",
     "value_type": "zhi",
     "key_pillar": ["month"],
-    "value_pillar": "hour", 
+    "value_pillar": "time", 
     "mapping": {
       "寅": ["亥", "子"],
       "卯": ["亥", "子"],
@@ -1057,7 +1057,6 @@ xiao_er_guan_sha_rules = [
 ]
 
 
-print(len(xiao_er_guan_sha_rules))
 
 shensha_other_rules = [
     {

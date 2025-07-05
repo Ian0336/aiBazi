@@ -16,7 +16,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), 'external', 'bazi'))
 from external.bazi.datas import *
 from external.bazi.common import *
 from external.bazi.ganzhi import *
-from bazi.bazi_data import ten_deities_map, nayins_map
+from bazi.bazi_data import ten_deities_map, nayins_map, shensha_rules, shensha_other_rules, xiao_er_guan_sha_rules
 
 
 # Define the functions directly here (copied from bazi.py) to avoid importing the script
@@ -192,6 +192,87 @@ def get_nayin(gan, zhi):
     original_value = nayins.get((gan, zhi), "unknown")
     return nayins_map.get(original_value, original_value)
 
+
+def apply_shensha_rules(shansha, data):
+    """Apply general shensha rules"""
+    for rule in shensha_rules:
+        name = rule["name"]
+        key_type = rule["key_type"]  # "gan" or "zhi"
+        value_type = rule["value_type"]  # "gan" or "zhi"
+        key_pillars = rule["key_pillar"]  # which pillars to check as key
+        mapping = rule["mapping"]
+        # Check each key pillar
+        for key_pillar in key_pillars:
+            key_value = data[key_type][key_pillar]
+            if key_value in mapping:
+                target_values = mapping[key_value]
+                # Check all pillars for matches
+                for pillar in ["year", "month", "day", "time"]:
+                    if pillar == key_pillars: continue
+                    pillar_value = data[value_type][pillar]
+                    if pillar_value in target_values:
+                        shansha[pillar].add(name)
+    
+    return shansha
+
+def apply_shensha_other_rules(shansha, data):
+    """Apply other shensha rules with special formats"""
+    for rule in shensha_other_rules:
+        name = rule["name"]
+        format_patterns = rule["format"]
+        values = rule["value"]
+        
+        # Check each format pattern
+        for format_pattern in format_patterns:
+            # Build current combination based on format
+            current_combination = []
+            pillars_involved = []
+            
+            for pillar_spec, type_spec in format_pattern:
+                current_combination.append(data[type_spec][pillar_spec])
+                pillars_involved.append(pillar_spec)
+            
+            current_tuple = tuple(current_combination)
+            
+            # Check if current combination matches any target value
+            for target_value in values:
+                if isinstance(target_value, tuple) and current_tuple == target_value:
+                    # Add to all involved pillars
+                    shansha["day"].add(name)
+                    break
+    
+    return shansha
+
+def apply_xiao_er_guan_sha_rules(shansha, data):
+    """Apply children-specific rules (小兒關煞)"""
+    for rule in xiao_er_guan_sha_rules:
+        name = rule["name"]
+        key_type = rule["key_type"]  # "gan" or "zhi"
+        value_type = rule["value_type"]  # "gan" or "zhi"
+        key_pillars = rule["key_pillar"]  # which pillars to check as key
+        value_pillar = rule.get("value_pillar", None)  # specific pillar to check for value
+        mapping = rule["mapping"]
+        
+        # Check each key pillar
+        for key_pillar in key_pillars:
+            key_value = data[key_type][key_pillar]
+            
+            if key_value in mapping:
+                target_values = mapping[key_value]
+                if not isinstance(target_values, list):
+                    target_values = [target_values]
+                
+                # Check specific pillar or all pillars for matches
+                pillars_to_check = [value_pillar] if value_pillar else ["year", "month", "day", "time"]
+                
+                for pillar in pillars_to_check:
+                    pillar_value = data[value_type][pillar]
+                    
+                    if pillar_value in target_values:
+                        shansha["day"].add(name)
+                        break
+    
+    return shansha
 def analyze_special_stars(gans, zhis, day_master):
     """Analyze special stars and patterns"""
     analysis = {}
