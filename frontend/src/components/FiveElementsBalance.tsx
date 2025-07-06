@@ -133,7 +133,7 @@ const FiveElementsBalance: React.FC<FiveElementsBalanceProps> = ({ chart }) => {
   };
 
   return (
-    <div className="chinese-card p-8 brush-border lotus-pattern">
+    <div className="chinese-card p-8 brush-border lotus-pattern w-full max-w-6xl mx-auto">
       <div className="text-center mb-10">
         <h3 className="text-3xl chinese-title mb-4">
           五行平衡

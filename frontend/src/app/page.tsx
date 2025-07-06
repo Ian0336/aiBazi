@@ -156,7 +156,7 @@ export default function HomePage() {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="container mx-auto px-1 md:px-4 py-8 relative z-10"
+        className="mx-auto px-1 md:px-4 py-8 relative z-10"
       >
         {/* Header Section */}
         <AnimatePresence mode="wait">
@@ -275,81 +275,6 @@ export default function HomePage() {
                 style={{ animationDelay: '0.3s' }}
               >
                 <FiveElementsBalance chart={chart} />
-              </motion.section>
-
-              {/* Detailed Analysis Section */}
-              <motion.section
-                variants={chartSectionVariants}
-                initial="hidden"
-                animate="visible"
-                className="animate-ink-drop pattern-analysis"
-                style={{ animationDelay: '0.6s' }}
-              >
-                <div className="chinese-card p-8 brush-border lotus-pattern">
-                  <div className="text-center mb-8">
-                    <h3 className="text-3xl chinese-title mb-4">命理詳析</h3>
-                    <div className="flex justify-center items-center gap-4">
-                      <div className="w-20 h-0.5 bg-gradient-to-r from-transparent via-red-600 to-transparent"></div>
-                      <span className="text-lg">🔮</span>
-                      <div className="w-20 h-0.5 bg-gradient-to-r from-transparent via-yellow-600 to-transparent"></div>
-                    </div>
-                  </div>
-                  
-                  <div className="grid md:grid-cols-2 gap-8">
-                    {/* Four Pillars Analysis */}
-                    <div className="space-y-6">
-                      <div className="chinese-card p-6">
-                        <h4 className="text-xl font-semibold chinese-text text-red-700 mb-3 flex items-center gap-2">
-                          <span>🏛️</span>年柱 · 根基
-                        </h4>
-                        <p className="chinese-text text-gray-700 leading-relaxed">
-                          年柱代表祖上根基與早年運勢，奠定一生的基本格局與先天稟賦，影響性格底蘊。
-                        </p>
-                      </div>
-                      
-                      <div className="chinese-card p-6">
-                        <h4 className="text-xl font-semibold chinese-text text-yellow-700 mb-3 flex items-center gap-2">
-                          <span>🌸</span>月柱 · 青春
-                        </h4>
-                        <p className="chinese-text text-gray-700 leading-relaxed">
-                          月柱主管青年時期，關係到事業發展、人際關係與求學運勢，是人生發展的關鍵期。
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="space-y-6">
-                      <div className="chinese-card p-6">
-                        <h4 className="text-xl font-semibold chinese-text text-blue-700 mb-3 flex items-center gap-2">
-                          <span>☀️</span>日柱 · 本命
-                        </h4>
-                        <p className="chinese-text text-gray-700 leading-relaxed">
-                          日柱為命主本身，代表個人性格、夫妻關係與中年運勢，是八字分析的核心。
-                        </p>
-                      </div>
-                      
-                      <div className="chinese-card p-6">
-                        <h4 className="text-xl font-semibold chinese-text text-green-700 mb-3 flex items-center gap-2">
-                          <span>🌙</span>時柱 · 晚景
-                        </h4>
-                        <p className="chinese-text text-gray-700 leading-relaxed">
-                          時柱主晚年運勢，也關係到子女緣分與後代發展，影響人生的收穫與歸宿。
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Traditional Chinese wisdom quote */}
-                  <div className="mt-8 text-center">
-                    <div className="chinese-card p-6 bg-gradient-to-r from-red-50 to-yellow-50">
-                      <p className="chinese-text text-lg text-gray-800 italic">
-                        "天行健，君子以自強不息；地勢坤，君子以厚德載物"
-                      </p>
-                      <p className="chinese-text text-sm text-gray-600 mt-2">
-                        ——《易經》
-                      </p>
-                    </div>
-                  </div>
-                </div>
               </motion.section>
             </motion.div>
           )}

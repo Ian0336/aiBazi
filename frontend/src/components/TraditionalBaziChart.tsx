@@ -123,7 +123,7 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) =>
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="w-full max-w-6xl mx-auto space-y-8"
+        className="w-full max-w-6xl mx-auto space-y-8 print:w-[95%] print:max-w-none"
       >
         {/* Header Section */}
         <motion.div 
@@ -131,7 +131,7 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) =>
           className="chinese-card p-6 text-center brush-border"
         >
           <div className="space-y-4">
-            <h1 className="text-4xl md:text-5xl font-bold chinese-title mb-4">
+            <h1 className="text-4xl md:text-5xl font-bold chinese-title mb-4 print:hidden">
               命盤資料
             </h1>
             
@@ -161,17 +161,17 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) =>
           variants={itemVariants}
           className="chinese-card p-1 md:p-6 brush-border"
         >
-          <div className="text-center mb-6">
+          <div className="text-center mb-6 print:hidden">
             <h2 className="text-2xl chinese-title mb-2">八字排盤</h2>
             <div className="w-20 h-0.5 bg-gradient-to-r from-transparent via-red-600 to-transparent mx-auto"></div>
           </div>
 
           <div className="chinese-text">
             <div className="bg-white rounded-lg border overflow-hidden">
-              <table className="w-full border-collapse text-lg md:text-2xl">
+              <table className="w-full border-collapse text-lg md:text-2xl print:text-lg">
                 {/* Header Row */}
                 <thead>
-                  <tr className="bg-gray-50 border-b text-sm md:text-lg">
+                  <tr className="bg-gray-50 border-b text-sm md:text-lg print:text-sm">
                     <th className="p-2 text-center font-bold text-gray-700 ">流年</th>
                     <th className="p-2 text-center font-bold text-gray-700 ">大運</th>
                     <th className="p-2 text-center font-bold text-gray-700 border-l-2 border-gray-400">時柱</th>
@@ -219,7 +219,7 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) =>
 
 
                                     {/* Heavenly Stems Row */}
-                    <tr className="border-b border-gray-100 text-3xl">
+                    <tr className="border-b border-gray-100 text-3xl print:text-2xl">
                       <td className="p-1 text-center">
                         {selectedLiunian && (
                           <div className={`inline-block px-2 py-1 rounded  font-bold ${getElementClass(Gan2Wuxing(selectedLiunian.gan))}`}>
@@ -254,11 +254,11 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) =>
                           {chart.year_pillar.gan}
                         </div>
                       </td>
-                      <td className="p-2 font-semibold text-gray-700  bg-gray-50 text-lg md:text-2xl">天干</td>
+                      <td className="p-2 font-semibold text-gray-700  bg-gray-50 text-lg md:text-2xl print:text-base">天干</td>
                     </tr>
 
                                     {/* Earthly Branches Row */}
-                    <tr className="border-b border-gray-100 text-3xl">
+                    <tr className="border-b border-gray-100 text-3xl print:text-2xl">
                       <td className="p-1 text-center">
                         {selectedLiunian && (
                           <div className={`inline-block px-2 py-1 rounded  font-bold ${getElementClass(Zhi2Wuxing(selectedLiunian.zhi))}`}>
@@ -293,7 +293,7 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) =>
                           {chart.year_pillar.zhi}
                         </div>
                       </td>
-                      <td className="p-2 font-semibold text-gray-700  bg-gray-50 text-lg md:text-2xl">地支</td>
+                      <td className="p-2 font-semibold text-gray-700  bg-gray-50 text-lg md:text-2xl print:text-base">地支</td>
                     </tr>
 
                                     {/* Star Fortune Row */}
@@ -513,7 +513,7 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) =>
                           )}
                         </div>
                       </td>
-                      <td className="p-2 font-semibold text-gray-700  bg-gray-50 align-middle text-lg md:text-2xl">神煞</td>
+                      <td className="p-2 font-semibold text-gray-700  bg-gray-50 align-middle text-lg md:text-2xl print:text-base">神煞</td>
                     </tr>
                 </tbody>
               </table>
@@ -525,7 +525,7 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) =>
         {chart.dayun && chart.dayun.length > 0 && (
           <motion.div 
             variants={itemVariants}
-            className="chinese-card p-1 md:p-6 brush-border"
+            className="chinese-card p-1 md:p-6 brush-border print:p-0"
           >
             <DayunCard 
               chart={chart} 
@@ -548,14 +548,14 @@ const DayunCard = ({ chart, _currentDayun, _currentLiunian, onDayunChange, onLiu
   console.log(currentDayunIdx)
   return (
     <>
-      <div className="text-center mb-6">
+      <div className="text-center mb-6 print:hidden">
         <h2 className="text-2xl chinese-title mb-2">大運流年</h2>
-        <div className="w-20 h-0.5 bg-gradient-to-r from-transparent via-blue-600 to-transparent mx-auto"></div>
+        <div className="w-20 h-0.5 bg-gradient-to-r from-transparent via-blue-600 to-transparent mx-auto "></div>
       </div>
 
       {/* Major Fortune Periods */}
       <div className="mb-6">
-        <h3 className="text-sm md:text-lg chinese-text font-semibold mb-4 text-gray-700">大運</h3>
+        <h3 className="text-sm md:text-lg chinese-text font-semibold mb-4 text-gray-700 print:hidden">大運</h3>
         <div className="grid grid-cols-9  md:gap-3">
           {chart.dayun.slice(0, 9).map((dayun, idx) => (
             <div 
@@ -587,7 +587,7 @@ const DayunCard = ({ chart, _currentDayun, _currentLiunian, onDayunChange, onLiu
       </div>
 
       {/* Current Year Fortune */}
-      <div>
+      <div className="print:hidden">
         <h3 className="text-sm md:text-lg chinese-text font-semibold mb-4 text-gray-700">流年</h3>
         <div className="grid grid-cols-10 md:gap-2">
           {chart.dayun[currentDayunIdx]?.liunian?.slice(0, 10).map((liunian, idx) => (
