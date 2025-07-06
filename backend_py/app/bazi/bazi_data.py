@@ -481,7 +481,8 @@ xiao_er_guan_sha_rules = [
     "name": "斷腸關",
     "key_type": "gan",
     "value_type": "zhi",
-    "key_pillar": ["day"],
+    "key_pillar": ["day", "year"],
+    "value_pillar": "time",
     "mapping": {
       "甲": ["午", "未"],
       "乙": ["午", "未"],

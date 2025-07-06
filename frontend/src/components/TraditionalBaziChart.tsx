@@ -168,17 +168,17 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) =>
 
           <div className="chinese-text">
             <div className="bg-white rounded-lg border overflow-hidden">
-              <table className="w-full border-collapse text-xs md:text-lg">
+              <table className="w-full border-collapse text-lg md:text-2xl">
                 {/* Header Row */}
                 <thead>
-                  <tr className="bg-gray-50 border-b">
+                  <tr className="bg-gray-50 border-b text-sm md:text-lg">
                     <th className="p-2 text-center font-bold text-gray-700 ">流年</th>
                     <th className="p-2 text-center font-bold text-gray-700 ">大運</th>
                     <th className="p-2 text-center font-bold text-gray-700 border-l-2 border-gray-400">時柱</th>
                     <th className="p-2 text-center font-bold text-gray-700 ">日柱</th>
                     <th className="p-2 text-center font-bold text-gray-700 ">月柱</th>
                     <th className="p-2 text-center font-bold text-gray-700 ">年柱</th>
-                    <th className="p-2 text-left font-bold text-gray-700  w-12"></th>
+                    <th className="p-2 text-left font-bold text-gray-700  w-8 md:w-12"></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -219,7 +219,7 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) =>
 
 
                                     {/* Heavenly Stems Row */}
-                    <tr className="border-b border-gray-100">
+                    <tr className="border-b border-gray-100 text-3xl">
                       <td className="p-1 text-center">
                         {selectedLiunian && (
                           <div className={`inline-block px-2 py-1 rounded  font-bold ${getElementClass(Gan2Wuxing(selectedLiunian.gan))}`}>
@@ -254,11 +254,11 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) =>
                           {chart.year_pillar.gan}
                         </div>
                       </td>
-                      <td className="p-2 font-semibold text-gray-700  bg-gray-50">天干</td>
+                      <td className="p-2 font-semibold text-gray-700  bg-gray-50 text-lg md:text-2xl">天干</td>
                     </tr>
 
                                     {/* Earthly Branches Row */}
-                    <tr className="border-b border-gray-100">
+                    <tr className="border-b border-gray-100 text-3xl">
                       <td className="p-1 text-center">
                         {selectedLiunian && (
                           <div className={`inline-block px-2 py-1 rounded  font-bold ${getElementClass(Zhi2Wuxing(selectedLiunian.zhi))}`}>
@@ -293,7 +293,7 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) =>
                           {chart.year_pillar.zhi}
                         </div>
                       </td>
-                      <td className="p-2 font-semibold text-gray-700  bg-gray-50">地支</td>
+                      <td className="p-2 font-semibold text-gray-700  bg-gray-50 text-lg md:text-2xl">地支</td>
                     </tr>
 
                                     {/* Star Fortune Row */}
@@ -320,7 +320,7 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) =>
                     </tr>
 
                                     {/* Hidden Stems Row */}
-                    <tr className="border-b border-gray-100">
+                    <tr className="border-b border-gray-100 align-top">
                       <td className="p-1 text-center">
                         {selectedLiunian && (
                           <div className="flex flex-col gap-0.5">
@@ -421,7 +421,7 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) =>
                           ))}
                         </div>
                       </td>
-                      <td className="p-2 font-semibold text-gray-700  bg-gray-50">藏干</td>
+                      <td className="p-2 font-semibold text-gray-700  bg-gray-50 align-middle">藏干</td>
                     </tr>
 
                                     {/* Nayin Row */}
@@ -448,29 +448,29 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) =>
                     </tr>
 
                     {/* shensha Row */}
-                    <tr>
+                    <tr className="align-top text-sm">
                       <td className="p-1 text-center">
                         <div className="flex flex-col gap-0.5">
                           {/* 流年神煞暫時顯示為空 */}
-                          <div className="text-orange-600 text-xs">-</div>
+                          <div className="text-orange-600">-</div>
                         </div>
                       </td>
                       <td className="p-1 text-center">
                         <div className="flex flex-col gap-0.5">
                           {/* 大運神煞暫時顯示為空 */}
-                          <div className="text-orange-600 text-xs">-</div>
+                          <div className="text-orange-600">-</div>
                         </div>
                       </td>
                       <td className="p-1 text-center border-l-2 border-gray-400">
                         <div className="flex flex-col gap-0.5">
                           {chart.hour_pillar.shensha && chart.hour_pillar.shensha.length > 0 ? (
                             chart.hour_pillar.shensha.map((star, idx) => (
-                              <div key={idx} className="text-orange-600 text-xs px-1 py-0.5 bg-orange-50 rounded">
+                              <div key={idx} className="text-orange-600 px-1 py-0.5 bg-orange-50 rounded">
                                 {star}
                               </div>
                             ))
                           ) : (
-                            <div className="text-gray-400 text-xs">-</div>
+                            <div className="text-gray-400">-</div>
                           )}
                         </div>
                       </td>
@@ -478,12 +478,12 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) =>
                         <div className="flex flex-col gap-0.5">
                           {chart.day_pillar.shensha && chart.day_pillar.shensha.length > 0 ? (
                             chart.day_pillar.shensha.map((star, idx) => (
-                              <div key={idx} className="text-orange-600 text-xs px-1 py-0.5 bg-orange-50 rounded">
+                              <div key={idx} className="text-orange-600 px-1 py-0.5 bg-orange-50 rounded">
                                 {star}
                               </div>
                             ))
                           ) : (
-                            <div className="text-gray-400 text-xs">-</div>
+                            <div className="text-gray-400">-</div>
                           )}
                         </div>
                       </td>
@@ -491,12 +491,12 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) =>
                         <div className="flex flex-col gap-0.5">
                           {chart.month_pillar.shensha && chart.month_pillar.shensha.length > 0 ? (
                             chart.month_pillar.shensha.map((star, idx) => (
-                              <div key={idx} className="text-orange-600 text-xs px-1 py-0.5 bg-orange-50 rounded">
+                              <div key={idx} className="text-orange-600 px-1 py-0.5 bg-orange-50 rounded">
                                 {star}
                               </div>
                             ))
                           ) : (
-                            <div className="text-gray-400 text-xs">-</div>
+                            <div className="text-gray-400">-</div>
                           )}
                         </div>
                       </td>
@@ -504,16 +504,16 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) =>
                         <div className="flex flex-col gap-0.5">
                           {chart.year_pillar.shensha && chart.year_pillar.shensha.length > 0 ? (
                             chart.year_pillar.shensha.map((star, idx) => (
-                              <div key={idx} className="text-orange-600 text-xs px-1 py-0.5 bg-orange-50 rounded">
+                              <div key={idx} className="text-orange-600 px-1 py-0.5 bg-orange-50 rounded">
                                 {star}
                               </div>
                             ))
                           ) : (
-                            <div className="text-gray-400 text-xs">-</div>
+                            <div className="text-gray-400">-</div>
                           )}
                         </div>
                       </td>
-                      <td className="p-2 font-semibold text-gray-700  bg-gray-50">神煞</td>
+                      <td className="p-2 font-semibold text-gray-700  bg-gray-50 align-middle text-lg md:text-2xl">神煞</td>
                     </tr>
                 </tbody>
               </table>
@@ -653,6 +653,9 @@ const DayunCard = ({ chart, _currentDayun, _currentLiunian, onDayunChange, onLiu
               <div className="text-xs text-purple-600 mt-1 font-medium">
                 {dayun.gan_ten_deity}
               </div>
+              <div className="text-xs text-purple-600 mt-1 font-medium">
+                {dayun.zhi_ten_deity}
+              </div>
             </div>
           ))}
         </div>
@@ -677,6 +680,9 @@ const DayunCard = ({ chart, _currentDayun, _currentLiunian, onDayunChange, onLiu
               </div>
               <div className="text-purple-600 mt-0.5 font-medium text-xs">
                 {liunian.gan_ten_deity}
+              </div>
+              <div className="text-purple-600 mt-0.5 font-medium text-xs">
+                {liunian.zhi_ten_deity}
               </div>
             </div>
           ))}

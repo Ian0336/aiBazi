@@ -211,7 +211,7 @@ def apply_shensha_rules(shansha, data):
                     if pillar == key_pillars: continue
                     pillar_value = data[value_type][pillar]
                     if pillar_value in target_values:
-                        shansha[pillar].add(name)
+                        shansha[pillar].append(name)
     
     return shansha
 
@@ -238,7 +238,7 @@ def apply_shensha_other_rules(shansha, data):
             for target_value in values:
                 if isinstance(target_value, tuple) and current_tuple == target_value:
                     # Add to all involved pillars
-                    shansha["day"].add(name)
+                    shansha["day"].append(name)
                     break
     
     return shansha
@@ -263,13 +263,15 @@ def apply_xiao_er_guan_sha_rules(shansha, data):
                     target_values = [target_values]
                 
                 # Check specific pillar or all pillars for matches
-                pillars_to_check = [value_pillar] if value_pillar else ["year", "month", "day", "time"]
+                pillars_to_check = [value_pillar] if value_pillar else ["time"]
                 
                 for pillar in pillars_to_check:
                     pillar_value = data[value_type][pillar]
                     
                     if pillar_value in target_values:
-                        shansha["day"].add(name)
+                        print(name,key_value, pillar_value, target_values)
+                        print(value_pillar)
+                        shansha["time"].append(name)
                         break
     
     return shansha

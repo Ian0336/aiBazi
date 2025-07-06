@@ -329,6 +329,8 @@ class BaziCalculator:
             # Skip first item as it's the starting period, analyze from second onwards
             for idx, dayun_item in enumerate(yun.getDaYun()):
                 if idx == 0:
+                    if yun.getDaYun()[1].getStartAge() == 1:
+                        continue
                     gan_ = yun.getDaYun()[1].getGanZhi()[0]
                     zhi_ = yun.getDaYun()[1].getGanZhi()[1]
                 else:
@@ -339,9 +341,7 @@ class BaziCalculator:
                 # Check if this dayun gan-zhi appears in original chart
                 is_repeated = (gan_, zhi_) in zhus
                 
-                # Calculate ten deities for dayun gan and zhi
-                gan_ten_deity = get_ten_deity(day_master, gan_)
-                zhi_ten_deity = get_ten_deity(day_master, zhi_)
+                
                 
                 # Get hidden stems (藏干) for dayun zhi
                 hidden_stems = []
@@ -352,6 +352,10 @@ class BaziCalculator:
                             "ten_deity": get_ten_deity(day_master, hidden_gan),
                             "strength": zhi5[zhi_].get(hidden_gan, 0)
                         })
+                
+                # Calculate ten deities for dayun gan and zhi
+                gan_ten_deity = get_ten_deity(day_master, gan_)
+                zhi_ten_deity = hidden_stems[0]["ten_deity"]
                 
                 # Check relationships with original chart zhis
                 zhi_relationships = set()
@@ -473,7 +477,7 @@ class BaziCalculator:
                         "gan": gan2_,
                         "zhi": zhi2_,
                         "gan_ten_deity": ln_gan_ten_deity,
-                        "zhi_ten_deity": ln_zhi_ten_deity,
+                        "zhi_ten_deity": ln_hidden_stems[0]["ten_deity"],
                         "hidden_stems": ln_hidden_stems,
                         "zhi_relationships": list(ln_zhi_relationships),
                         "is_empty": ln_is_empty,
@@ -532,10 +536,10 @@ class BaziCalculator:
         
         # Initialize result structure
         shensha = {
-            "year": set(),
-            "month": set(),
-            "day": set(),
-            "time": set()
+            "year": [],
+            "month": [],
+            "day": [],
+            "time": []
         }
 
         # Apply different rules based on age
@@ -551,7 +555,12 @@ class BaziCalculator:
             shensha = apply_xiao_er_guan_sha_rules(shensha, data)
             
         
-        return {"year": list(shensha["year"]), "month": list(shensha["month"]), "day": list(shensha["day"]), "time": list(shensha["time"])}
+        return {
+            "year": list(dict.fromkeys(shensha["year"])),
+            "month": list(dict.fromkeys(shensha["month"])), 
+            "day": list(dict.fromkeys(shensha["day"])),
+            "time": list(dict.fromkeys(shensha["time"]))
+        }
     
     def analyze_bazi(
         self,

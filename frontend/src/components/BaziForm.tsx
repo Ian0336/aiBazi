@@ -102,8 +102,15 @@ const BaziForm: React.FC<BaziFormProps> = ({ onCalculate, isLoading = false }) =
       { name: '亥時', time: '21:00-23:00', animal: '🐷' }
     ];
     
+    // Helper function to get correct hour index
+    const getHourIndex = (hour: number): number => {
+      if (hour === 23) return 0; // 子時 (23:00)
+      if (hour === 0) return 0;  // 子時 (00:00)
+      return Math.floor((hour + 1) / 2);
+    };
+    
     for (let hour = 0; hour < 24; hour++) {
-      const hourInfo = hourNames[Math.floor(hour / 2)];
+      const hourInfo = hourNames[getHourIndex(hour)];
       hours.push({
         value: hour,
         label: `${hour.toString().padStart(2, '0')}:00`,
@@ -321,7 +328,7 @@ const BaziForm: React.FC<BaziFormProps> = ({ onCalculate, isLoading = false }) =
           >
             {generateYearOptions().map(year => (
               <option key={year} value={year}>
-                {year}年
+                {year}年 {year > 1911 ? `民國${year - 1911}年` : ''}
               </option>
             ))}
           </select>
