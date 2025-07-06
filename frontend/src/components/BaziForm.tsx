@@ -169,7 +169,7 @@ const BaziForm: React.FC<BaziFormProps> = ({ onCalculate, isLoading = false }) =
     
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+      const apiUrl = process.env.NODE_ENV === 'production' ? process.env.NEXT_PUBLIC_API_BASE_URL_PROD : process.env.NEXT_PUBLIC_API_BASE_URL_DEV;
       if (!apiUrl) {
         throw new Error('API 配置錯誤，請聯繫管理員');
       }
