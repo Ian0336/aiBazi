@@ -263,15 +263,15 @@ def apply_xiao_er_guan_sha_rules(shansha, data):
                     target_values = [target_values]
                 
                 # Check specific pillar or all pillars for matches
-                pillars_to_check = [value_pillar] if value_pillar else ["time"]
-                
-                for pillar in pillars_to_check:
+                # pillars_to_check = [value_pillar] if value_pillar else ["time"]
+                print(value_pillar)
+                for pillar in value_pillar:
                     pillar_value = data[value_type][pillar]
                     
                     if pillar_value in target_values:
                         print(name,key_value, pillar_value, target_values)
                         print(value_pillar)
-                        shansha["time"].append(name)
+                        shansha[pillar].append(name)
                         break
     
     return shansha
