@@ -11,7 +11,8 @@ interface BaziFormProps {
 }
 
 const BaziForm: React.FC<BaziFormProps> = ({ onCalculate, isLoading = false }) => {
-  const [input, setInput] = useState<BaziInput>({
+  // Default input values
+  const getDefaultInput = (): BaziInput => ({
     year: new Date().getFullYear(),
     month: new Date().getMonth() + 1,
     day: new Date().getDate(),
@@ -20,6 +21,36 @@ const BaziForm: React.FC<BaziFormProps> = ({ onCalculate, isLoading = false }) =
     is_lunar: false,
     is_leap_month: false,
   });
+
+  // Load saved input from localStorage or use default
+  const loadSavedInput = (): BaziInput => {
+    if (typeof window !== 'undefined') {
+      try {
+        const savedInput = localStorage.getItem('bazi-form-input');
+        if (savedInput) {
+          const parsed = JSON.parse(savedInput);
+          // Validate the parsed data structure
+          if (parsed && typeof parsed === 'object' && 
+              typeof parsed.year === 'number' && 
+              typeof parsed.month === 'number' && 
+              typeof parsed.day === 'number' && 
+              typeof parsed.hour === 'number') {
+            return {
+              ...getDefaultInput(),
+              ...parsed
+            };
+          }
+        }
+      } catch (error) {
+        console.warn('Failed to load saved form data:', error);
+        // Clear corrupted data
+        localStorage.removeItem('bazi-form-input');
+      }
+    }
+    return getDefaultInput();
+  };
+
+  const [input, setInput] = useState<BaziInput>(loadSavedInput);
 
   interface FormErrors {
     year?: number;
@@ -30,6 +61,17 @@ const BaziForm: React.FC<BaziFormProps> = ({ onCalculate, isLoading = false }) =
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [internalLoading, setInternalLoading] = useState(false);
+
+  // Auto-save input to localStorage whenever it changes
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('bazi-form-input', JSON.stringify(input));
+      } catch (error) {
+        console.warn('Failed to save form data:', error);
+      }
+    }
+  }, [input]);
 
   // Helper function to check if a year is a leap year
   const isLeapYear = (year: number): boolean => {
@@ -501,11 +543,13 @@ const BaziForm: React.FC<BaziFormProps> = ({ onCalculate, isLoading = false }) =
           <span>⭐</span>
         </div>
         <p>八字命理以出生時間的天干地支為基礎進行分析</p>
-        <div className="grid md:grid-cols-2 gap-4 mt-3 text-xs">
+        <div className="grid md:grid-cols-3 gap-4 mt-3 text-xs">
           <p>🌙 支援農曆與國曆日期轉換</p>
           <p>👥 性別會影響大運順逆排列</p>
         </div>
       </motion.div>
+
+
     </motion.form>
   );
 };

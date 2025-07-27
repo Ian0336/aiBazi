@@ -13,7 +13,7 @@ const StickyHeader: React.FC<StickyHeaderProps> = ({ input, onEdit }) => {
     const { year, month, day, hour } = input;
     const date = `${year}年${month}月${day}日`;
     
-    const hourInfo = [
+    const hourNames = [
       { name: '子時', time: '23:00-01:00', animal: '🐭' },
       { name: '丑時', time: '01:00-03:00', animal: '🐂' },
       { name: '寅時', time: '03:00-05:00', animal: '🐅' },
@@ -28,7 +28,14 @@ const StickyHeader: React.FC<StickyHeaderProps> = ({ input, onEdit }) => {
       { name: '亥時', time: '21:00-23:00', animal: '🐷' }
     ];
     
-    const currentHourInfo = hourInfo[Math.floor(hour / 2)];
+    // Helper function to get correct hour index
+    const getHourIndex = (hour: number): number => {
+      if (hour === 23) return 0; // 子時 (23:00)
+      if (hour === 0) return 0;  // 子時 (00:00)
+      return Math.floor((hour + 1) / 2);
+    };
+
+    const currentHourInfo = hourNames[getHourIndex(hour)];
     const time = `${hour.toString().padStart(2, '0')}:00`;
     
     return { date, time, hourInfo: currentHourInfo };

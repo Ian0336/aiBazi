@@ -7,13 +7,15 @@ import FiveElementsBalance from '@/components/FiveElementsBalance';
 import TraditionalBaziChart from '@/components/TraditionalBaziChart';
 import StickyHeader from '@/components/StickyHeader';
 import { BaziChart as BaziChartType, BaziInput } from '@/types/bazi';
+import { useAtom } from 'jotai';
+import { chartAtom, originalInputAtom } from '@/store/jotai';
 
 export default function HomePage() {
-  const [chart, setChart] = useState<BaziChartType | null>(null);
-  const [originalInput, setOriginalInput] = useState<BaziInput | null>(null);
+  const [chart, setChart] = useAtom(chartAtom);
+  const [originalInput, setOriginalInput] = useAtom(originalInputAtom);
   const [isCalculating, setIsCalculating] = useState<boolean>(false);
-  const [showChart, setShowChart] = useState<boolean>(false);
   const [sequenceState  , setSequenceState] = useState<'visible' | 'exit'>('visible');
+
 
   const scrollToTop = () => {
     window.scrollTo({
@@ -25,12 +27,10 @@ export default function HomePage() {
   const handleCalculate = (newChart: BaziChartType, input: BaziInput) => {
     setChart(newChart);
     setOriginalInput(input);
-    setShowChart(true);
     scrollToTop();
   };
 
   const handleEdit = () => {
-    setShowChart(false);
     setChart(null);
     setOriginalInput(null);
     setSequenceState('exit');
@@ -130,13 +130,6 @@ export default function HomePage() {
         <div className="absolute bottom-0 right-0 w-80 h-80 opacity-8">
           <div className="w-full h-full rounded-full bg-gradient-radial from-red-900/15 via-transparent to-transparent blur-2xl"></div>
         </div>
-        
-        {/* Subtle mountain silhouettes */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 opacity-5">
-          <svg viewBox="0 0 1200 200" className="w-full h-full">
-            <path d="M0,200 C300,50 600,120 900,40 C1000,20 1100,60 1200,30 L1200,200 Z" fill="currentColor"/>
-          </svg>
-        </div>
       </div>
       {/* Traditional Chinese Seal/Stamp in corner */}
       <div className="fixed top-6 left-6 z-10 opacity-20">
@@ -147,7 +140,7 @@ export default function HomePage() {
 
       {/* Sticky Header - only show when chart is calculated */}
       <AnimatePresence>
-        {showChart && originalInput && (
+        {originalInput && (
           <StickyHeader input={originalInput} onEdit={handleEdit} />
         )}
       </AnimatePresence>
@@ -160,7 +153,7 @@ export default function HomePage() {
       >
         {/* Header Section */}
         <AnimatePresence mode="wait">
-          {!showChart && (
+          {!chart && (
             <motion.header 
               key="header"
               variants={sequenceVariants}
@@ -212,7 +205,7 @@ export default function HomePage() {
 
         {/* Form Section */}
         <AnimatePresence mode="wait">
-          {!showChart && (
+          {!chart && (
             <motion.div
               key="form"
               variants={itemVariants}
@@ -248,7 +241,7 @@ export default function HomePage() {
 
         {/* Chart Section */}
         <AnimatePresence>
-          {showChart && chart && (
+          {chart && (
             <motion.div
               key="chart"
               initial={{ opacity: 0, y: 50 }}
@@ -282,7 +275,7 @@ export default function HomePage() {
       </motion.main>
 
       {/* Traditional Chinese footer elements */}
-      {!showChart && (
+      {!chart && (
         <motion.footer 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
