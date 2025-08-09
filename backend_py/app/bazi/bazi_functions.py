@@ -215,6 +215,26 @@ def apply_shensha_rules(shansha, data):
     
     return shansha
 
+def apply_shensha_rules_with_certain_pillar(data, pillar):
+    """Apply general shensha rules"""
+    shansha = []
+    for rule in shensha_rules:
+        name = rule["name"]
+        key_type = rule["key_type"]  # "gan" or "zhi"
+        value_type = rule["value_type"]  # "gan" or "zhi"
+        key_pillars = rule["key_pillar"]  # which pillars to check as key
+        mapping = rule["mapping"]
+        # Check each key pillar
+        for key_pillar in key_pillars:
+            key_value = data[key_type][key_pillar]
+            if key_value in mapping:
+                target_values = mapping[key_value]
+                pillar_value = pillar[value_type]
+                if pillar_value in target_values:
+                    shansha.append(name)
+    
+    return shansha
+
 def apply_shensha_other_rules(shansha, data):
     """Apply other shensha rules with special formats"""
     for rule in shensha_other_rules:
@@ -264,13 +284,9 @@ def apply_xiao_er_guan_sha_rules(shansha, data):
                 
                 # Check specific pillar or all pillars for matches
                 # pillars_to_check = [value_pillar] if value_pillar else ["time"]
-                print(value_pillar)
                 for pillar in value_pillar:
                     pillar_value = data[value_type][pillar]
-                    
                     if pillar_value in target_values:
-                        print(name,key_value, pillar_value, target_values)
-                        print(value_pillar)
                         shansha[pillar].append(name)
                         break
     

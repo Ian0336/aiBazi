@@ -8,16 +8,18 @@ import json
 
 def test_enhanced_api():
     response = requests.post('http://localhost:8000/api/bazi', json={
-        'year': 1990,
-        'month': 1, 
-        'day': 1,
-        'hour': 0,
+        'year': 2026,
+        'month': 10, 
+        'day': 8,
+        'hour': 13,
         'is_lunar': False,
         'is_leap_month': False,
         'gender': 'male'
     })
     if response.status_code == 200:
         data = response.json()
+        print(data['dayun_pillar'])
+        print(data['liunian_pillar'])
         print('✅ Enhanced API Test Success!')
         # print(json.dumps(data, indent=4, ensure_ascii=False))
         # print('📅 Basic Info:')

@@ -1,4 +1,17 @@
 # Changelog
+## [1.1.0] - 2025-08-09
+
+### Added
+- Backend Python API now includes two additional fields in the Bazi response:
+  - `dayun_pillar`: Current Dayun (大運) pillar with `gan`, `zhi`, `ganzhi`, `gan_ten_deity`, `zhi_ten_deity`, `hidden_stems`, `nayin`, and computed `shensha` using `apply_shensha_rules_with_certain_pillar`.
+  - `liunian_pillar`: Current Liunian (流年) pillar (for the current year) with year/age and similar attributes including `shensha`.
+
+### Fixed
+- Corrected a datetime usage bug in backend when determining child age for shensha rules.
+
+### Notes
+- The computation of current Dayun aligns with frontend age reckoning (current year − birth year + 1).
+
 
 This document records all modifications, updates, and changes made to the AI Bazi fortune telling application project.
 

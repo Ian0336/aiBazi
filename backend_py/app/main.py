@@ -55,6 +55,30 @@ class HiddenStem(BaseModel):
     ten_deity: str = Field(..., description="Ten deity relationship")
     strength: Optional[int] = Field(None, description="Strength of the hidden stem")
 
+class DayunPillar(BaseModel):
+    """Simplified pillar structure for current Dayun (大運) with shensha"""
+    ganzhi: str = Field(..., description="Combined heavenly stem and earthly branch")
+    gan: str = Field(..., description="Heavenly stem")
+    zhi: str = Field(..., description="Earthly branch")
+    gan_ten_deity: str = Field(..., description="Ten deity of heavenly stem")
+    zhi_ten_deity: str = Field(..., description="Twelve lifecycle stage")
+    hidden_stems: List[HiddenStem] = Field(..., description="Hidden stems in earthly branch")
+    nayin: str = Field(..., description="Nayin (sound) element")
+    shensha: List[str] = Field(..., description="List of shensha (神煞) influences")
+
+class LiunianPillar(BaseModel):
+    """Simplified pillar structure for current Liunian (流年) with shensha"""
+    year: int = Field(..., description="Calendar year")
+    age: int = Field(..., description="Age during the year")
+    ganzhi: str = Field(..., description="Combined heavenly stem and earthly branch")
+    gan: str = Field(..., description="Heavenly stem")
+    zhi: str = Field(..., description="Earthly branch")
+    gan_ten_deity: str = Field(..., description="Ten deity of heavenly stem")
+    zhi_ten_deity: str = Field(..., description="Twelve lifecycle stage")
+    hidden_stems: List[HiddenStem] = Field(..., description="Hidden stems in earthly branch")
+    nayin: str = Field(..., description="Nayin (sound) element")
+    shensha: List[str] = Field(..., description="List of shensha (神煞) influences")
+
 class Pillar(BaseModel):
     """Structure for year, month, day, and hour pillars"""
     ganzhi: str = Field(..., description="Combined heavenly stem and earthly branch")
@@ -112,6 +136,8 @@ class BaziResponse(BaseModel):
     day_pillar: Pillar = Field(..., description="Day pillar information")
     hour_pillar: Pillar = Field(..., description="Hour pillar information")
     dayun: List[DayunEntry] = Field(..., description="Major fortune periods")
+    dayun_pillar: Optional[DayunPillar] = Field(None, description="Current dayun pillar with shensha")
+    liunian_pillar: Optional[LiunianPillar] = Field(None, description="Current liunian pillar with shensha")
     lunar_date: str = Field(..., description="Corresponding lunar date")
     solar_date: str = Field(..., description="Solar calendar date")
     nayin: Dict[str, str] = Field(..., description="Nayin elements for each pillar")

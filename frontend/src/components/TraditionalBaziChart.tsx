@@ -49,47 +49,7 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) =>
 
   const zodiacInfo = getZodiac(chart.year_pillar.zhi);
 
-  // Calculate current Dayun (Major Fortune Period)
-  const getCurrentDayun = () => {
-    if (!chart.dayun || chart.dayun.length === 0) return 0;
-    
-    for (let i = 0; i < chart.dayun.length; i++) {
-      const dayun = chart.dayun[i];
-      const nextDayun = chart.dayun[i + 1];
-      
-      if (nextDayun) {
-        if (age >= dayun.start_age && age < nextDayun.start_age) {
-          return i;
-        }
-      } else {
-        // Last dayun period
-        if (age >= dayun.start_age) {
-          return i;
-        }
-      }
-    }
-    
-    return 0; // Fallback to first period
-  };
-
-  // Calculate current Liunian (Annual Fortune)
-  const getCurrentLiunian = () => {
-    const currentDayunIdx = getCurrentDayun();
-    const currentDayunData = chart.dayun[currentDayunIdx];
-    if (!currentDayunData || !currentDayunData.liunian) return 0;
-    
-    const currentYear = new Date().getFullYear();
-    const currentLiunianIdx = currentDayunData.liunian.findIndex(ln => ln.year === currentYear);
-    
-    return currentLiunianIdx !== -1 ? currentLiunianIdx : 0; // Fallback to first year in period
-  };
-
-  // State for selected dayun and liunian
-  const [selectedDayunIdx, setSelectedDayunIdx] = React.useState(getCurrentDayun());
-  const [selectedLiunianIdx, setSelectedLiunianIdx] = React.useState(getCurrentLiunian());
-  
-  const selectedDayun = chart.dayun[selectedDayunIdx];
-  const selectedLiunian = chart.dayun[selectedDayunIdx]?.liunian[selectedLiunianIdx];
+  // No local selection; display always reflects backend-provided pillars
 
   // Print handler function - navigate to print page
   const handlePrint = () => {
@@ -190,12 +150,12 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) =>
                     <tr className="border-b border-gray-100">
                       <td className="p-1 text-center">
                         <div className="text-purple-700 font-medium ">
-                          {selectedLiunian?.gan_ten_deity || '-'}
+                          {chart.liunian_pillar?.gan_ten_deity || '-'}
                         </div>
                       </td>
                       <td className="p-1 text-center">
                         <div className="text-purple-700 font-medium ">
-                          {selectedDayun?.gan_ten_deity || '-'}
+                          {chart.dayun_pillar?.gan_ten_deity || '-'}
                         </div>
                       </td>
                       <td className="p-1 text-center border-l-2 border-gray-400">
@@ -225,16 +185,16 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) =>
                                     {/* Heavenly Stems Row */}
                     <tr className="border-b border-gray-100 text-3xl">
                       <td className="p-1 text-center">
-                        {selectedLiunian && (
-                          <div className={`inline-block px-2 py-1 rounded  font-bold ${getElementClass(Gan2Wuxing(selectedLiunian.gan))}`}>
-                            {selectedLiunian.gan}
+                        {chart.liunian_pillar && (
+                          <div className={`inline-block px-2 py-1 rounded  font-bold ${getElementClass(Gan2Wuxing(chart.liunian_pillar.gan))}`}>
+                            {chart.liunian_pillar.gan}
                           </div>
                         )}
                       </td>
                       <td className="p-1 text-center">
-                        {selectedDayun && (
-                          <div className={`inline-block px-2 py-1 rounded  font-bold ${getElementClass(Gan2Wuxing(selectedDayun.gan))}`}>
-                            {selectedDayun.gan}
+                        {chart.dayun_pillar && (
+                          <div className={`inline-block px-2 py-1 rounded  font-bold ${getElementClass(Gan2Wuxing(chart.dayun_pillar.gan))}`}>
+                            {chart.dayun_pillar.gan}
                           </div>
                         )}
                       </td>
@@ -264,16 +224,16 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) =>
                                     {/* Earthly Branches Row */}
                     <tr className="border-b border-gray-100 text-3xl">
                       <td className="p-1 text-center">
-                        {selectedLiunian && (
-                          <div className={`inline-block px-2 py-1 rounded  font-bold ${getElementClass(Zhi2Wuxing(selectedLiunian.zhi))}`}>
-                            {selectedLiunian.zhi}
+                        {chart.liunian_pillar && (
+                          <div className={`inline-block px-2 py-1 rounded  font-bold ${getElementClass(Zhi2Wuxing(chart.liunian_pillar.zhi))}`}>
+                            {chart.liunian_pillar.zhi}
                           </div>
                         )}
                       </td>
                       <td className="p-1 text-center">
-                        {selectedDayun && (
-                          <div className={`inline-block px-2 py-1 rounded  font-bold ${getElementClass(Zhi2Wuxing(selectedDayun.zhi))}`}>
-                            {selectedDayun.zhi}
+                        {chart.dayun_pillar && (
+                          <div className={`inline-block px-2 py-1 rounded  font-bold ${getElementClass(Zhi2Wuxing(chart.dayun_pillar.zhi))}`}>
+                            {chart.dayun_pillar.zhi}
                           </div>
                         )}
                       </td>
@@ -303,10 +263,10 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) =>
                                     {/* Star Fortune Row */}
                     <tr className="border-b border-gray-100">
                       <td className="p-1 text-center  text-indigo-600 font-medium">
-                        {selectedLiunian?.zhi_ten_deity || '-'}
+                        {chart.liunian_pillar?.zhi_ten_deity || '-'}
                       </td>
                       <td className="p-1 text-center  text-indigo-600 font-medium">
-                        {selectedDayun?.zhi_ten_deity || '-'}
+                        {chart.dayun_pillar?.zhi_ten_deity || '-'}
                       </td>
                       <td className="p-1 text-center  text-indigo-600 font-medium border-l-2 border-gray-400">
                         {chart.hour_pillar.zhi_ten_deity}
@@ -326,9 +286,9 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) =>
                                     {/* Hidden Stems Row */}
                     <tr className="border-b border-gray-100 align-top">
                       <td className="p-1 text-center">
-                        {selectedLiunian && (
+                        {chart.liunian_pillar && (
                           <div className="flex flex-col gap-0.5">
-                            {selectedLiunian.hidden_stems.map((stem, idx) => (
+                            {chart.liunian_pillar.hidden_stems.map((stem, idx) => (
                               <div key={idx} className={` px-1 py-0.5 rounded ${getElementClass(Gan2Wuxing(stem.gan))}`}>
                                 <div className="md:hidden">
                                   <div className="font-bold">{stem.gan}</div>
@@ -344,9 +304,9 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) =>
                         )}
                       </td>
                       <td className="p-1 text-center">
-                        {selectedDayun && (
+                        {chart.dayun_pillar && (
                           <div className="flex flex-col gap-0.5">
-                            {selectedDayun.hidden_stems.map((stem, idx) => (
+                            {chart.dayun_pillar.hidden_stems.map((stem, idx) => (
                               <div key={idx} className={` px-1 py-0.5 rounded ${getElementClass(Gan2Wuxing(stem.gan))}`}>
                                 <div className="md:hidden">
                                   <div className="font-bold">{stem.gan}</div>
@@ -430,11 +390,11 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) =>
 
                                     {/* Nayin Row */}
                     <tr className="border-b border-gray-100">
-                      <td className={`p-1 text-center  ${selectedLiunian ? getElementClass(selectedLiunian.nayin[selectedLiunian.nayin.length - 1]) : ''}`}>
-                        <div className="">{selectedLiunian?.nayin || '-'}</div>
+                      <td className={`p-1 text-center  ${chart.liunian_pillar ? getElementClass(chart.liunian_pillar.nayin[chart.liunian_pillar.nayin.length - 1]) : ''}`}>
+                        <div className="">{chart.liunian_pillar?.nayin || '-'}</div>
                       </td>
-                      <td className={`p-1 text-center  ${selectedDayun ? getElementClass(selectedDayun.nayin[selectedDayun.nayin.length - 1]) : ''}`}>
-                        <div className="">{selectedDayun?.nayin || '-'}</div>
+                      <td className={`p-1 text-center  ${chart.dayun_pillar ? getElementClass(chart.dayun_pillar.nayin[chart.dayun_pillar.nayin.length - 1]) : ''}`}>
+                        <div className="">{chart.dayun_pillar?.nayin || '-'}</div>
                       </td>
                       <td className={`p-1 text-center border-l-2 border-gray-400 ${getElementClass(chart.hour_pillar.nayin[chart.hour_pillar.nayin.length - 1])}`}>
                         <div className="">{chart.hour_pillar.nayin}</div>
@@ -455,14 +415,28 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) =>
                     <tr className="align-top text-sm">
                       <td className="p-1 text-center">
                         <div className="flex flex-col gap-0.5">
-                          {/* 流年神煞暫時顯示為空 */}
-                          <div className="text-orange-600">-</div>
+                          {chart.liunian_pillar?.shensha && chart.liunian_pillar.shensha.length > 0 ? (
+                            chart.liunian_pillar.shensha.map((star, idx) => (
+                              <div key={idx} className="text-orange-600 px-1 py-0.5 bg-orange-50 rounded">
+                                {star}
+                              </div>
+                            ))
+                          ) : (
+                            <div className="text-gray-400">-</div>
+                          )}
                         </div>
                       </td>
                       <td className="p-1 text-center">
                         <div className="flex flex-col gap-0.5">
-                          {/* 大運神煞暫時顯示為空 */}
-                          <div className="text-orange-600">-</div>
+                          {chart.dayun_pillar?.shensha && chart.dayun_pillar.shensha.length > 0 ? (
+                            chart.dayun_pillar.shensha.map((star, idx) => (
+                              <div key={idx} className="text-orange-600 px-1 py-0.5 bg-orange-50 rounded">
+                                {star}
+                              </div>
+                            ))
+                          ) : (
+                            <div className="text-gray-400">-</div>
+                          )}
                         </div>
                       </td>
                       <td className="p-1 text-center border-l-2 border-gray-400">
@@ -531,25 +505,21 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) =>
             variants={itemVariants}
             className="chinese-card p-1 md:p-6 brush-border"
           >
-            <DayunCard 
-              chart={chart} 
-              _currentDayun={selectedDayunIdx} 
-              _currentLiunian={selectedLiunianIdx}
-              onDayunChange={setSelectedDayunIdx}
-              onLiunianChange={setSelectedLiunianIdx}
-            />
+            <DayunCard chart={chart} />
           </motion.div>
         )}
       </motion.div>
     </>
   );
 };
-const DayunCard = ({ chart, _currentDayun, _currentLiunian, onDayunChange, onLiunianChange }: { chart: BaziChart, _currentDayun: number, _currentLiunian: number, onDayunChange: React.Dispatch<React.SetStateAction<number>>, onLiunianChange: React.Dispatch<React.SetStateAction<number>> }) => {
-  const [currentDayunIdx, setCurrentDayunIdx] = React.useState(_currentDayun)
-  React.useEffect(() => {
-    setCurrentDayunIdx(_currentDayun)
-  }, [_currentDayun])
-  console.log(currentDayunIdx)
+const DayunCard = ({ chart }: { chart: BaziChart }) => {
+  const [currentDayunIdx, setCurrentDayunIdx] = React.useState(() => {
+    if (chart.dayun_pillar) {
+      const idx = chart.dayun.findIndex(du => du.gan === chart.dayun_pillar!.gan && du.zhi === chart.dayun_pillar!.zhi)
+      if (idx !== -1) return idx
+    }
+    return 0
+  })
   return (
     <>
       <div className="text-center mb-6">
@@ -597,7 +567,7 @@ const DayunCard = ({ chart, _currentDayun, _currentLiunian, onDayunChange, onLiu
           {chart.dayun[currentDayunIdx]?.liunian?.slice(0, 10).map((liunian, idx) => (
             <div 
               key={idx} 
-              className={`chinese-card p-1 md:p-2 text-center bg-gradient-to-b from-green-50 to-white border-2 text-xs cursor-pointer hover:shadow-md transition-all ${_currentLiunian === idx && _currentDayun === currentDayunIdx ? 'bg-green/0 border-green-400' : ''}`}
+                  className={`chinese-card p-1 md:p-2 text-center bg-gradient-to-b from-green-50 to-white border-2 text-xs`}
             >
               <div className="text-gray-500 mb-1">{liunian.year}</div>
               <div className="text-xs text-gray-500 mb-1">{liunian.age}歲</div>

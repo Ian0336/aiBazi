@@ -21,7 +21,8 @@ try:
     from bazi.bazi_functions import (
         get_gen, gan_zhi_he, get_gong, is_ku, zhi_ku, gan_ke, jin_jiao,
         calculate_wuxing_scores, calculate_ten_deities, check_day_master_strength,
-        get_nayin_for_ganzhi, get_empty_positions, analyze_special_stars, get_ten_deity, get_nayin, apply_shensha_rules, apply_shensha_other_rules, apply_xiao_er_guan_sha_rules
+        get_nayin_for_ganzhi, get_empty_positions, analyze_special_stars, get_ten_deity, get_nayin, apply_shensha_rules, apply_shensha_other_rules, apply_xiao_er_guan_sha_rules,
+        apply_shensha_rules_with_certain_pillar,
     )
 except ImportError as e:
     print(f"Error importing bazi modules: {e}")
@@ -65,6 +66,7 @@ class BaziCalculator:
             Dictionary containing complete bazi calculation results
         """
         try:
+            
             # Convert between solar and lunar calendar (same logic as bazi.py)
             if is_lunar:
                 # Input is lunar, convert to solar
@@ -109,16 +111,20 @@ class BaziCalculator:
 
             # Calculate shensha (神煞)
             shensha = self._get_shansha({"gan": gans._asdict(), "zhi": zhis._asdict()}, year)
-            
             year_pillar["shensha"] = shensha["year"]
             month_pillar["shensha"] = shensha["month"]
             day_pillar["shensha"] = shensha["day"]
             hour_pillar["shensha"] = shensha["time"]
-            print(shensha)
+            # print(shensha)
 
             # Calculate dayun (大運)
             yun = ba.getYun(gender == "male")
             dayun = self._get_dayun(yun, gans, zhis, day_master)
+            
+
+            # Add dayun pillar and liunian pillar
+            dayun_pillar = self._get_dayun_pillar(dayun, gans, zhis, day_master, year)
+            liunian_pillar = self._get_liunian_pillar(dayun, gans, zhis, day_master, year)
 
             
             # Calculate nayin (納音)
@@ -141,6 +147,8 @@ class BaziCalculator:
                 "day_pillar": day_pillar,
                 "hour_pillar": hour_pillar,
                 "dayun": dayun,
+                "dayun_pillar": dayun_pillar,
+                "liunian_pillar": liunian_pillar,
                 "lunar_date": lunar_date_str,
                 "solar_date": solar_date_str,
                 "nayin": nayin_info,
@@ -561,6 +569,127 @@ class BaziCalculator:
             "day": list(dict.fromkeys(shensha["day"])),
             "time": list(dict.fromkeys(shensha["time"]))
         }
+
+    def _get_dayun_pillar(self, dayun_list: List[Dict[str, Any]], gans, zhis, day_master: str, birth_year: int) -> Optional[Dict[str, Any]]:
+        """Compute the current Dayun pillar and its shensha.
+
+        Returns a structure similar to the frontend's Dayun cell with extra shensha list.
+        """
+        if not dayun_list:
+            return None
+
+        # East Asian age reckoning consistent with frontend: current year - birth year + 1
+        current_year = datetime.datetime.now().year
+        current_age = current_year - birth_year + 1
+        # Build natal data map for shensha rules
+        base_data = {"gan": gans._asdict(), "zhi": zhis._asdict()}
+
+        # Determine current dayun by age
+        selected_idx = 0
+        for i, du in enumerate(dayun_list):
+            start_age = du.get("start_age", 0)
+            next_start_age = dayun_list[i + 1].get("start_age", 200) if i + 1 < len(dayun_list) else 200
+            if current_age >= start_age and current_age < next_start_age:
+                selected_idx = i
+                break
+
+        current_dayun = dayun_list[selected_idx]
+        gan_ = current_dayun.get("gan")
+        zhi_ = current_dayun.get("zhi")
+
+        # Hidden stems
+        hidden_stems = []
+        try:
+            from external.bazi.datas import zhi5_list, zhi5
+        except Exception:
+            pass
+        if 'zhi5_list' in globals() and zhi_ in zhi5_list:
+            for hidden_gan in zhi5_list[zhi_]:
+                hidden_stems.append({
+                    "gan": hidden_gan,
+                    "ten_deity": get_ten_deity(day_master, hidden_gan)
+                })
+
+        pillar = {
+            "ganzhi": f"{gan_}{zhi_}",
+            "gan": gan_,
+            "zhi": zhi_,
+            "gan_ten_deity": get_ten_deity(day_master, gan_),
+            "zhi_ten_deity": hidden_stems[0]["ten_deity"] if hidden_stems else get_ten_deity(day_master, zhi_),
+            "hidden_stems": hidden_stems,
+            "nayin": get_nayin(gan_, zhi_),
+        }
+
+        # Compute shensha for this specific pillar
+        try:
+            pillar["shensha"] = apply_shensha_rules_with_certain_pillar(base_data, {"gan": gan_, "zhi": zhi_})
+        except Exception:
+            pillar["shensha"] = []
+
+        return pillar
+
+    def _get_liunian_pillar(self, dayun_list: List[Dict[str, Any]], gans, zhis, day_master: str, birth_year: int) -> Optional[Dict[str, Any]]:
+        """Compute the current Liunian pillar (for the current year) and its shensha."""
+        if not dayun_list:
+            return None
+
+        current_year = datetime.datetime.now().year
+        base_data = {"gan": gans._asdict(), "zhi": zhis._asdict()}
+
+        current_dayun = None
+        current_liunian = None
+
+        # Find the dayun that contains current year in its liunian list
+        for du in dayun_list:
+            for ln in du.get("liunian", []) :
+                if ln.get("year") == current_year:
+                    current_dayun = du
+                    current_liunian = ln
+                    break
+            if current_liunian:
+                break
+
+        # If not found, fallback to first dayun's first liunian
+        if current_liunian is None:
+            current_dayun = dayun_list[0]
+            ln_list = current_dayun.get("liunian", [])
+            if not ln_list:
+                return None
+            current_liunian = ln_list[0]
+
+        gan_ = current_liunian.get("gan")
+        zhi_ = current_liunian.get("zhi")
+
+        hidden_stems = []
+        try:
+            from external.bazi.datas import zhi5_list
+        except Exception:
+            pass
+        if 'zhi5_list' in globals() and zhi_ in zhi5_list:
+            for hidden_gan in zhi5_list[zhi_]:
+                hidden_stems.append({
+                    "gan": hidden_gan,
+                    "ten_deity": get_ten_deity(day_master, hidden_gan)
+                })
+
+        pillar = {
+            "year": current_liunian.get("year"),
+            "age": current_liunian.get("age"),
+            "ganzhi": f"{gan_}{zhi_}",
+            "gan": gan_,
+            "zhi": zhi_,
+            "gan_ten_deity": get_ten_deity(day_master, gan_),
+            "zhi_ten_deity": hidden_stems[0]["ten_deity"] if hidden_stems else get_ten_deity(day_master, zhi_),
+            "hidden_stems": hidden_stems,
+            "nayin": get_nayin(gan_, zhi_),
+        }
+
+        try:
+            pillar["shensha"] = apply_shensha_rules_with_certain_pillar(base_data, {"gan": gan_, "zhi": zhi_})
+        except Exception:
+            pillar["shensha"] = []
+
+        return pillar
     
     def analyze_bazi(
         self,

@@ -29,46 +29,24 @@ const PrintableBaziChart: React.FC<PrintableBaziChartProps> = ({ chart }) => {
 
   const zodiacInfo = getZodiac(chart.year_pillar.zhi);
 
-  // Calculate current Dayun (Major Fortune Period)
-  const getCurrentDayun = () => {
-    if (!chart.dayun || chart.dayun.length === 0) return 0;
-    
-    for (let i = 0; i < chart.dayun.length; i++) {
-      const dayun = chart.dayun[i];
-      const nextDayun = chart.dayun[i + 1];
-      
-      if (nextDayun) {
-        if (age >= dayun.start_age && age < nextDayun.start_age) {
-          return i;
-        }
-      } else {
-        // Last dayun period
-        if (age >= dayun.start_age) {
-          return i;
-        }
-      }
+  // Determine current dayun/liunian based on backend-provided pillars
+  const currentDayunIdx = React.useMemo(() => {
+    if (chart.dayun_pillar) {
+      const idx = chart.dayun.findIndex(du => du.gan === chart.dayun_pillar!.gan && du.zhi === chart.dayun_pillar!.zhi);
+      if (idx !== -1) return idx;
     }
-    
-    return 0; // Fallback to first period
-  };
+    return 0;
+  }, [chart.dayun, chart.dayun_pillar]);
 
-  // Calculate current Liunian (Annual Fortune)
-  const getCurrentLiunian = () => {
-    const currentDayunIdx = getCurrentDayun();
-    const currentDayunData = chart.dayun[currentDayunIdx];
-    if (!currentDayunData || !currentDayunData.liunian) return 0;
-    
-    const currentYear = new Date().getFullYear();
-    const currentLiunianIdx = currentDayunData.liunian.findIndex(ln => ln.year === currentYear);
-    
-    return currentLiunianIdx !== -1 ? currentLiunianIdx : 0; // Fallback to first year in period
-  };
-
-  const selectedDayunIdx = getCurrentDayun();
-  const selectedLiunianIdx = getCurrentLiunian();
-  
-  const selectedDayun = chart.dayun[selectedDayunIdx];
-  const selectedLiunian = chart.dayun[selectedDayunIdx]?.liunian[selectedLiunianIdx];
+  const currentLiunianIdx = React.useMemo(() => {
+    const du = chart.dayun[currentDayunIdx];
+    if (!du) return 0;
+    if (chart.liunian_pillar) {
+      const idx = du.liunian.findIndex(ln => ln.year === chart.liunian_pillar!.year);
+      if (idx !== -1) return idx;
+    }
+    return 0;
+  }, [chart.dayun, chart.liunian_pillar, currentDayunIdx]);
 
   const containerStyle: React.CSSProperties = {
     background: 'white',
@@ -229,8 +207,8 @@ const PrintableBaziChart: React.FC<PrintableBaziChartProps> = ({ chart }) => {
           <tbody>
             {/* Main Stars Row */}
             <tr>
-              <td style={tableCellStyle}>{selectedLiunian?.gan_ten_deity || '-'}</td>
-              <td style={tableCellStyle}>{selectedDayun?.gan_ten_deity || '-'}</td>
+              <td style={tableCellStyle}>{chart.liunian_pillar?.gan_ten_deity || '-'}</td>
+              <td style={tableCellStyle}>{chart.dayun_pillar?.gan_ten_deity || '-'}</td>
               <td style={{ ...tableCellStyle, borderLeft: '2px solid black' }}>{chart.hour_pillar.ten_deity}</td>
               <td style={tableCellStyle}>{chart.day_pillar.ten_deity}</td>
               <td style={tableCellStyle}>{chart.month_pillar.ten_deity}</td>
@@ -241,10 +219,10 @@ const PrintableBaziChart: React.FC<PrintableBaziChartProps> = ({ chart }) => {
             {/* Heavenly Stems Row */}
             <tr>
               <td style={elementCellStyle}>
-                {selectedLiunian?.gan || '-'}
+                {chart.liunian_pillar?.gan || '-'}
               </td>
               <td style={elementCellStyle}>
-                {selectedDayun?.gan || '-'}
+                {chart.dayun_pillar?.gan || '-'}
               </td>
               <td style={{ ...elementCellStyle, borderLeft: '2px solid black' }}>
                 {chart.hour_pillar.gan}
@@ -264,10 +242,10 @@ const PrintableBaziChart: React.FC<PrintableBaziChartProps> = ({ chart }) => {
             {/* Earthly Branches Row */}
             <tr>
               <td style={elementCellStyle}>
-                {selectedLiunian?.zhi || '-'}
+                {chart.liunian_pillar?.zhi || '-'}
               </td>
               <td style={elementCellStyle}>
-                {selectedDayun?.zhi || '-'}
+                {chart.dayun_pillar?.zhi || '-'}
               </td>
               <td style={{ ...elementCellStyle, borderLeft: '2px solid black' }}>
                 {chart.hour_pillar.zhi}
@@ -286,8 +264,8 @@ const PrintableBaziChart: React.FC<PrintableBaziChartProps> = ({ chart }) => {
 
             {/* Star Fortune Row */}
             <tr>
-              <td style={tableCellStyle}>{selectedLiunian?.zhi_ten_deity || '-'}</td>
-              <td style={tableCellStyle}>{selectedDayun?.zhi_ten_deity || '-'}</td>
+              <td style={tableCellStyle}>{chart.liunian_pillar?.zhi_ten_deity || '-'}</td>
+              <td style={tableCellStyle}>{chart.dayun_pillar?.zhi_ten_deity || '-'}</td>
               <td style={{ ...tableCellStyle, borderLeft: '2px solid black' }}>{chart.hour_pillar.zhi_ten_deity}</td>
               <td style={tableCellStyle}>{chart.day_pillar.zhi_ten_deity}</td>
               <td style={tableCellStyle}>{chart.month_pillar.zhi_ten_deity}</td>
@@ -298,14 +276,14 @@ const PrintableBaziChart: React.FC<PrintableBaziChartProps> = ({ chart }) => {
             {/* Hidden Stems Row */}
             <tr style={{ verticalAlign: 'top' }}>
               <td style={hiddenStemsStyle}>
-                {selectedLiunian?.hidden_stems.map((stem, idx) => (
+                {chart.liunian_pillar?.hidden_stems.map((stem, idx) => (
                   <div key={idx}>
                     {stem.gan}({stem.ten_deity})
                   </div>
                 )) || '-'}
               </td>
               <td style={hiddenStemsStyle}>
-                {selectedDayun?.hidden_stems.map((stem, idx) => (
+                {chart.dayun_pillar?.hidden_stems.map((stem, idx) => (
                   <div key={idx}>
                     {stem.gan}({stem.ten_deity})
                   </div>
@@ -344,8 +322,8 @@ const PrintableBaziChart: React.FC<PrintableBaziChartProps> = ({ chart }) => {
 
             {/* Nayin Row */}
             <tr>
-              <td style={tableCellStyle}>{selectedLiunian?.nayin || '-'}</td>
-              <td style={tableCellStyle}>{selectedDayun?.nayin || '-'}</td>
+              <td style={tableCellStyle}>{chart.liunian_pillar?.nayin || '-'}</td>
+              <td style={tableCellStyle}>{chart.dayun_pillar?.nayin || '-'}</td>
               <td style={{ ...tableCellStyle, borderLeft: '2px solid black' }}>{chart.hour_pillar.nayin}</td>
               <td style={tableCellStyle}>{chart.day_pillar.nayin}</td>
               <td style={tableCellStyle}>{chart.month_pillar.nayin}</td>
@@ -355,8 +333,20 @@ const PrintableBaziChart: React.FC<PrintableBaziChartProps> = ({ chart }) => {
 
             {/* Shensha Row */}
             <tr style={{ verticalAlign: 'top' }}>
-              <td style={hiddenStemsStyle}>-</td>
-              <td style={hiddenStemsStyle}>-</td>
+              <td style={hiddenStemsStyle}>
+                {chart.liunian_pillar?.shensha && chart.liunian_pillar.shensha.length > 0 ? (
+                  chart.liunian_pillar.shensha.map((star, idx) => (
+                    <div key={idx}>{star}</div>
+                  ))
+                ) : '-'}
+              </td>
+              <td style={hiddenStemsStyle}>
+                {chart.dayun_pillar?.shensha && chart.dayun_pillar.shensha.length > 0 ? (
+                  chart.dayun_pillar.shensha.map((star, idx) => (
+                    <div key={idx}>{star}</div>
+                  ))
+                ) : '-'}
+              </td>
               <td style={{ ...hiddenStemsStyle, borderLeft: '2px solid black' }}>
                 {chart.hour_pillar.shensha && chart.hour_pillar.shensha.length > 0 ? (
                   chart.hour_pillar.shensha.map((star, idx) => (
@@ -403,7 +393,7 @@ const PrintableBaziChart: React.FC<PrintableBaziChartProps> = ({ chart }) => {
               {chart.dayun.slice(0, 9).map((dayun, idx) => (
                 <div 
                   key={idx} 
-                  style={selectedDayunIdx === idx ? dayunItemCurrentStyle : dayunItemStyle}
+                  style={currentDayunIdx === idx ? dayunItemCurrentStyle : dayunItemStyle}
                 >
                   <div>{dayun.liunian[0].year}</div>
                   <div>{dayun.start_age}歲</div>
@@ -420,10 +410,10 @@ const PrintableBaziChart: React.FC<PrintableBaziChartProps> = ({ chart }) => {
           <div>
             <div style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '10px' }}>流年</div>
             <div style={liunianGridStyle}>
-              {chart.dayun[selectedDayunIdx]?.liunian?.slice(0, 10).map((liunian, idx) => (
+              {chart.dayun[currentDayunIdx]?.liunian?.slice(0, 10).map((liunian, idx) => (
                 <div 
                   key={idx} 
-                  style={selectedLiunianIdx === idx ? liunianItemCurrentStyle : liunianItemStyle}
+                  style={currentLiunianIdx === idx ? liunianItemCurrentStyle : liunianItemStyle}
                 >
                   <div>{liunian.year}</div>
                   <div>{liunian.age}歲</div>

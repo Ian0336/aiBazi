@@ -30,6 +30,30 @@ export interface Pillar {
   shensha?: string[];
 }
 
+export interface DayunPillar {
+  ganzhi: string;
+  gan: string;
+  zhi: string;
+  gan_ten_deity: string;
+  zhi_ten_deity: string;
+  hidden_stems: HiddenStem[];
+  nayin: string;
+  shensha: string[];
+}
+
+export interface LiunianPillar {
+  year: number;
+  age: number;
+  ganzhi: string;
+  gan: string;
+  zhi: string;
+  gan_ten_deity: string;
+  zhi_ten_deity: string;
+  hidden_stems: HiddenStem[];
+  nayin: string;
+  shensha: string[];
+}
+
 export interface LiunianEntry {
   year: number;
   age: number;
@@ -126,6 +150,8 @@ export interface BaziChart {
   day_pillar: Pillar;
   hour_pillar: Pillar;
   dayun: DayunEntry[];
+  dayun_pillar?: DayunPillar;
+  liunian_pillar?: LiunianPillar;
   lunar_date: string;
   solar_date: string;
   nayin: Record<string, string>;
