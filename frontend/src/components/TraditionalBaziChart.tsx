@@ -37,10 +37,10 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) =>
     const zodiacMap: Record<string, { name: string; icon: string }> = {
       '子': { name: '鼠', icon: '🐭' }, '丑': { name: '牛', icon: '🐂' }, 
       '寅': { name: '虎', icon: '🐅' }, '卯': { name: '兔', icon: '🐰' },
-      '辰': { name: '龙', icon: '🐲' }, '巳': { name: '蛇', icon: '🐍' }, 
-      '午': { name: '马', icon: '🐴' }, '未': { name: '羊', icon: '🐑' }, 
-      '申': { name: '猴', icon: '🐒' }, '酉': { name: '鸡', icon: '🐓' }, 
-      '戌': { name: '狗', icon: '🐕' }, '亥': { name: '猪', icon: '🐷' }
+      '辰': { name: '龍', icon: '🐲' }, '巳': { name: '蛇', icon: '🐍' }, 
+      '午': { name: '馬', icon: '🐴' }, '未': { name: '羊', icon: '🐑' }, 
+      '申': { name: '猴', icon: '🐒' }, '酉': { name: '雞', icon: '🐓' }, 
+      '戌': { name: '狗', icon: '🐕' }, '亥': { name: '豬', icon: '🐷' }
     };
     return zodiacMap[yearZhi] || { name: '未知', icon: '❓' };
   };

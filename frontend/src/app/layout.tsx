@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import "./globals.css";
+import Providers from './providers';
 
 export const metadata: Metadata = {
   title: "AI 八字算命 | 融合古老智慧與現代AI技術",
@@ -38,7 +39,9 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased font-inter">
-          {children}
+          <Providers>
+            {children}
+          </Providers>
           <ToastContainer
             position="top-right"
             autoClose={2000}

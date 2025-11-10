@@ -19,10 +19,10 @@ const PrintableBaziChart: React.FC<PrintableBaziChartProps> = ({ chart }) => {
     const zodiacMap: Record<string, { name: string; icon: string }> = {
       '子': { name: '鼠', icon: '🐭' }, '丑': { name: '牛', icon: '🐂' }, 
       '寅': { name: '虎', icon: '🐅' }, '卯': { name: '兔', icon: '🐰' },
-      '辰': { name: '龙', icon: '🐲' }, '巳': { name: '蛇', icon: '🐍' }, 
-      '午': { name: '马', icon: '🐴' }, '未': { name: '羊', icon: '🐑' }, 
-      '申': { name: '猴', icon: '🐒' }, '酉': { name: '鸡', icon: '🐓' }, 
-      '戌': { name: '狗', icon: '🐕' }, '亥': { name: '猪', icon: '🐷' }
+      '辰': { name: '龍', icon: '🐲' }, '巳': { name: '蛇', icon: '🐍' }, 
+      '午': { name: '馬', icon: '🐴' }, '未': { name: '羊', icon: '🐑' }, 
+      '申': { name: '猴', icon: '🐒' }, '酉': { name: '雞', icon: '🐓' }, 
+      '戌': { name: '狗', icon: '🐕' }, '亥': { name: '豬', icon: '🐷' }
     };
     return zodiacMap[yearZhi] || { name: '未知', icon: '❓' };
   };
@@ -52,7 +52,7 @@ const PrintableBaziChart: React.FC<PrintableBaziChartProps> = ({ chart }) => {
     background: 'white',
     color: 'black',
     fontFamily: '"Noto Serif SC", serif',
-    padding: '20px',
+    padding: '5px 0 0 0',
     maxWidth: '210mm',
     margin: '0 auto',
     lineHeight: 1.4,
@@ -90,7 +90,7 @@ const PrintableBaziChart: React.FC<PrintableBaziChartProps> = ({ chart }) => {
   const mainTableStyle: React.CSSProperties = {
     width: '100%',
     borderCollapse: 'collapse',
-    margin: '20px 0',
+    margin: '0',
     fontSize: '16px', 
   };
 
@@ -120,7 +120,7 @@ const PrintableBaziChart: React.FC<PrintableBaziChartProps> = ({ chart }) => {
   };
 
   const fortuneSectionStyle: React.CSSProperties = {
-    marginTop: '30px',
+    marginTop: '5px',
   };
 
   const fortuneTitleStyle: React.CSSProperties = {
@@ -387,8 +387,8 @@ const PrintableBaziChart: React.FC<PrintableBaziChartProps> = ({ chart }) => {
           {/* <div style={fortuneTitleStyle}>大運流年</div> */}
 
           {/* Major Fortune Periods */}
-          <div style={{ marginBottom: '20px' }}>
-            <div style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '10px' }}>大運</div>
+          <div>
+            <div style={{ fontSize: '18px', fontWeight: 'bold'}}>大運</div>
             <div style={dayunGridStyle}>
               {chart.dayun.slice(0, 9).map((dayun, idx) => (
                 <div 

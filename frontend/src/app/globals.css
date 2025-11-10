@@ -1,12 +1,10 @@
 /* Modern Chinese-Style Bazi Website - Global Styles */
 
+/* Import Chinese-inspired fonts - must come first */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Import Chinese-inspired fonts */
-@import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@400;500;600;700&family=Merriweather:wght@400;700&family=Fira+Code:wght@400;500&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Ma+Shan+Zheng&display=swap');
 
 @layer base {
   :root {
@@ -435,6 +433,31 @@
   .print-button:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Remove browser headers and footers when printing */
+  @media print {
+    @page {
+      margin: 0;
+      size: A4;
+    }
+    
+    /* Hide browser-generated headers and footers */
+    html {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    
+    body {
+      margin: 0;
+      padding: 10px;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    
+    .no-print {
+      display: none !important;
+    }
   }
 
 }
