@@ -1,0 +1,20 @@
+{
+  "name": "AI Bazi",
+  "short_name": "AI Bazi",
+  "description": "A modern, interactive web application that combines traditional Chinese Bazi (八字) fortune telling with artificial intelligence technology to provide users with accurate and insightful personality and life analysis.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#1e293b",
+  "background_color": "#000000",
+  "lang": "en",
+  "scope": "/",
+  "categories": ["lifestyle", "entertainment"],
+  "icons": [
+    {
+      "src": "/icon.png",
+      "type": "image/png"
+    }
+  ],
+  "prefer_related_applications": false
+}
