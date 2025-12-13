@@ -4,8 +4,8 @@ import { motion } from 'framer-motion';
 import { BaziChart } from '@/types/bazi';
 import { Gan2Wuxing, Zhi2Wuxing } from '@/util/toWuxing';
 import { convertToROCDate } from '@/util/bazi';
-import { useRouter } from 'next/navigation';
 import React from 'react';
+import FloatingToolMenu from './FloatingToolMenu';
 interface TraditionalBaziChartProps {
   chart: BaziChart;
 }
@@ -25,7 +25,6 @@ const getElementClass = (element: string) => {
 };
 
 const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) => {
-  const router = useRouter();
   
   // Calculate current age
   const currentYear = new Date().getFullYear();
@@ -47,14 +46,10 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) =>
 
   
 
+
   const zodiacInfo = getZodiac(chart.year_pillar.zhi);
 
   // No local selection; display always reflects backend-provided pillars
-
-  // Print handler function - navigate to print page
-  const handlePrint = () => {
-    router.push('/print');
-  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -74,14 +69,7 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) =>
   };
   return (
     <>
-      {/* Print Button */}
-      <button
-        onClick={handlePrint}
-        className="print-button btn-chinese fixed bottom-4 right-4"
-        title="列印八字命盤"
-      >
-        🖨️ 列印
-      </button>
+      <FloatingToolMenu chart={chart} />
 
       <motion.div 
         variants={containerVariants}
