@@ -6,21 +6,20 @@ import { Gan2Wuxing, Zhi2Wuxing } from '@/util/toWuxing';
 import { convertToROCDate } from '@/util/bazi';
 import React from 'react';
 import FloatingToolMenu from './FloatingToolMenu';
+
 interface TraditionalBaziChartProps {
   chart: BaziChart;
 }
-// Get element styling
+
+// Get element styling - Updated to use global CSS classes
 const getElementClass = (element: string) => {
   const classMap: Record<string, string> = {
-    '木': 'bg-green-100 text-green-800 border-green-200',
-    '火': 'bg-red-100 text-red-800 border-red-200', 
-    '土': 'bg-[#D7CCC8] text-[#4E342E] border-[#BCAAA4]',  
-    '金': 'bg-yellow-100 text-yellow-800 border-yellow-200',
-    '水': 'bg-blue-100 text-blue-800 border-blue-200'
+    '木': 'element-wood',
+    '火': 'element-fire', 
+    '土': 'element-earth',  
+    '金': 'element-metal',
+    '水': 'element-water'
   };
-  if (!classMap[element]) {
-    console.log(element);
-  }
   return classMap[element] || 'bg-gray-100 text-gray-800 border-gray-200';
 };
 
@@ -44,12 +43,7 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) =>
     return zodiacMap[yearZhi] || { name: '未知', icon: '❓' };
   };
 
-  
-
-
   const zodiacInfo = getZodiac(chart.year_pillar.zhi);
-
-  // No local selection; display always reflects backend-provided pillars
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -67,6 +61,7 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) =>
       transition: { duration: 0.6 }
     }
   };
+
   return (
     <>
       <FloatingToolMenu chart={chart} />
@@ -88,19 +83,19 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) =>
             </h1>
             
             <div className="flex flex-wrap justify-center items-center gap-4 text-sm chinese-text">
-              <div className="flex items-center gap-2 px-3 py-1 bg-red-50 rounded-lg border">
+              <div className="flex items-center gap-2 px-3 py-1 bg-white rounded border">
                 <span>生辰：</span>
                 <span className="font-semibold">{chart.solar_date}</span>
               </div>
-              <div className="flex items-center gap-2 px-3 py-1 bg-blue-50 rounded-lg border">
+              <div className="flex items-center gap-2 px-3 py-1 bg-white rounded border">
                 <span>農曆：</span>
                 <span className="font-semibold">{convertToROCDate(chart.lunar_date)}</span>
               </div>
-              <div className="flex items-center gap-2 px-3 py-1 bg-yellow-50 rounded-lg border">
+              <div className="flex items-center gap-2 px-3 py-1 bg-white rounded border">
                 <span className="text-xl">{zodiacInfo.icon}</span>
                 <span className="font-semibold">{zodiacInfo.name}年</span>
               </div>
-              <div className="flex items-center gap-2 px-3 py-1 bg-green-50 rounded-lg border">
+              <div className="flex items-center gap-2 px-3 py-1 bg-white rounded border">
                 <span>現年：</span>
                 <span className="font-semibold">{age}歲</span>
               </div>
@@ -115,18 +110,19 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) =>
         >
           <div className="text-center mb-6">
             <h2 className="text-2xl chinese-title mb-2">八字排盤</h2>
-            <div className="w-20 h-0.5 bg-gradient-to-r from-transparent via-red-600 to-transparent mx-auto"></div>
+            {/* Simple ink divider */}
+            <div className="w-16 h-0.5 bg-gray-400 mx-auto opacity-50"></div>
           </div>
 
           <div className="chinese-text">
-            <div className="bg-white rounded-lg border overflow-hidden">
+            <div className="bg-white rounded border overflow-hidden">
               <table className="w-full border-collapse text-lg md:text-2xl">
                 {/* Header Row */}
                 <thead>
                   <tr className="bg-gray-50 border-b text-sm md:text-lg">
                     <th className="p-2 text-center font-bold text-gray-700 ">流年</th>
                     <th className="p-2 text-center font-bold text-gray-700 ">大運</th>
-                    <th className="p-2 text-center font-bold text-gray-700 border-l-2 border-gray-400">時柱</th>
+                    <th className="p-2 text-center font-bold text-gray-700 border-l border-gray-300">時柱</th>
                     <th className="p-2 text-center font-bold text-gray-700 ">日柱</th>
                     <th className="p-2 text-center font-bold text-gray-700 ">月柱</th>
                     <th className="p-2 text-center font-bold text-gray-700 ">年柱</th>
@@ -134,43 +130,43 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) =>
                   </tr>
                 </thead>
                 <tbody>
-                                    {/* Main Stars Row */}
+                    {/* Main Stars Row */}
                     <tr className="border-b border-gray-100">
                       <td className="p-1 text-center">
-                        <div className="text-purple-700 font-medium ">
+                        <div className="text-gray-600 text-sm font-medium ">
                           {chart.liunian_pillar?.gan_ten_deity || '-'}
                         </div>
                       </td>
                       <td className="p-1 text-center">
-                        <div className="text-purple-700 font-medium ">
+                        <div className="text-gray-600 text-sm font-medium ">
                           {chart.dayun_pillar?.gan_ten_deity || '-'}
                         </div>
                       </td>
-                      <td className="p-1 text-center border-l-2 border-gray-400">
-                        <div className="text-purple-700 font-medium ">
+                      <td className="p-1 text-center border-l border-gray-300">
+                        <div className="text-gray-600 text-sm font-medium ">
                           {chart.hour_pillar.ten_deity}
                         </div>
                       </td>
                       <td className="p-1 text-center">
-                        <div className="text-purple-700 font-medium ">
+                        <div className="text-gray-600 text-sm font-medium ">
                           {chart.day_pillar.ten_deity}
                         </div>
                       </td>
                       <td className="p-1 text-center">
-                        <div className="text-purple-700 font-medium ">
+                        <div className="text-gray-600 text-sm font-medium ">
                           {chart.month_pillar.ten_deity}
                         </div>
                       </td>
                       <td className="p-1 text-center">
-                        <div className="text-purple-700 font-medium ">
+                        <div className="text-gray-600 text-sm font-medium ">
                           {chart.year_pillar.ten_deity}
                         </div>
                       </td>
-                      <td className="p-2 font-semibold text-gray-700  bg-gray-50">主星</td>
+                      <td className="p-2 font-semibold text-gray-700  bg-gray-50 text-sm">主星</td>
                     </tr>
 
 
-                                    {/* Heavenly Stems Row */}
+                    {/* Heavenly Stems Row */}
                     <tr className="border-b border-gray-100 text-3xl">
                       <td className="p-1 text-center">
                         {chart.liunian_pillar && (
@@ -186,7 +182,7 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) =>
                           </div>
                         )}
                       </td>
-                      <td className="p-1 text-center border-l-2 border-gray-400">
+                      <td className="p-1 text-center border-l border-gray-300">
                         <div className={`inline-block px-2 py-1 rounded  font-bold ${getElementClass(chart.hour_pillar.gan_wuxing)}`}>
                           {chart.hour_pillar.gan}
                         </div>
@@ -206,10 +202,10 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) =>
                           {chart.year_pillar.gan}
                         </div>
                       </td>
-                      <td className="p-2 font-semibold text-gray-700  bg-gray-50 text-lg md:text-2xl">天干</td>
+                      <td className="p-2 font-semibold text-gray-700  bg-gray-50 text-base md:text-xl">天干</td>
                     </tr>
 
-                                    {/* Earthly Branches Row */}
+                    {/* Earthly Branches Row */}
                     <tr className="border-b border-gray-100 text-3xl">
                       <td className="p-1 text-center">
                         {chart.liunian_pillar && (
@@ -225,7 +221,7 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) =>
                           </div>
                         )}
                       </td>
-                      <td className="p-1 text-center border-l-2 border-gray-400">
+                      <td className="p-1 text-center border-l border-gray-300">
                         <div className={`inline-block px-2 py-1 rounded  font-bold ${getElementClass(chart.hour_pillar.zhi_wuxing)}`}>
                           {chart.hour_pillar.zhi}
                         </div>
@@ -245,47 +241,40 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) =>
                           {chart.year_pillar.zhi}
                         </div>
                       </td>
-                      <td className="p-2 font-semibold text-gray-700  bg-gray-50 text-lg md:text-2xl">地支</td>
+                      <td className="p-2 font-semibold text-gray-700  bg-gray-50 text-base md:text-xl">地支</td>
                     </tr>
 
-                                    {/* Star Fortune Row */}
+                    {/* Star Fortune Row */}
                     <tr className="border-b border-gray-100">
-                      <td className="p-1 text-center  text-indigo-600 font-medium">
+                      <td className="p-1 text-center  text-gray-600 text-sm font-medium">
                         {chart.liunian_pillar?.zhi_ten_deity || '-'}
                       </td>
-                      <td className="p-1 text-center  text-indigo-600 font-medium">
+                      <td className="p-1 text-center  text-gray-600 text-sm font-medium">
                         {chart.dayun_pillar?.zhi_ten_deity || '-'}
                       </td>
-                      <td className="p-1 text-center  text-indigo-600 font-medium border-l-2 border-gray-400">
+                      <td className="p-1 text-center  text-gray-600 text-sm font-medium border-l border-gray-300">
                         {chart.hour_pillar.zhi_ten_deity}
                       </td>
-                      <td className="p-1 text-center  text-indigo-600 font-medium">
+                      <td className="p-1 text-center  text-gray-600 text-sm font-medium">
                         {chart.day_pillar.zhi_ten_deity}
                       </td>
-                      <td className="p-1 text-center  text-indigo-600 font-medium">
+                      <td className="p-1 text-center  text-gray-600 text-sm font-medium">
                         {chart.month_pillar.zhi_ten_deity}
                       </td>
-                      <td className="p-1 text-center  text-indigo-600 font-medium">
+                      <td className="p-1 text-center  text-gray-600 text-sm font-medium">
                         {chart.year_pillar.zhi_ten_deity}
                       </td>
-                      <td className="p-2 font-semibold text-gray-700  bg-gray-50">星運</td>
+                      <td className="p-2 font-semibold text-gray-700  bg-gray-50 text-sm">星運</td>
                     </tr>
 
-                                    {/* Hidden Stems Row */}
+                    {/* Hidden Stems Row */}
                     <tr className="border-b border-gray-100 align-top">
                       <td className="p-1 text-center">
                         {chart.liunian_pillar && (
-                          <div className="flex flex-col gap-0.5">
+                          <div className="flex flex-col gap-1 items-center">
                             {chart.liunian_pillar.hidden_stems.map((stem, idx) => (
-                              <div key={idx} className={` px-1 py-0.5 rounded ${getElementClass(Gan2Wuxing(stem.gan))}`}>
-                                <div className="md:hidden">
-                                  <div className="font-bold">{stem.gan}</div>
-                                  <div className="text-gray-600 text-xs">({stem.ten_deity})</div>
-                                </div>
-                                <div className="hidden md:block">
-                                  {stem.gan}
-                                  <span className="text-gray-600 ml-1">({stem.ten_deity})</span>
-                                </div>
+                              <div key={idx} className={`px-1 py-0.5 rounded text-xs ${getElementClass(Gan2Wuxing(stem.gan))}`}>
+                                {stem.gan} <span className="text-gray-500 scale-75 inline-block">({stem.ten_deity})</span>
                               </div>
                             ))}
                           </div>
@@ -293,193 +282,95 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) =>
                       </td>
                       <td className="p-1 text-center">
                         {chart.dayun_pillar && (
-                          <div className="flex flex-col gap-0.5">
+                          <div className="flex flex-col gap-1 items-center">
                             {chart.dayun_pillar.hidden_stems.map((stem, idx) => (
-                              <div key={idx} className={` px-1 py-0.5 rounded ${getElementClass(Gan2Wuxing(stem.gan))}`}>
-                                <div className="md:hidden">
-                                  <div className="font-bold">{stem.gan}</div>
-                                  <div className="text-gray-600 text-xs">({stem.ten_deity})</div>
-                                </div>
-                                <div className="hidden md:block">
-                                  {stem.gan}
-                                  <span className="text-gray-600 ml-1">({stem.ten_deity})</span>
-                                </div>
+                              <div key={idx} className={`px-1 py-0.5 rounded text-xs ${getElementClass(Gan2Wuxing(stem.gan))}`}>
+                                {stem.gan} <span className="text-gray-500 scale-75 inline-block">({stem.ten_deity})</span>
                               </div>
                             ))}
                           </div>
                         )}
                       </td>
-                      <td className="p-1 text-center border-l-2 border-gray-400">
-                        <div className="flex flex-col gap-0.5">
+                      <td className="p-1 text-center border-l border-gray-300">
+                        <div className="flex flex-col gap-1 items-center">
                           {chart.hour_pillar.hidden_stems.map((stem, idx) => (
-                            <div key={idx} className={` px-1 py-0.5 rounded ${getElementClass(Gan2Wuxing(stem.gan))}`}>
-                              <div className="md:hidden">
-                                <div className="font-bold">{stem.gan}</div>
-                                <div className="text-gray-600 text-xs">({stem.ten_deity})</div>
-                              </div>
-                              <div className="hidden md:block">
-                                {stem.gan}
-                                <span className="text-gray-600 ml-1">({stem.ten_deity})</span>
-                              </div>
+                            <div key={idx} className={`px-1 py-0.5 rounded text-xs ${getElementClass(Gan2Wuxing(stem.gan))}`}>
+                              {stem.gan} <span className="text-gray-500 scale-75 inline-block">({stem.ten_deity})</span>
                             </div>
                           ))}
                         </div>
                       </td>
                       <td className="p-1 text-center">
-                        <div className="flex flex-col gap-0.5">
+                        <div className="flex flex-col gap-1 items-center">
                           {chart.day_pillar.hidden_stems.map((stem, idx) => (
-                            <div key={idx} className={` px-1 py-0.5 rounded ${getElementClass(Gan2Wuxing(stem.gan))}`}>
-                              <div className="md:hidden">
-                                <div className="font-bold">{stem.gan}</div>
-                                <div className="text-gray-600 text-xs">({stem.ten_deity})</div>
-                              </div>
-                              <div className="hidden md:block">
-                                {stem.gan}
-                                <span className="text-gray-600 ml-1">({stem.ten_deity})</span>
-                              </div>
+                            <div key={idx} className={`px-1 py-0.5 rounded text-xs ${getElementClass(Gan2Wuxing(stem.gan))}`}>
+                              {stem.gan} <span className="text-gray-500 scale-75 inline-block">({stem.ten_deity})</span>
                             </div>
                           ))}
                         </div>
                       </td>
                       <td className="p-1 text-center">
-                        <div className="flex flex-col gap-0.5">
+                        <div className="flex flex-col gap-1 items-center">
                           {chart.month_pillar.hidden_stems.map((stem, idx) => (
-                            <div key={idx} className={` px-1 py-0.5 rounded ${getElementClass(Gan2Wuxing(stem.gan))}`}>
-                              <div className="md:hidden">
-                                <div className="font-bold">{stem.gan}</div>
-                                <div className="text-gray-600 text-xs">({stem.ten_deity})</div>
-                              </div>
-                              <div className="hidden md:block">
-                                {stem.gan}
-                                <span className="text-gray-600 ml-1">({stem.ten_deity})</span>
-                              </div>
+                            <div key={idx} className={`px-1 py-0.5 rounded text-xs ${getElementClass(Gan2Wuxing(stem.gan))}`}>
+                              {stem.gan} <span className="text-gray-500 scale-75 inline-block">({stem.ten_deity})</span>
                             </div>
                           ))}
                         </div>
                       </td>
                       <td className="p-1 text-center">
-                        <div className="flex flex-col gap-0.5">
+                        <div className="flex flex-col gap-1 items-center">
                           {chart.year_pillar.hidden_stems.map((stem, idx) => (
-                            <div key={idx} className={` px-1 py-0.5 rounded ${getElementClass(Gan2Wuxing(stem.gan))}`}>
-                              <div className="md:hidden">
-                                <div className="font-bold">{stem.gan}</div>
-                                <div className="text-gray-600 text-xs">({stem.ten_deity})</div>
-                              </div>
-                              <div className="hidden md:block">
-                                {stem.gan}
-                                <span className="text-gray-600 ml-1">({stem.ten_deity})</span>
-                              </div>
+                            <div key={idx} className={`px-1 py-0.5 rounded text-xs ${getElementClass(Gan2Wuxing(stem.gan))}`}>
+                              {stem.gan} <span className="text-gray-500 scale-75 inline-block">({stem.ten_deity})</span>
                             </div>
                           ))}
                         </div>
                       </td>
-                      <td className="p-2 font-semibold text-gray-700  bg-gray-50 align-middle">藏干</td>
+                      <td className="p-2 font-semibold text-gray-700  bg-gray-50 align-middle text-sm">藏干</td>
                     </tr>
 
-                                    {/* Nayin Row */}
+                    {/* Nayin Row */}
                     <tr className="border-b border-gray-100">
-                      <td className={`p-1 text-center  ${chart.liunian_pillar ? getElementClass(chart.liunian_pillar.nayin[chart.liunian_pillar.nayin.length - 1]) : ''}`}>
+                      <td className={`p-1 text-center text-sm ${chart.liunian_pillar ? getElementClass(chart.liunian_pillar.nayin[chart.liunian_pillar.nayin.length - 1]) : ''}`}>
                         <div className="">{chart.liunian_pillar?.nayin || '-'}</div>
                       </td>
-                      <td className={`p-1 text-center  ${chart.dayun_pillar ? getElementClass(chart.dayun_pillar.nayin[chart.dayun_pillar.nayin.length - 1]) : ''}`}>
+                      <td className={`p-1 text-center text-sm ${chart.dayun_pillar ? getElementClass(chart.dayun_pillar.nayin[chart.dayun_pillar.nayin.length - 1]) : ''}`}>
                         <div className="">{chart.dayun_pillar?.nayin || '-'}</div>
                       </td>
-                      <td className={`p-1 text-center border-l-2 border-gray-400 ${getElementClass(chart.hour_pillar.nayin[chart.hour_pillar.nayin.length - 1])}`}>
+                      <td className={`p-1 text-center text-sm border-l border-gray-300 ${getElementClass(chart.hour_pillar.nayin[chart.hour_pillar.nayin.length - 1])}`}>
                         <div className="">{chart.hour_pillar.nayin}</div>
                       </td>
-                      <td className={`p-1 text-center  ${getElementClass(chart.day_pillar.nayin[chart.day_pillar.nayin.length - 1])}`}>
+                      <td className={`p-1 text-center text-sm ${getElementClass(chart.day_pillar.nayin[chart.day_pillar.nayin.length - 1])}`}>
                         <div className="">{chart.day_pillar.nayin}</div>
                       </td>
-                      <td className={`p-1 text-center  ${getElementClass(chart.month_pillar.nayin[chart.month_pillar.nayin.length - 1])}`}>
+                      <td className={`p-1 text-center text-sm ${getElementClass(chart.month_pillar.nayin[chart.month_pillar.nayin.length - 1])}`}>
                         <div className="">{chart.month_pillar.nayin}</div>
                       </td>
-                      <td className={`p-1 text-center  ${getElementClass(chart.year_pillar.nayin[chart.year_pillar.nayin.length - 1])}`}>
+                      <td className={`p-1 text-center text-sm ${getElementClass(chart.year_pillar.nayin[chart.year_pillar.nayin.length - 1])}`}>
                         <div className="">{chart.year_pillar.nayin}</div>
                       </td>
-                      <td className="p-2 font-semibold text-gray-700  bg-gray-50">納音</td>
+                      <td className="p-2 font-semibold text-gray-700  bg-gray-50 text-sm">納音</td>
                     </tr>
 
                     {/* shensha Row */}
-                    <tr className="align-top text-sm">
-                      <td className="p-1 text-center">
-                        <div className="flex flex-col gap-0.5">
-                          {chart.liunian_pillar?.shensha && chart.liunian_pillar.shensha.length > 0 ? (
-                            chart.liunian_pillar.shensha.map((star, idx) => (
-                              <div key={idx} className="text-orange-600 px-1 py-0.5 bg-orange-50 rounded">
-                                {star}
-                              </div>
-                            ))
-                          ) : (
-                            <div className="text-gray-400">-</div>
-                          )}
-                        </div>
-                      </td>
-                      <td className="p-1 text-center">
-                        <div className="flex flex-col gap-0.5">
-                          {chart.dayun_pillar?.shensha && chart.dayun_pillar.shensha.length > 0 ? (
-                            chart.dayun_pillar.shensha.map((star, idx) => (
-                              <div key={idx} className="text-orange-600 px-1 py-0.5 bg-orange-50 rounded">
-                                {star}
-                              </div>
-                            ))
-                          ) : (
-                            <div className="text-gray-400">-</div>
-                          )}
-                        </div>
-                      </td>
-                      <td className="p-1 text-center border-l-2 border-gray-400">
-                        <div className="flex flex-col gap-0.5">
-                          {chart.hour_pillar.shensha && chart.hour_pillar.shensha.length > 0 ? (
-                            chart.hour_pillar.shensha.map((star, idx) => (
-                              <div key={idx} className="text-orange-600 px-1 py-0.5 bg-orange-50 rounded">
-                                {star}
-                              </div>
-                            ))
-                          ) : (
-                            <div className="text-gray-400">-</div>
-                          )}
-                        </div>
-                      </td>
-                      <td className="p-1 text-center">
-                        <div className="flex flex-col gap-0.5">
-                          {chart.day_pillar.shensha && chart.day_pillar.shensha.length > 0 ? (
-                            chart.day_pillar.shensha.map((star, idx) => (
-                              <div key={idx} className="text-orange-600 px-1 py-0.5 bg-orange-50 rounded">
-                                {star}
-                              </div>
-                            ))
-                          ) : (
-                            <div className="text-gray-400">-</div>
-                          )}
-                        </div>
-                      </td>
-                      <td className="p-1 text-center">
-                        <div className="flex flex-col gap-0.5">
-                          {chart.month_pillar.shensha && chart.month_pillar.shensha.length > 0 ? (
-                            chart.month_pillar.shensha.map((star, idx) => (
-                              <div key={idx} className="text-orange-600 px-1 py-0.5 bg-orange-50 rounded">
-                                {star}
-                              </div>
-                            ))
-                          ) : (
-                            <div className="text-gray-400">-</div>
-                          )}
-                        </div>
-                      </td>
-                      <td className="p-1 text-center">
-                        <div className="flex flex-col gap-0.5">
-                          {chart.year_pillar.shensha && chart.year_pillar.shensha.length > 0 ? (
-                            chart.year_pillar.shensha.map((star, idx) => (
-                              <div key={idx} className="text-orange-600 px-1 py-0.5 bg-orange-50 rounded">
-                                {star}
-                              </div>
-                            ))
-                          ) : (
-                            <div className="text-gray-400">-</div>
-                          )}
-                        </div>
-                      </td>
-                      <td className="p-2 font-semibold text-gray-700  bg-gray-50 align-middle text-lg md:text-2xl">神煞</td>
+                    <tr className="align-top text-xs">
+                      {[chart.liunian_pillar?.shensha, chart.dayun_pillar?.shensha, chart.hour_pillar.shensha, chart.day_pillar.shensha, chart.month_pillar.shensha, chart.year_pillar.shensha].map((shensha, i) => (
+                         <td key={i} className={`p-1 text-center ${i === 2 ? 'border-l border-gray-300' : ''}`}>
+                           <div className="flex flex-col gap-0.5 items-center">
+                             {shensha && shensha.length > 0 ? (
+                               shensha.map((star, idx) => (
+                                 <div key={idx} className="text-gray-600 px-1 py-0.5 bg-gray-50 border border-gray-200 rounded">
+                                   {star}
+                                 </div>
+                               ))
+                             ) : (
+                               <div className="text-gray-300">-</div>
+                             )}
+                           </div>
+                         </td>
+                      ))}
+                      <td className="p-2 font-semibold text-gray-700 bg-gray-50 align-middle text-sm">神煞</td>
                     </tr>
                 </tbody>
               </table>
@@ -500,6 +391,7 @@ const TraditionalBaziChart: React.FC<TraditionalBaziChartProps> = ({ chart }) =>
     </>
   );
 };
+
 const DayunCard = ({ chart }: { chart: BaziChart }) => {
   const [currentDayunIdx, setCurrentDayunIdx] = React.useState(() => {
     if (chart.dayun_pillar) {
@@ -508,21 +400,25 @@ const DayunCard = ({ chart }: { chart: BaziChart }) => {
     }
     return 0
   })
+
   return (
     <>
       <div className="text-center mb-6">
         <h2 className="text-2xl chinese-title mb-2">大運流年</h2>
-        <div className="w-20 h-0.5 bg-gradient-to-r from-transparent via-blue-600 to-transparent mx-auto "></div>
+        <div className="w-16 h-0.5 bg-gray-400 mx-auto opacity-50"></div>
       </div>
 
       {/* Major Fortune Periods */}
       <div className="mb-6">
         <h3 className="text-sm md:text-lg chinese-text font-semibold mb-4 text-gray-700">大運</h3>
-        <div className="grid grid-cols-9  md:gap-3">
+        <div className="grid grid-cols-9 md:gap-3">
           {chart.dayun.slice(0, 9).map((dayun, idx) => (
             <div 
               key={idx} 
-              className={`chinese-card p-1 md:p-3 text-center bg-gradient-to-b from-blue-50 to-white border-2 cursor-pointer hover:shadow-md transition-all ${currentDayunIdx === idx ? 'bg-blue/0 border-blue-400' : ''}`}
+              className={`
+                chinese-card p-1 md:p-3 text-center border cursor-pointer transition-all
+                ${currentDayunIdx === idx ? 'border-2 border-red-800 bg-red-50' : 'hover:border-red-300'}
+              `}
               onClick={() => {
                 setCurrentDayunIdx(idx);
               }}
@@ -537,10 +433,10 @@ const DayunCard = ({ chart }: { chart: BaziChart }) => {
                   {dayun.zhi}
                 </div>
               </div>
-              <div className="text-xs text-purple-600 mt-1 font-medium">
+              <div className="text-xs text-gray-600 mt-1 font-medium">
                 {dayun.gan_ten_deity}
               </div>
-              <div className="text-xs text-purple-600 mt-1 font-medium">
+              <div className="text-xs text-gray-600 mt-1 font-medium">
                 {dayun.zhi_ten_deity}
               </div>
             </div>
@@ -555,7 +451,7 @@ const DayunCard = ({ chart }: { chart: BaziChart }) => {
           {chart.dayun[currentDayunIdx]?.liunian?.slice(0, 10).map((liunian, idx) => (
             <div 
               key={idx} 
-                  className={`chinese-card p-1 md:p-2 text-center bg-gradient-to-b from-green-50 to-white border-2 text-xs`}
+              className="chinese-card p-1 md:p-2 text-center border text-xs"
             >
               <div className="text-gray-500 mb-1">{liunian.year}</div>
               <div className="text-xs text-gray-500 mb-1">{liunian.age}歲</div>
@@ -565,10 +461,10 @@ const DayunCard = ({ chart }: { chart: BaziChart }) => {
               <div className={`px-1 py-0.5 rounded text-xs font-bold mt-0.5 ${getElementClass(Zhi2Wuxing(liunian.zhi))}`}>
                 {liunian.zhi}
               </div>
-              <div className="text-purple-600 mt-0.5 font-medium text-xs">
+              <div className="text-gray-600 mt-0.5 font-medium text-xs">
                 {liunian.gan_ten_deity}
               </div>
-              <div className="text-purple-600 mt-0.5 font-medium text-xs">
+              <div className="text-gray-600 mt-0.5 font-medium text-xs">
                 {liunian.zhi_ten_deity}
               </div>
             </div>

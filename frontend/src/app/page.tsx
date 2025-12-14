@@ -170,9 +170,9 @@ export default function HomePage() {
                 </h1>
                 {/* Decorative elements */}
                 <div className="flex justify-center items-center gap-4 mb-6">
-                  <div className="w-16 h-0.5 bg-gradient-to-r from-transparent via-red-600 to-transparent"></div>
-                  <span className="text-2xl">🪷</span>
-                  <div className="w-16 h-0.5 bg-gradient-to-r from-transparent via-yellow-600 to-transparent"></div>
+                  <div className="w-16 h-0.5 bg-gray-400 opacity-30"></div>
+                  <span className="text-2xl opacity-70">🪷</span>
+                  <div className="w-16 h-0.5 bg-gray-400 opacity-30"></div>
                 </div>
               </motion.div>
 
@@ -212,7 +212,7 @@ export default function HomePage() {
               initial="hidden"
               animate="visible"
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="max-w-2xl mx-auto animate-ink-drop"
+              className="max-w-2xl mx-auto animate-ink-drop bg-"
             >
               {/* Traditional form wrapper */}
               <div className="chinese-card p-8 brush-border">

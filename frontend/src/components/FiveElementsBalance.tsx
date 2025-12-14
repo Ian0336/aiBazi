@@ -139,9 +139,9 @@ const FiveElementsBalance: React.FC<FiveElementsBalanceProps> = ({ chart }) => {
           五行平衡
         </h3>
         <div className="flex justify-center items-center gap-4 mb-4">
-          <div className="w-16 h-0.5 bg-gradient-to-r from-transparent via-red-600 to-transparent"></div>
-          <span className="text-xl">☯️</span>
-          <div className="w-16 h-0.5 bg-gradient-to-r from-transparent via-yellow-600 to-transparent"></div>
+          <div className="w-16 h-0.5 bg-gray-400 opacity-40"></div>
+          <span className="text-xl opacity-70">☯️</span>
+          <div className="w-16 h-0.5 bg-gray-400 opacity-40"></div>
         </div>
         <p className="chinese-text text-gray-600 text-lg leading-relaxed">
           陰陽五行 · 天地造化 · 觀您命中元素分布
@@ -310,7 +310,7 @@ const FiveElementsBalance: React.FC<FiveElementsBalanceProps> = ({ chart }) => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 2, duration: 0.6 }}
-        className="chinese-card p-6 bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 brush-border"
+        className="chinese-card p-6 bg-gray-50 brush-border"
       >
         <div className="text-center mb-6">
           <h4 className="text-2xl chinese-title flex items-center justify-center gap-3 mb-4">
@@ -341,7 +341,7 @@ const FiveElementsBalance: React.FC<FiveElementsBalanceProps> = ({ chart }) => {
           {showHealthDetails && (
             <div className="space-y-6">
               {/* Five Elements Relationships */}
-              <div className="chinese-card p-5 bg-white/70">
+              <div className="chinese-card p-5 bg-white">
                 <h5 className="text-lg chinese-title mb-4 flex items-center gap-2">
                   <span>🔄</span>
                   <span>五行相生相剋</span>
@@ -371,7 +371,7 @@ const FiveElementsBalance: React.FC<FiveElementsBalanceProps> = ({ chart }) => {
               </div>
 
               {/* Personalized Health Advice */}
-              <div className="chinese-card p-5 bg-white/70">
+              <div className="chinese-card p-5 bg-white">
                 <h5 className="text-lg chinese-title mb-4 flex items-center gap-2">
                   <span>🎯</span>
                   <span>個人化養生建議</span>
@@ -401,7 +401,7 @@ const FiveElementsBalance: React.FC<FiveElementsBalanceProps> = ({ chart }) => {
               </div>
 
               {/* General Health Tips */}
-              <div className="chinese-card p-5 bg-gradient-to-r from-yellow-50 to-orange-50">
+              <div className="chinese-card p-5 bg-orange-50">
                 <h5 className="text-lg chinese-title mb-4 flex items-center gap-2">
                   <span>🌟</span>
                   <span>通用養生原則</span>

@@ -1,73 +1,47 @@
 /* Modern Chinese-Style Bazi Website - Global Styles */
 
-/* Import Chinese-inspired fonts - must come first */
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    /* Chinese Traditional Color Palette */
-    --background: oklch(0.9885 0.0057 84.5659);
-    --foreground: oklch(0.3660 0.0251 49.6085);
-    --card: oklch(0.9686 0.0091 78.2818);
-    --card-foreground: oklch(0.3660 0.0251 49.6085);
-    --popover: oklch(0.9686 0.0091 78.2818);
-    --popover-foreground: oklch(0.3660 0.0251 49.6085);
-    --primary: oklch(0.5553 0.1455 48.9975);
-    --primary-foreground: oklch(1.0000 0 0);
-    --secondary: oklch(0.8276 0.0752 74.4400);
-    --secondary-foreground: oklch(0.4444 0.0096 73.6390);
-    --muted: oklch(0.9363 0.0218 83.2637);
-    --muted-foreground: oklch(0.5534 0.0116 58.0708);
-    --accent: oklch(0.9000 0.0500 74.9889);
-    --accent-foreground: oklch(0.4444 0.0096 73.6390);
-    --destructive: oklch(0.4437 0.1613 26.8994);
-    --destructive-foreground: oklch(1.0000 0 0);
-    --border: oklch(0.8866 0.0404 89.6994);
-    --input: oklch(0.8866 0.0404 89.6994);
-    --ring: oklch(0.5553 0.1455 48.9975);
-    --chart-1: oklch(0.5553 0.1455 48.9975);
-    --chart-2: oklch(0.5534 0.0116 58.0708);
-    --chart-3: oklch(0.5538 0.1207 66.4416);
-    --chart-4: oklch(0.5534 0.0116 58.0708);
-    --chart-5: oklch(0.6806 0.1423 75.8340);
-    --sidebar: oklch(0.9363 0.0218 83.2637);
-    --sidebar-foreground: oklch(0.3660 0.0251 49.6085);
-    --sidebar-primary: oklch(0.5553 0.1455 48.9975);
-    --sidebar-primary-foreground: oklch(1.0000 0 0);
-    --sidebar-accent: oklch(0.5538 0.1207 66.4416);
-    --sidebar-accent-foreground: oklch(1.0000 0 0);
-    --sidebar-border: oklch(0.8866 0.0404 89.6994);
-    --sidebar-ring: oklch(0.5553 0.1455 48.9975);
-    --font-sans: Oxanium, sans-serif;
-    --font-serif: Merriweather, serif;
-    --font-mono: Fira Code, monospace;
+    /* "Ink on Rice Paper" Palette */
+    /* Warm, light rice paper background */
+    --background: #F9F7F2; 
+    /* Ink black for primary text */
+    --foreground: #2C2C2C; 
+    
+    /* Variables for shadcn/ui components mapping */
+    --card: #FFFFFF;
+    --card-foreground: #2C2C2C;
+    --popover: #FFFFFF;
+    --popover-foreground: #2C2C2C;
+    --primary: #B22222; /* Cinnabar Red */
+    --primary-foreground: #FFFFFF;
+    --secondary: #F0EAE0;
+    --secondary-foreground: #2C2C2C;
+    --muted: #F5F5F5;
+    --muted-foreground: #666666;
+    --accent: #F0EAE0;
+    --accent-foreground: #2C2C2C;
+    --destructive: #DC143C;
+    --destructive-foreground: #FFFFFF;
+    --border: #E5E5E5;
+    --input: #E5E5E5;
+    --ring: #B22222;
+    
+    /* Core Chinese Colors */
+    --chinese-red: #B22222; /* Cinnabar - deeper, less neon */
+    --chinese-gold: #C4A484; /* Earthy Gold/Bronze - less yellow */
+    --chinese-black: #2C2C2C; /* Ink */
+    --ink-wash: #5D5D5D;
+    
+    /* Fonts */
+    --font-sans: 'Noto Serif SC', serif; /* Prioritize serif for the main text */
+    
     --radius: 0.3rem;
-    --shadow-2xs: 0px 2px 3px 0px hsl(28 18% 25% / 0.09);
-    --shadow-xs: 0px 2px 3px 0px hsl(28 18% 25% / 0.09);
-    --shadow-sm: 0px 2px 3px 0px hsl(28 18% 25% / 0.18), 0px 1px 2px -1px hsl(28 18% 25% / 0.18);
-    --shadow: 0px 2px 3px 0px hsl(28 18% 25% / 0.18), 0px 1px 2px -1px hsl(28 18% 25% / 0.18);
-    --shadow-md: 0px 2px 3px 0px hsl(28 18% 25% / 0.18), 0px 2px 4px -1px hsl(28 18% 25% / 0.18);
-    --shadow-lg: 0px 2px 3px 0px hsl(28 18% 25% / 0.18), 0px 4px 6px -1px hsl(28 18% 25% / 0.18);
-    --shadow-xl: 0px 2px 3px 0px hsl(28 18% 25% / 0.18), 0px 8px 10px -1px hsl(28 18% 25% / 0.18);
-    --shadow-2xl: 0px 2px 3px 0px hsl(28 18% 25% / 0.45);
-    --tracking-normal: 0em;
-    --spacing: 0.25rem;
-
-    /* Traditional Chinese Colors */
-    --chinese-red: #DC143C;
-    --chinese-gold: #FFD700;
-    --chinese-black: #2C2C2C;
-    --ink-wash: #4A4A4A;
-    --lotus-pink: #F8BBD9;
-    --bamboo-green: #8FBC8F;
-    --jade-green: #00A86B;
-    --imperial-yellow: #FFDF00;
   }
-
-
 
   * {
     border-color: var(--border);
@@ -78,39 +52,14 @@
     color: var(--foreground);
     position: relative;
     min-height: 100vh;
-    /* Beautiful Chinese background with overlay */
-    background-image: 
-      linear-gradient(
-        135deg, 
-        rgba(255, 248, 240, 0.85) 0%, 
-        rgba(255, 245, 230, 0.80) 25%,
-        rgba(254, 243, 235, 0.85) 50%,
-        rgba(255, 240, 225, 0.80) 75%,
-        rgba(255, 248, 240, 0.85) 100%
-      ),
-      url('/bg.png');
+    font-family: 'Noto Serif SC', serif;
+    
+    /* Pure texture background, no color overlay */
+    background-image: url('/bg_new.png');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
     background-repeat: no-repeat;
-  }
-
-
-
-  /* Additional background texture for better integration */
-  body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: 
-      radial-gradient(circle at 20% 80%, rgba(255, 182, 193, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 80% 20%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 40% 40%, rgba(143, 188, 143, 0.1) 0%, transparent 50%);
-    pointer-events: none;
-    z-index: -1;
   }
 }
 
@@ -118,347 +67,201 @@
   /* Chinese-style Typography */
   .chinese-text {
     font-family: 'Noto Serif SC', serif;
-    line-height: 1.6;
+    line-height: 1.8;
+    letter-spacing: 0.05em;
   }
 
   .chinese-title {
     font-family: 'Ma Shan Zheng', cursive;
-    background: linear-gradient(45deg, var(--chinese-red), var(--chinese-gold));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.1));
+    color: var(--chinese-black);
+    text-shadow: none; /* Removed heavy shadows */
+    font-weight: normal;
+  }
+  
+  /* Primary title usually red */
+  h1.chinese-title {
+    color: var(--chinese-red);
   }
 
-  /* Chinese-style Cards */
+  /* Chinese-style Cards - Minimalist Paper Style */
   .chinese-card {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(220, 20, 60, 0.2);
-    border-radius: 12px;
-    box-shadow: 
-      0 8px 32px rgba(0, 0, 0, 0.1),
-      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid #E0E0E0;
+    border-radius: 4px; /* Sharper corners for paper feel */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Very subtle shadow */
     transition: all 0.3s ease;
   }
 
   .chinese-card:hover {
     transform: translateY(-2px);
-    box-shadow: 
-      0 12px 40px rgba(0, 0, 0, 0.15),
-      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    border-color: #D6D6D6;
   }
 
-  /* Brush Border Effect */
+  /* Brush Border Effect - Simplified to a double line or simple frame */
   .brush-border {
     position: relative;
-    border: 2px solid transparent;
-    background: 
-      linear-gradient(white, white) padding-box,
-      linear-gradient(45deg, var(--chinese-red), var(--chinese-gold), var(--chinese-red)) border-box;
+    border: 1px solid var(--chinese-gold);
+    padding: 2px; /* Inner spacing for double border effect */
   }
-
-  .brush-border::before {
+  
+  .brush-border::after {
     content: '';
     position: absolute;
-    top: -4px;
-    left: -4px;
-    right: -4px;
-    bottom: -4px;
-    background: linear-gradient(45deg, var(--chinese-red), var(--chinese-gold), var(--chinese-red));
-    border-radius: inherit;
-    z-index: -1;
-    opacity: 0.3;
-    filter: blur(6px);
-  }
-
-  /* Lotus Pattern Background */
-  .lotus-pattern {
-    position: relative;
-  }
-
-  .lotus-pattern::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: 
-      radial-gradient(circle at 10% 20%, rgba(248, 187, 217, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 90% 80%, rgba(248, 187, 217, 0.1) 0%, transparent 50%);
+    top: 3px;
+    left: 3px;
+    right: 3px;
+    bottom: 3px;
+    border: 1px solid rgba(196, 164, 132, 0.3);
     pointer-events: none;
-    z-index: 0;
-    border-radius: inherit;
   }
 
-  .lotus-pattern > * {
-    position: relative;
-    z-index: 1;
-  }
-
-  /* Five Elements Styling */
+  /* Five Elements Styling - Flat Colors (Ink style) */
   .element-wood {
-    background: linear-gradient(135deg, #228B22, #32CD32);
-    color: white;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    color: #2E5C38; /* Bamboo Green text */
+    background: #E8F5E9; /* Very light wash background */
+    border: 1px solid #C8E6C9;
   }
 
   .element-fire {
-    background: linear-gradient(135deg, #DC143C, #FF6347);
-    color: white;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    color: #B71C1C; /* Deep Red */
+    background: #FFEBEE;
+    border: 1px solid #FFCDD2;
   }
 
   .element-earth {
-    background: linear-gradient(135deg, #DAA520, #FFD700);
-    color: #8B4513;
-    text-shadow: 1px 1px 2px rgba(255,255,255,0.3);
+    color: #5D4037; /* Brown */
+    background: #EFEBE9;
+    border: 1px solid #D7CCC8;
   }
 
   .element-metal {
-    background: linear-gradient(135deg, #C0C0C0, #D3D3D3);
-    color: #2F4F4F;
-    text-shadow: 1px 1px 2px rgba(255,255,255,0.3);
+    color: #455A64; /* Blue Grey */
+    background: #ECEFF1;
+    border: 1px solid #CFD8DC;
   }
 
   .element-water {
-    background: linear-gradient(135deg, #4169E1, #87CEEB);
-    color: white;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    color: #1565C0; /* Deep Blue */
+    background: #E3F2FD;
+    border: 1px solid #BBDEFB;
   }
 
-  /* Bazi Pillar Cards */
+  /* Bazi Pillar Cards - Simplified */
   .bazi-pillar {
-    background: rgba(255, 255, 255, 0.98);
-    border: 2px solid rgba(220, 20, 60, 0.2);
-    border-radius: 16px;
-    padding: 24px;
-    box-shadow: 
-      0 10px 30px rgba(0, 0, 0, 0.1),
-      inset 0 1px 0 rgba(255, 255, 255, 0.3);
-    backdrop-filter: blur(10px);
-    transition: all 0.4s ease;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .bazi-pillar::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, var(--chinese-red), var(--chinese-gold), var(--chinese-red));
-  }
-
-  /* Chinese Button Styling */
-  .btn-chinese {
-    background: linear-gradient(135deg, var(--chinese-red), #B22222);
-    color: white;
-    border: 2px solid var(--chinese-gold);
-    padding: 12px 24px;
+    background: white;
+    border: 1px solid var(--border);
     border-radius: 8px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  }
+
+  /* Chinese Button Styling - "Seal" Style */
+  .btn-chinese {
+    background-color: var(--chinese-red);
+    color: white;
+    border: 1px solid var(--chinese-red);
+    padding: 10px 24px;
+    border-radius: 4px; /* Seal shape */
     font-family: 'Noto Serif SC', serif;
-    font-weight: 600;
-    box-shadow: 
-      0 4px 15px rgba(220, 20, 60, 0.3),
-      inset 0 1px 0 rgba(255, 255, 255, 0.2);
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .btn-chinese::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transition: left 0.5s ease;
-  }
-
-  .btn-chinese:hover::before {
-    left: 100%;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    box-shadow: 0 2px 4px rgba(178, 34, 34, 0.2);
+    transition: all 0.2s ease;
   }
 
   .btn-chinese:hover {
-    transform: translateY(-2px);
-    box-shadow: 
-      0 6px 20px rgba(220, 20, 60, 0.4),
-      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    background-color: #9A1D1D;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(178, 34, 34, 0.3);
+  }
+  
+  /* Outline variant for secondary actions */
+  .btn-chinese-outline {
+    background-color: transparent;
+    color: var(--chinese-red);
+    border: 1px solid var(--chinese-red);
+  }
+  
+  .btn-chinese-outline:hover {
+    background-color: rgba(178, 34, 34, 0.05);
   }
 
-  /* Chinese Input Styling */
+  /* Chinese Input Styling - "Calligraphy" Style */
   .input-chinese {
-    background: rgba(255, 255, 255, 0.95);
-    border: 2px solid rgba(220, 20, 60, 0.3);
-    border-radius: 8px;
-    padding: 12px 16px;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid #E0E0E0;
+    border-radius: 0;
+    padding: 8px 4px;
     font-family: 'Noto Serif SC', serif;
     font-size: 16px;
+    color: var(--foreground);
     width: 100%;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
   }
 
   .input-chinese:focus {
     outline: none;
-    border-color: var(--chinese-red);
-    box-shadow: 
-      inset 0 2px 4px rgba(0, 0, 0, 0.1),
-      0 0 0 3px rgba(220, 20, 60, 0.1);
+    border-bottom-color: var(--chinese-red);
+    background: rgba(0, 0, 0, 0.01);
   }
 
-  /* Shimmer animation for progress bars */
-  @keyframes shimmer {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
-  }
-
-  .animate-shimmer {
-    animation: shimmer 2s infinite;
-  }
-
-  /* Scrollbar styling */
+  /* Scrollbar styling - Minimal */
   ::-webkit-scrollbar {
-    width: 8px;
+    width: 6px;
   }
 
   ::-webkit-scrollbar-track {
-    background: rgba(220, 20, 60, 0.1);
-    border-radius: 4px;
+    background: transparent;
   }
 
   ::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, var(--chinese-red), var(--chinese-gold));
-    border-radius: 4px;
+    background: #D4D4D4;
+    border-radius: 3px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: var(--chinese-red);
+    background: #A0A0A0;
   }
 
-  /* Custom Toast Styling */
+  /* Custom Toast Styling - Clean */
   .Toastify__toast-container {
     font-family: 'Noto Serif SC', serif !important;
   }
 
   .Toastify__toast {
-    background: rgba(255, 255, 255, 0.98) !important;
-    backdrop-filter: blur(12px) !important;
-    border: 1px solid rgba(220, 20, 60, 0.2) !important;
-    border-radius: 12px !important;
-    box-shadow: 
-      0 8px 32px rgba(0, 0, 0, 0.15),
-      inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+    background: white !important;
+    border: 1px solid #E0E0E0 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
     color: var(--foreground) !important;
-    font-size: 14px !important;
-    line-height: 1.5 !important;
-  }
-
-  .Toastify__toast--success {
-    border-left: 4px solid var(--bamboo-green) !important;
-  }
-
-  .Toastify__toast--error {
-    border-left: 4px solid var(--chinese-red) !important;
-  }
-
-  .Toastify__toast--info {
-    border-left: 4px solid var(--jade-green) !important;
-  }
-
-  .Toastify__toast--warning {
-    border-left: 4px solid var(--imperial-yellow) !important;
-  }
-
-  .Toastify__toast--loading {
-    border-left: 4px solid var(--chinese-gold) !important;
-  }
-
-  .Toastify__progress-bar {
-    background: linear-gradient(45deg, var(--chinese-red), var(--chinese-gold)) !important;
-  }
-
-  .Toastify__close-button {
-    color: var(--ink-wash) !important;
-    opacity: 0.7 !important;
-  }
-
-  .Toastify__close-button:hover {
-    opacity: 1 !important;
-  }
-
-  .Toastify__toast-icon {
-    margin-right: 12px !important;
-  }
-
-  /* Customize toast based on Chinese theme */
-  .Toastify__toast::before {
-    content: '';
-    position: absolute;
-    top: -2px;
-    left: -2px;
-    right: -2px;
-    bottom: -2px;
-    background: linear-gradient(45deg, var(--chinese-red), var(--chinese-gold));
-    border-radius: inherit;
-    z-index: -1;
-    opacity: 0.1;
-    filter: blur(4px);
   }
 
   /* Print Styles */
   .print-button {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 1000;
-    background: linear-gradient(45deg, var(--chinese-red), var(--chinese-gold));
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-family: 'Noto Serif SC', serif;
-    font-weight: 600;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s ease;
+    /* Uses .btn-chinese styles */
   }
 
-  .print-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
-  }
-
-  /* Remove browser headers and footers when printing */
   @media print {
     @page {
       margin: 0;
       size: A4;
     }
     
-    /* Hide browser-generated headers and footers */
-    html {
-      -webkit-print-color-adjust: exact;
-      print-color-adjust: exact;
-    }
-    
-    body {
-      margin: 0;
-      padding: 10px;
-      -webkit-print-color-adjust: exact;
-      print-color-adjust: exact;
+    html, body {
+      background: white !important;
+      color: black !important;
     }
     
     .no-print {
       display: none !important;
     }
+    
+    .chinese-card {
+      border: 1px solid #ccc;
+      box-shadow: none;
+    }
   }
-
 }
+
 

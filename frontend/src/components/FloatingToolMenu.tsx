@@ -102,7 +102,7 @@ const FloatingToolMenu: React.FC<FloatingToolMenuProps> = ({ chart }) => {
                 e.stopPropagation();
                 handleCopy();
               }}
-              className="btn-chinese flex items-center gap-2 shadow-lg !py-2 !px-4 min-w-[100px] justify-center"
+              className="btn-chinese flex items-center gap-2 shadow-lg !py-2 !px-4 min-w-[100px] justify-center text-sm"
               title="複製連結"
             >
               <span className="text-xl">📋</span>
@@ -117,7 +117,7 @@ const FloatingToolMenu: React.FC<FloatingToolMenuProps> = ({ chart }) => {
                 e.stopPropagation();
                 handlePrint();
               }}
-              className="btn-chinese flex items-center gap-2 shadow-lg !py-2 !px-4 min-w-[100px] justify-center"
+              className="btn-chinese flex items-center gap-2 shadow-lg !py-2 !px-4 min-w-[100px] justify-center text-sm"
               title="列印八字命盤"
             >
               <span className="text-xl">🖨️</span>
@@ -132,7 +132,7 @@ const FloatingToolMenu: React.FC<FloatingToolMenuProps> = ({ chart }) => {
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
         onClick={() => setIsMenuOpen(!isMenuOpen)}
-        className="btn-chinese !rounded-full !w-16 !h-16 !p-0 flex items-center justify-center shadow-xl overflow-hidden relative border-2 border-yellow-600"
+        className="btn-chinese !rounded-full !w-16 !h-16 !p-0 flex items-center justify-center shadow-xl overflow-hidden relative border-2 border-[#B22222]"
         title="更多工具"
       >
         <motion.div

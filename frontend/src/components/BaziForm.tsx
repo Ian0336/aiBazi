@@ -485,24 +485,24 @@ const BaziForm: React.FC<BaziFormProps> = ({ onCalculate, isLoading = false }) =
       {/* Current Selection Display */}
       <motion.div 
         variants={itemVariants}
-        className="chinese-card p-4 bg-gradient-to-r from-red-50 to-yellow-50"
+        className="chinese-card p-4 brush-border"
       >
         <div className="text-center chinese-text">
-          <p className="text-sm text-gray-600 mb-2">您選擇的出生時間：</p>
-          <div className="grid md:grid-cols-2 gap-4 text-sm">
+          <p className="text-sm text-gray-500 mb-2">您選擇的出生時間</p>
+          <div className="grid md:grid-cols-2 gap-4 text-sm mt-2">
             <div>
-              <p className="text-lg font-semibold text-gray-800">
+              <p className="text-xl font-medium text-gray-800">
                 {input.is_lunar ? '農曆' : '西元'} {input.year}年 {input.month}月{input.is_leap_month ? '(閏)' : ''} {input.day}日 {input.hour}時
               </p>
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-base text-gray-600 mt-1">
                 {generateHourOptions().find(h => h.value === input.hour)?.chinese}
               </p>
             </div>
             <div className="flex items-center justify-center gap-4">
-              <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
+              <span className="px-3 py-1 bg-gray-100 text-gray-800 border border-gray-300 rounded text-sm">
                 {input.gender === 'male' ? '👨 男性' : '👩 女性'}
               </span>
-              <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs">
+              <span className="px-3 py-1 bg-gray-100 text-gray-800 border border-gray-300 rounded text-sm">
                 {input.is_lunar ? '🌙 農曆' : '🗓️ 國曆'}
               </span>
             </div>
