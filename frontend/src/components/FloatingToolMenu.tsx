@@ -31,32 +31,84 @@ const FloatingToolMenu: React.FC<FloatingToolMenuProps> = ({ chart }) => {
 
   const handleCopy = () => {
     try {
-      const formatHiddenStems = (stems: { gan: string, ten_deity: string }[]) => {
-        return stems.map(s => `${s.gan}(${s.ten_deity})`).join(' ');
+      const formatHiddenStems = (stems: { gan: string, ten_deity: string }[] = []) => {
+        return stems.length > 0
+          ? stems.map((stem) => `${stem.gan}(${stem.ten_deity})`).join(', ')
+          : '-';
       };
 
       const formatShensha = (shensha?: string[]) => {
-        return shensha && shensha.length > 0 ? shensha.join(' ') : '-';
+        return shensha && shensha.length > 0 ? shensha.join(', ') : '-';
       };
 
-      // Format chart data for clipboard (LLM-friendly Markdown format)
+      const formatList = (items?: string[]) => {
+        return items && items.length > 0 ? items.join(', ') : '-';
+      };
+
+      const formatPillarLine = (
+        label: string,
+        pillar: BaziChart['hour_pillar']
+      ) => {
+        return `- ${label} | 干支=${pillar.ganzhi} | 天干=${pillar.gan} | 地支=${pillar.zhi} | 天干十神=${pillar.ten_deity} | 地支十神=${pillar.zhi_ten_deity} | 藏干=${formatHiddenStems(pillar.hidden_stems)} | 納音=${pillar.nayin} | 神煞=${formatShensha(pillar.shensha)}`;
+      };
+
+      const formatDayunPillarLine = (pillar?: BaziChart['dayun_pillar']) => {
+        if (!pillar) {
+          return '- 目前大運 | -';
+        }
+
+        return `- 目前大運 | 干支=${pillar.ganzhi} | 天干=${pillar.gan} | 地支=${pillar.zhi} | 天干十神=${pillar.gan_ten_deity} | 地支十神=${pillar.zhi_ten_deity} | 藏干=${formatHiddenStems(pillar.hidden_stems)} | 納音=${pillar.nayin} | 神煞=${formatShensha(pillar.shensha)}`;
+      };
+
+      const formatLiunianPillarLine = (pillar?: BaziChart['liunian_pillar']) => {
+        if (!pillar) {
+          return '- 目前流年 | -';
+        }
+
+        return `- 目前流年 | 年份=${pillar.year} | 歲數=${pillar.age} | 干支=${pillar.ganzhi} | 天干=${pillar.gan} | 地支=${pillar.zhi} | 天干十神=${pillar.gan_ten_deity} | 地支十神=${pillar.zhi_ten_deity} | 藏干=${formatHiddenStems(pillar.hidden_stems)} | 納音=${pillar.nayin} | 神煞=${formatShensha(pillar.shensha)}`;
+      };
+
+      const currentDayunEntry = chart.dayun_pillar
+        ? chart.dayun.find((dayun) => dayun.ganzhi === chart.dayun_pillar?.ganzhi)
+        : undefined;
+
+      const dayunTimeline = chart.dayun.map((dayun, index) => {
+        const startYear = dayun.liunian[0]?.year;
+        const endYear = dayun.liunian[dayun.liunian.length - 1]?.year;
+        const yearRange = startYear && endYear ? `${startYear}-${endYear}` : '-';
+
+        return `- 大運_${index + 1} | 起始歲數=${dayun.start_age} | 年份區間=${yearRange} | 干支=${dayun.ganzhi} | 天干=${dayun.gan} | 地支=${dayun.zhi} | 天干十神=${dayun.gan_ten_deity} | 地支十神=${dayun.zhi_ten_deity} | 藏干=${formatHiddenStems(dayun.hidden_stems)} | 地支關係=${formatList(dayun.zhi_relationships)} | 納音=${dayun.nayin} | 特殊組合=${formatList(dayun.special_combinations)} | 是否空亡=${dayun.is_empty} | 是否重複=${dayun.is_repeated}`;
+      });
+
+      const currentDayunLiunianTimeline = currentDayunEntry?.liunian?.length
+        ? currentDayunEntry.liunian.map((liunian, index) => {
+            return `- 流年_${index + 1} | 年份=${liunian.year} | 歲數=${liunian.age} | 干支=${liunian.ganzhi} | 天干=${liunian.gan} | 地支=${liunian.zhi} | 天干十神=${liunian.gan_ten_deity} | 地支十神=${liunian.zhi_ten_deity} | 藏干=${formatHiddenStems(liunian.hidden_stems)} | 地支關係=${formatList(liunian.zhi_relationships)} | 納音=${liunian.nayin} | 特殊組合=${formatList(liunian.special_combinations)} | 特殊格局=${formatList(liunian.special_patterns)} | 是否空亡=${liunian.is_empty} | 是否重複=${liunian.is_repeated}`;
+          })
+        : ['- 目前大運沒有對應的流年資料'];
+
+      // Format chart data for clipboard in a key/value layout that is easier for AI to parse.
       const text = [
-        '# 八字命盤分析資料',
+        '# 八字命盤資料',
         '',
         '## 基本資料',
-        `- 生辰：${chart.solar_date}`,
-        `- 農曆：${convertToROCDate(chart.lunar_date)}`,
+        `- 國曆=${chart.solar_date}`,
+        `- 農曆=${convertToROCDate(chart.lunar_date)}`,
         '',
-        '## 四柱詳細資料',
-        '| 項目 | 時柱 | 日柱 | 月柱 | 年柱 |',
-        '| :-: | :-: | :-: | :-: | :-: |',
-        `| **天干** | ${chart.hour_pillar.gan} | ${chart.day_pillar.gan} | ${chart.month_pillar.gan} | ${chart.year_pillar.gan} |`,
-        `| **地支** | ${chart.hour_pillar.zhi} | ${chart.day_pillar.zhi} | ${chart.month_pillar.zhi} | ${chart.year_pillar.zhi} |`,
-        `| **十神(主星)** | ${chart.hour_pillar.ten_deity} | ${chart.day_pillar.ten_deity} | ${chart.month_pillar.ten_deity} | ${chart.year_pillar.ten_deity} |`,
-        `| **星運(副星)** | ${chart.hour_pillar.zhi_ten_deity} | ${chart.day_pillar.zhi_ten_deity} | ${chart.month_pillar.zhi_ten_deity} | ${chart.year_pillar.zhi_ten_deity} |`,
-        `| **藏干** | ${formatHiddenStems(chart.hour_pillar.hidden_stems)} | ${formatHiddenStems(chart.day_pillar.hidden_stems)} | ${formatHiddenStems(chart.month_pillar.hidden_stems)} | ${formatHiddenStems(chart.year_pillar.hidden_stems)} |`,
-        `| **納音** | ${chart.hour_pillar.nayin} | ${chart.day_pillar.nayin} | ${chart.month_pillar.nayin} | ${chart.year_pillar.nayin} |`,
-        `| **神煞** | ${formatShensha(chart.hour_pillar.shensha)} | ${formatShensha(chart.day_pillar.shensha)} | ${formatShensha(chart.month_pillar.shensha)} | ${formatShensha(chart.year_pillar.shensha)} |`,
+        '## 四柱',
+        formatPillarLine('時柱', chart.hour_pillar),
+        formatPillarLine('日柱', chart.day_pillar),
+        formatPillarLine('月柱', chart.month_pillar),
+        formatPillarLine('年柱', chart.year_pillar),
+        '',
+        '## 目前運勢',
+        formatDayunPillarLine(chart.dayun_pillar),
+        formatLiunianPillarLine(chart.liunian_pillar),
+        '',
+        '## 大運列表',
+        ...dayunTimeline,
+        '',
+        '## 目前大運的流年列表',
+        ...currentDayunLiunianTimeline,
         ''
       ].join('\n');
 
