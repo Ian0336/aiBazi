@@ -14,7 +14,10 @@
     deepseek-ai/deepseek-v4-flash            V4 速度版，284B / 13B active
     deepseek-ai/deepseek-v3.1-terminus       V3 末代穩定版，作為 fallback
     deepseek-ai/deepseek-r1                  reasoning 王者，慢但深
-    qwen/qwen2.5-72b-instruct                結構化輸出工整
+    qwen/qwen3.5-397b-a17b                   Qwen 3.5 旗艦，397B / 17B active
+    qwen/qwen3.5-122b-a10b                   Qwen 3.5 中型，122B / 10B active，TTFT 快
+    qwen/qwen3-235b-a22b                     Qwen 3 經典款，235B / 22B active，中文強
+    qwen/qwen3-next-80b-a3b-instruct         Qwen3-Next，80B / 3B active，速度版，256K ctx
     nvidia/llama-3.3-nemotron-super-49b-v1   NV 自家調過
 
 注意：deepseek-ai/deepseek-v3.2 已於 2026-05-04 EOL，不能再用。
@@ -67,12 +70,21 @@ SYSTEM_PROMPT = """你是一位精通子平命學的命理大師，分析時以�
 - 結合格局與十神判斷實際作用力道，不流於吉凶名詞的羅列。
 - 說明神煞是加強還是減弱該柱十神的力量，以及對性格、事件的具體影響。
 
-## 四、性格、事業、財運
-- 基於日主與十神配置，論天賦傾向、處事風格。
-- 事業適性：適合的產業、職位類型、工作模式（穩定受僱／專業技術／創業等）。
-- 財運大方向：正財為主或偏財可圖？財星與官、印、食傷的互動關係。
+## 四、性格、事業、財運（綜合一、二之全局判斷）
+此項須**以第一項格局判定與第二項調候、體用之結論為前提**做整體推導，不得脫離前文獨立發揮。寫作時要明確點出「因為前述何種格局／何種體用，所以推得此處何種傾向」的因果鏈。
+- **性格傾向**：結合日主強弱、格局成破、相神是否到位、清濁寒暖，論天賦特質與處事風格；若格局清純則論其長處，若有官殺混／食傷擾／財印戰，則指出性格上的拉扯與內耗點。
+- **事業適性**：依格局類型（食傷洩秀／財官並透／印比扶身等）與「體用所繫之五行」，推導適合的產業類別、職位定位、工作模式（受僱／專業技術／創業）；體用為何字，事業就應「順其勢」而非逆。
+- **財運脈絡**：以財星與格局用神／相神／忌神之互動為主軸，論正偏財取向、財與官印食傷之間的氣機流轉，指出聚財與耗財的關鍵節點。
 
-## 五、此命格值得注意之處
+## 五、命格綜論與五行能量補益建議
+本項為全局收束，須整合第一項所得之**格局用神／相神／忌神**，與第二項所得之**調候用神／體用／清濁寒暖**，給出可操作的五行補益方向與隱憂提醒。寫作上應先論「全局氣勢一句話」，再展開以下兩部分。
+
+### （一）五行能量補益方向
+- **最需補強之五行**：明確指出（如「最需補火以暖土調候，次補金以洩土生水成財」），並說明此判斷係源自格局用神缺位、相神無力，抑或調候不足、體用受傷。若格局用神與調候用神方向不一致，須交代取捨優先序及兼顧之道。
+- **宜近之五行能量**：以具體可行的方式表達——方位（東南西北中）、顏色、季節、時段、適合的行業屬性、宜親近的人際五行屬性。
+- **宜避之五行能量**：指出忌神所在之五行，說明在何種情境下會引動破格或加重失衡（例如「忌再見燥土、避西南方久居」）。
+
+### （二）此命格值得注意之處
 - 特殊組合、罕見格局、潛藏隱憂、刑沖會合、空亡夾拱。
 - 大運流年中即將出現的關鍵轉折節點（如換大運、某五行得勢或受制）。
 - 特別提醒任何容易忽略的暗藏結構（如地支暗合、七殺攻身無制、梟神奪食等）。
@@ -143,7 +155,7 @@ def list_models(api_key: str) -> None:
         print(f"  {m.get('id')}")
 
 
-def build_payload(model: str, stream: bool, reasoning: bool) -> dict:
+def build_payload(model: str, stream: bool, reasoning: bool, max_tokens: int) -> dict:
     payload: dict = {
         "model": model,
         "messages": [
@@ -152,7 +164,7 @@ def build_payload(model: str, stream: bool, reasoning: bool) -> dict:
         ],
         "temperature": 0.6,
         "top_p": 0.95,
-        "max_tokens": 2048,
+        "max_tokens": max_tokens,
         "stream": stream,
     }
     if reasoning:
@@ -170,6 +182,7 @@ def run_stream(model: str, payload: dict, api_key: str) -> None:
     first_token_at: float | None = None
     text_chars = 0
     reasoning_chars = 0
+    finish_reason: str | None = None
 
     print(f"\n=== model={model} stream=True ===\n")
     with httpx.stream("POST", f"{BASE_URL}/chat/completions",
@@ -190,7 +203,13 @@ def run_stream(model: str, payload: dict, api_key: str) -> None:
                 chunk = json.loads(data)
             except json.JSONDecodeError:
                 continue
-            delta = chunk.get("choices", [{}])[0].get("delta", {})
+            choices = chunk.get("choices") or []
+            if not choices:
+                # 最終 chunk 通常只帶 usage、無 choices
+                continue
+            if choices[0].get("finish_reason"):
+                finish_reason = choices[0]["finish_reason"]
+            delta = choices[0].get("delta") or {}
             # 一般 content
             content = delta.get("content")
             if content:
@@ -218,6 +237,9 @@ def run_stream(model: str, payload: dict, api_key: str) -> None:
         print(f"[ttft]    {(first_token_at - t0)*1000:.0f} ms")
         print(f"[stream]  {(total - (first_token_at - t0)):.2f} s after first token")
     print(f"[chars]   answer={text_chars}  reasoning={reasoning_chars}")
+    if finish_reason:
+        marker = " ⚠️ truncated by max_tokens" if finish_reason == "length" else ""
+        print(f"[finish]  {finish_reason}{marker}")
     print_rate_limit_headers(r.headers)
 
 
@@ -268,6 +290,8 @@ def main() -> None:
     p.add_argument("--no-stream", action="store_true", help="disable SSE streaming")
     p.add_argument("--reasoning", action="store_true",
                    help="enable thinking for V4 reasoning models")
+    p.add_argument("--max-tokens", type=int, default=8192,
+                   help="completion token cap (default: 8192). 完整六段分析約需 6000-8000 tokens。")
     p.add_argument("--list", action="store_true", help="list available models then exit")
     args = p.parse_args()
 
@@ -279,7 +303,12 @@ def main() -> None:
         list_models(api_key)
         return
 
-    payload = build_payload(model=args.model, stream=not args.no_stream, reasoning=args.reasoning)
+    payload = build_payload(
+        model=args.model,
+        stream=not args.no_stream,
+        reasoning=args.reasoning,
+        max_tokens=args.max_tokens,
+    )
     if args.no_stream:
         run_blocking(args.model, payload, api_key)
     else:
