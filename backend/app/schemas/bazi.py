@@ -26,14 +26,6 @@ class BaziRequest(BaseModel):
     gender: str = Field("male", description="Gender: 'male' or 'female'")
 
 
-class AnalysisRequest(BaseModel):
-    """Request model for Bazi analysis."""
-    year_ganzhi: str = Field(..., description="Year pillar (干支)")
-    month_ganzhi: str = Field(..., description="Month pillar (干支)")
-    day_ganzhi: str = Field(..., description="Day pillar (干支)")
-    hour_ganzhi: str = Field(..., description="Hour pillar (干支)")
-
-
 # =============================================================================
 # Component Models
 # =============================================================================
@@ -143,11 +135,6 @@ class BaziResponse(BaseModel):
     nayin: Dict[str, str] = Field(..., description="Nayin elements for each pillar")
     empty_positions: Dict[str, Any] = Field(..., description="Empty position analysis")
     analysis: Dict[str, Any] = Field(..., description="Detailed Bazi analysis")
-
-
-class AnalysisResponse(BaseModel):
-    """Response model for Bazi analysis."""
-    analysis: str
 
 
 class ErrorResponse(BaseModel):

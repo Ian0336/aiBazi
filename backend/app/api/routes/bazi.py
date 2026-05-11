@@ -11,7 +11,7 @@ from datetime import datetime
 
 from fastapi import APIRouter, HTTPException, Depends
 
-from app.schemas import BaziRequest, BaziResponse, AnalysisRequest, AnalysisResponse
+from app.schemas import BaziRequest, BaziResponse
 from app.api.deps import get_calculator
 from bazi.bazi_calculator import BaziCalculator
 
@@ -99,53 +99,3 @@ async def calculate_bazi(
         )
 
 
-@router.post("/analyze", response_model=AnalysisResponse)
-async def analyze_bazi(
-    request: AnalysisRequest,
-    calculator: BaziCalculator = Depends(get_calculator)
-):
-    """
-    Generate AI analysis for given Bazi chart.
-    
-    Args:
-        request: Analysis request with four pillars
-        calculator: Bazi calculator instance (injected)
-        
-    Returns:
-        AnalysisResponse: AI-generated analysis text
-        
-    Raises:
-        HTTPException: If input is invalid or analysis fails
-    """
-    try:
-        # Basic validation
-        if not all([request.year_ganzhi, request.month_ganzhi,
-                    request.day_ganzhi, request.hour_ganzhi]):
-            raise HTTPException(
-                status_code=400,
-                detail={
-                    "error": "Invalid input",
-                    "message": "All ganzhi fields must be provided"
-                }
-            )
-
-        # Generate analysis
-        analysis = calculator.analyze_bazi(
-            request.year_ganzhi,
-            request.month_ganzhi,
-            request.day_ganzhi,
-            request.hour_ganzhi
-        )
-
-        return AnalysisResponse(analysis=analysis)
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail={
-                "error": "Analysis failed",
-                "message": str(e)
-            }
-        )

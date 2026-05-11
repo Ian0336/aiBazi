@@ -1,0 +1,14 @@
+Generic single-database alembic migrations for aiBazi backend.
+
+Usage:
+  # generate a migration after editing models
+  alembic revision --autogenerate -m "describe change"
+
+  # apply migrations
+  alembic upgrade head
+
+  # roll back one
+  alembic downgrade -1
+
+DATABASE_URL is read from .env via app.core.config — no need to set
+sqlalchemy.url in alembic.ini.
