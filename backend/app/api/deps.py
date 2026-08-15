@@ -27,8 +27,13 @@ sys.path.insert(0, os.path.join(_HERE, ".."))
 
 from bazi.bazi_calculator import BaziCalculator  # noqa: E402
 
+from app.ziwei import ZiweiCalculator  # noqa: E402
+
 # Singleton instance of the Bazi calculator.
 _calculator_instance: BaziCalculator | None = None
+
+# Singleton instance of the Ziwei calculator.
+_ziwei_calculator_instance: ZiweiCalculator | None = None
 
 
 def get_calculator() -> BaziCalculator:
@@ -37,6 +42,14 @@ def get_calculator() -> BaziCalculator:
     if _calculator_instance is None:
         _calculator_instance = BaziCalculator()
     return _calculator_instance
+
+
+def get_ziwei_calculator() -> ZiweiCalculator:
+    """Return the shared ZiweiCalculator singleton."""
+    global _ziwei_calculator_instance
+    if _ziwei_calculator_instance is None:
+        _ziwei_calculator_instance = ZiweiCalculator()
+    return _ziwei_calculator_instance
 
 
 _bearer_scheme = HTTPBearer(auto_error=False)

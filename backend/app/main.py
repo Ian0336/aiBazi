@@ -58,6 +58,7 @@ if __name__ == "__main__":
     print(f"🌐 CORS enabled for frontend origins")
     print(f"🔗 Health check: http://localhost:{settings.PORT}/health")
     print(f"📊 Bazi API: http://localhost:{settings.PORT}/api/bazi")
+    print(f"🔮 Ziwei API: http://localhost:{settings.PORT}/api/ziwei")
     print(f"🤖 Analysis API: http://localhost:{settings.PORT}/api/analyze")
 
     uvicorn.run(

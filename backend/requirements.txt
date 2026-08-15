@@ -8,6 +8,13 @@ lunar-python>=1.4.4
 colorama>=0.4.6
 httpx>=0.25.2
 
+# 紫微斗數排盤。單一維護者的小套件，0.5.0 已逐檔審計過（wheel == GitHub tag，
+# 無網路/子行程/動態執行），所以釘死版本，升級前重審。
+# 它宣告的 lunarcalendar / python-dateutil 實際從未 import；只需要上面的
+# pydantic + lunar-python。要最小依賴面就改用：
+#   pip install --no-deps iztro-py==0.5.0
+iztro-py==0.5.0
+
 # DB
 sqlalchemy>=2.0.30
 alembic>=1.13.0

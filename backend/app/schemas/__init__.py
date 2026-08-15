@@ -11,6 +11,15 @@ from app.schemas.bazi import (
     LiunianPillar,
     Pillar,
 )
+from app.schemas.ziwei import (
+    ZiweiDecadal,
+    ZiweiHoroscope,
+    ZiweiHoroscopeScope,
+    ZiweiPalace,
+    ZiweiRequest,
+    ZiweiResponse,
+    ZiweiStar,
+)
 
 __all__ = [
     "BaziRequest",
@@ -22,4 +31,11 @@ __all__ = [
     "LiunianPillar",
     "DayunEntry",
     "LiunianEntry",
+    "ZiweiRequest",
+    "ZiweiResponse",
+    "ZiweiPalace",
+    "ZiweiStar",
+    "ZiweiDecadal",
+    "ZiweiHoroscope",
+    "ZiweiHoroscopeScope",
 ]
