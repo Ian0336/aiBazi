@@ -5,16 +5,21 @@ import { motion, AnimatePresence } from 'framer-motion';
 import BaziForm from '@/components/BaziForm';
 import FiveElementsBalance from '@/components/FiveElementsBalance';
 import TraditionalBaziChart from '@/components/TraditionalBaziChart';
+import ZiweiPanel from '@/components/ZiweiPanel';
 import StickyHeader from '@/components/StickyHeader';
 import { BaziChart as BaziChartType, BaziInput } from '@/types/bazi';
 import { useAtom } from 'jotai';
-import { chartAtom, originalInputAtom } from '@/store/jotai';
+import { chartAtom, originalInputAtom, ziweiChartAtom } from '@/store/jotai';
+
+type ChartTab = 'bazi' | 'ziwei';
 
 export default function HomePage() {
   const [chart, setChart] = useAtom(chartAtom);
   const [originalInput, setOriginalInput] = useAtom(originalInputAtom);
+  const [, setZiweiChart] = useAtom(ziweiChartAtom);
   const [isCalculating, setIsCalculating] = useState<boolean>(false);
   const [sequenceState  , setSequenceState] = useState<'visible' | 'exit'>('visible');
+  const [chartTab, setChartTab] = useState<ChartTab>('bazi');
 
 
   const scrollToTop = () => {
@@ -27,12 +32,16 @@ export default function HomePage() {
   const handleCalculate = (newChart: BaziChartType, input: BaziInput) => {
     setChart(newChart);
     setOriginalInput(input);
+    setZiweiChart(null);
+    setChartTab('bazi');
     scrollToTop();
   };
 
   const handleEdit = () => {
     setChart(null);
     setOriginalInput(null);
+    setZiweiChart(null);
+    setChartTab('bazi');
     setSequenceState('exit');
     scrollToTop();
   };
@@ -249,26 +258,63 @@ export default function HomePage() {
               transition={{ duration: 0.8, ease: "easeOut" }}
               className="space-y-12"
             >
-              {/* Traditional Bazi Chart */}
-              <motion.section
-                variants={chartSectionVariants}
-                initial="hidden"
-                animate="visible"
-                className="animate-fade-in-brush"
-              >
-                <TraditionalBaziChart chart={chart} />
-              </motion.section>
+              {/* Chart type switcher */}
+              <div className="flex justify-center">
+                <div className="inline-flex rounded-sm border border-gray-300 bg-white/60 p-1">
+                  {([
+                    ['bazi', '八字命盤'],
+                    ['ziwei', '紫微斗數'],
+                  ] as const).map(([value, label]) => (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => setChartTab(value)}
+                      className={`chinese-text rounded-sm px-5 py-1.5 text-sm transition-colors ${
+                        chartTab === value
+                          ? 'bg-gray-800 text-white'
+                          : 'text-gray-600 hover:text-gray-900'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-              {/* Five Elements Balance */}
-              <motion.section
-                variants={chartSectionVariants}
-                initial="hidden"
-                animate="visible"
-                className="animate-lotus-bloom wuxing-analysis"
-                style={{ animationDelay: '0.3s' }}
-              >
-                <FiveElementsBalance chart={chart} />
-              </motion.section>
+              {chartTab === 'bazi' ? (
+                <>
+                  {/* Traditional Bazi Chart */}
+                  <motion.section
+                    variants={chartSectionVariants}
+                    initial="hidden"
+                    animate="visible"
+                    className="animate-fade-in-brush"
+                  >
+                    <TraditionalBaziChart chart={chart} />
+                  </motion.section>
+
+                  {/* Five Elements Balance */}
+                  <motion.section
+                    variants={chartSectionVariants}
+                    initial="hidden"
+                    animate="visible"
+                    className="animate-lotus-bloom wuxing-analysis"
+                    style={{ animationDelay: '0.3s' }}
+                  >
+                    <FiveElementsBalance chart={chart} />
+                  </motion.section>
+                </>
+              ) : (
+                originalInput && (
+                  <motion.section
+                    variants={chartSectionVariants}
+                    initial="hidden"
+                    animate="visible"
+                  >
+                    <ZiweiPanel input={originalInput} />
+                  </motion.section>
+                )
+              )}
             </motion.div>
           )}
         </AnimatePresence>
