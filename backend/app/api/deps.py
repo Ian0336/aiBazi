@@ -13,14 +13,17 @@ from app.db.session import get_db
 from app.models.user import User
 from app.services.auth_service import get_user
 
-# Two sys.path entries needed for the legacy bazi library to load cleanly:
+# Two sys.path entries needed for the vendored bazi library to load cleanly:
 #
-#   1. `app/external/bazi/` — so the legacy modules can resolve their internal
+#   1. `app/external/bazi/` — so the vendored modules can resolve their internal
 #      bare imports (`from ganzhi import *`, `from datas import *`, ...).
-#   2. `app/` (inserted AFTER, ending up at sys.path[0]) — so the bare name
-#      `bazi` in `from bazi.bazi_calculator import BaziCalculator` resolves to
-#      the `app/bazi/` package, NOT to `app/external/bazi/bazi.py` (a script
-#      that runs argparse on import and would crash uvicorn / alembic).
+#   2. `app/` (inserted AFTER, ending up at sys.path[0]) — so `bazi` in
+#      `from bazi.bazi_calculator import BaziCalculator` resolves to the
+#      `app/bazi/` package, and so `external.bazi.*` resolves at all.
+#
+# Keep `app/` first: upstream ships a `bazi.py` CLI that runs argparse on
+# import. It is not vendored (see app/external/bazi/VENDORED.md), but pulling
+# a fuller copy of upstream back in would shadow `app/bazi/` without this order.
 _HERE = os.path.dirname(__file__)
 sys.path.insert(0, os.path.join(_HERE, "..", "external", "bazi"))
 sys.path.insert(0, os.path.join(_HERE, ".."))
